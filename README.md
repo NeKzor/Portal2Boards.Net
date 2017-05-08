@@ -17,7 +17,7 @@ changelog = client.GetChangelogAsync("?maxDaysAgo=1&wr=1").GetAwaiter().GetResul
 ```
 
 ### 3.)
-```
+```cs
 var dontclipthis = changelog.Data.Where(d => d.PlayerName == "Msushi" && d.PostRank == 2);
 ```
 
