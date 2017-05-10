@@ -7,8 +7,9 @@ namespace Portal2Boards.Net.Test
     {
 		private static readonly BoardParameters _latestWorldRecords = new BoardParameters()
 		{
-			[Parameters.MaxDaysAgo] = 7,
-			[Parameters.WorldRecord] = 1
+			//[Parameters.MaxDaysAgo] = 7,
+			//[Parameters.WorldRecord] = 1,
+			[Parameters.MapId] = 47458
 		};
 
 		private static void Main(string[] args)
@@ -19,7 +20,8 @@ namespace Portal2Boards.Net.Test
 				Console.WriteLine($"Fetched {changelog.Data.Count} entries.");
 				foreach (var entry in changelog)
 				{
-					Console.WriteLine($"[{entry.EntryId}] " +
+					Console.WriteLine($"[{entry.EntryId}]\t" +
+									  $"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
 									  $"{entry.Map.Name} in " +
 									  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
 									  $"{entry.Player.Name}");

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Portal2Boards.Net.API.Models;
 
 namespace Portal2Boards.Net.Entities
@@ -7,6 +8,7 @@ namespace Portal2Boards.Net.Entities
 	public class EntryData
 	{
 		public uint EntryId { get; set; }
+		public DateTime? Date { get; set; }
 		public EntryMap Map { get; set; }
 		public EntryScore Score { get; set; }
 		public EntryRank Rank { get; set; }
@@ -27,6 +29,7 @@ namespace Portal2Boards.Net.Entities
 			if (data != default(ChangelogData))
 			{
 				EntryId = data.Id;
+				Date = (data.TimeGained != default(string)) ? DateTime.Parse(data.TimeGained) : default(DateTime?);
 				Map = new EntryMap(data.MapId, data.ChapterId, data.ChamberName);
 				Score = new EntryScore(data.Score, data.PreviousScore, data.Improvement);
 				Rank = new EntryRank(data.PostRank, data.PreRank, data.RankImprovement);

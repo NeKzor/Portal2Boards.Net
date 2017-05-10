@@ -23,6 +23,8 @@ namespace Portal2Boards.Net.API.Models
 		public uint? PostRank { get; set; }
 		[JsonProperty("wr_gain")]
 		public string WrGain { get; set; }
+		[JsonProperty("time_gained")]
+		public string TimeGained { get; set; }
 		[JsonProperty("hasDemo")]
 		public string HasDemo { get; set; }
 		[JsonProperty("youtubeID")]
