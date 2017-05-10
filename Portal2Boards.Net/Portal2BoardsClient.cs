@@ -46,7 +46,7 @@ namespace Portal2Boards.Net
 			}
 			catch (Exception e)
 			{
-				Debug.WriteLine($"[Portal2Boards.Net] Failed to fetch changelog object.\nStacktrace: {e}");
+				Debug.WriteLine($"[Portal2Boards.Net] Failed to fetch changelog object.\nStack trace: {e}");
 			}
 			return result;
 		}
@@ -59,7 +59,7 @@ namespace Portal2Boards.Net
 			}
 			catch (Exception e)
 			{
-				Debug.WriteLine($"[Portal2Boards.Net] Failed to fetch changelog object.\nStacktrace: {e}");
+				Debug.WriteLine($"[Portal2Boards.Net] Failed to fetch changelog object.\nStack trace: {e}");
 			}
 			return result;
 		}

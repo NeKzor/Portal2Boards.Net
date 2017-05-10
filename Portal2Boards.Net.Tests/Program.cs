@@ -1,7 +1,7 @@
 ﻿using System;
 using Portal2Boards.Net.API;
 
-namespace Portal2Boards.Net.Tests
+namespace Portal2Boards.Net.Test
 {
 	internal static class Program
     {
@@ -21,7 +21,7 @@ namespace Portal2Boards.Net.Tests
 				{
 					Console.WriteLine($"[{entry.EntryId}] " +
 									  $"{entry.Map.Name} in " +
-									  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unkown"} by " +
+									  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
 									  $"{entry.Player.Name}");
 				}
 				Console.ReadKey();
