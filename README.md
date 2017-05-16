@@ -1,4 +1,16 @@
-# Usage
+﻿# Overview
+
+|Namespace|Status|Description|
+|---|:-:|---|
+|Portal2Boards.Net|✔|Client for fetching data.|
+|Portal2Boards.Net.API|✔|Advanced parameters for getting changelog.|
+|Portal2Boards.Net.API.Models|✔|API classes.|
+|Portal2Boards.Net.Entities|✖|API models conversion.|
+|Portal2Boards.Net.Extensions|✖|Game information.|
+
+---
+
+# Example: Changelog
 
 ### Simple
 
@@ -31,7 +43,7 @@ using Portal2Boards.Net.API;
 
 #### 2.)
 ```cs
-var parameters = new BoardParameters()
+var parameters = new ChangelogParameters()
 {
     [Parameters.MaxDaysAgo] = 7,
     [Parameters.WorldRecord] = 1

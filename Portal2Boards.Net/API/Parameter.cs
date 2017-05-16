@@ -2,7 +2,7 @@
 
 namespace Portal2Boards.Net.API
 {
-	[DebuggerDisplay("{Parameter,nq}")]
+	[DebuggerDisplay("{Value,nq}")]
 	public class Parameter : IParameter
 	{
 		public string Value { get; set; }

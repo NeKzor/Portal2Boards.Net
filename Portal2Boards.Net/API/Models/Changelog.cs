@@ -6,7 +6,7 @@ using Portal2Boards.Net.Entities;
 namespace Portal2Boards.Net.API.Models
 {
 	[DebuggerDisplay("Count = {Data.Count,nq}")]
-	public sealed class Changelog : IEnumerable<EntryData>
+	public sealed class Changelog : IModel, IEnumerable<EntryData>
     {
 		public IReadOnlyCollection<ChangelogData> Data { get; set; }
 

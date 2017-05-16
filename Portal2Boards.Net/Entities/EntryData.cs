@@ -7,7 +7,7 @@ namespace Portal2Boards.Net.Entities
 	[DebuggerDisplay("{EntryId,nq}")]
 	public class EntryData
 	{
-		public uint EntryId { get; set; }
+		public uint Id { get; set; }
 		public DateTime? Date { get; set; }
 		public EntryMap Map { get; set; }
 		public EntryScore Score { get; set; }
@@ -17,30 +17,32 @@ namespace Portal2Boards.Net.Entities
 		public bool IsBanned { get; set; }
 		public bool IsSubmission { get; set; }
 		public bool IsWorldRecord { get; set; }
-		public bool HasDemo { get; set; }
+		public bool DemoExists { get; set; }
 		public string YouTubeId { get; set; }
 		public string Comment { get; set; }
+		public string DemoLink
+			=> $"https://board.iverb.me/getDemo?id={Id}";
 
 		public EntryData()
 		{
 		}
-		public EntryData(ChangelogData data)
+		public EntryData(ChangelogData changelog)
 		{
-			if (data != default(ChangelogData))
+			if (changelog != default(ChangelogData))
 			{
-				EntryId = data.Id;
-				Date = (data.TimeGained != default(string)) ? DateTime.Parse(data.TimeGained) : default(DateTime?);
-				Map = new EntryMap(data.MapId, data.ChapterId, data.ChamberName);
-				Score = new EntryScore(data.Score, data.PreviousScore, data.Improvement);
-				Rank = new EntryRank(data.PostRank, data.PreRank, data.RankImprovement);
-				Points = new EntryPoints(data.PostPoints, data.PrePoints, data.PointImprovement);
-				Player = new EntryPlayer(data.PlayerName, data.Avatar, data.ProfileNumber);
-				IsBanned = data.Banned == "1";
-				IsSubmission = data.Submission == "1";
-				IsWorldRecord = data.WrGain == "1";
-				HasDemo = data.HasDemo == "1";
-				YouTubeId = data.YouTubeId;
-				Comment = data.Note;
+				Id = changelog.Id;
+				Date = (string.IsNullOrEmpty(changelog.TimeGained)) ? default(DateTime?) : DateTime.Parse(changelog.TimeGained);
+				Map = new EntryMap(changelog.MapId, changelog.ChapterId, changelog.ChamberName);
+				Score = new EntryScore(changelog.Score, changelog.PreviousScore, changelog.Improvement);
+				Rank = new EntryRank(changelog.PostRank, changelog.PreRank, changelog.RankImprovement);
+				Points = new EntryPoints(changelog.PostPoints, changelog.PrePoints, changelog.PointImprovement);
+				Player = new EntryPlayer(changelog.PlayerName, changelog.Avatar, changelog.ProfileNumber);
+				IsBanned = changelog.Banned == "1";
+				IsSubmission = changelog.Submission == "1";
+				IsWorldRecord = changelog.WrGain == "1";
+				DemoExists = changelog.HasDemo == "1";
+				YouTubeId = changelog.YouTubeId;
+				Comment = changelog.Note;
 			}
 		}
 	}
