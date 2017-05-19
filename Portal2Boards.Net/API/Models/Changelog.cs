@@ -9,6 +9,7 @@ namespace Portal2Boards.Net.API.Models
 	public sealed class Changelog : IModel, IEnumerable<EntryData>
     {
 		public IReadOnlyCollection<ChangelogData> Data { get; set; }
+		public bool EntityExists => true;
 
 		public Changelog()
 		{

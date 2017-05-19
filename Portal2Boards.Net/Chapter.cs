@@ -2,7 +2,7 @@
 {
 	public enum Chapter
 	{
-		DontCare,
+		DontCareOrUnknown,
 		TeamBuilding,
 		MassAndVelocity,
 		HardLight,

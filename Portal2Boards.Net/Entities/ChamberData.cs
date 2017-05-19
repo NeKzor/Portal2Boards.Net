@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using Portal2Boards.Net.API.Models;
+using Portal2Boards.Net.Utilities;
 
 namespace Portal2Boards.Net.Entities
 {
-	[DebuggerDisplay("{EntryId,nq}")]
-	public class ChamberData
+	[DebuggerDisplay("{Id,nq}")]
+	public class ChamberData : IEntity
 	{
 		public uint Id { get; set; }
 		public DateTime? Date { get; set; }
-		public ChamberPlayer Player { get; set; }
+		public User Player { get; set; }
 		public uint? PlayerRank { get; set; }
 		public uint? ScoreRank { get; set; }
 		public uint? Score { get; set; }
@@ -25,18 +26,25 @@ namespace Portal2Boards.Net.Entities
 		}
 		public ChamberData(BoardData board)
 		{
-			if (board != default(BoardData))
+			try
 			{
-				Id = board.Data.Score.ChangelogId;
-				Date = (string.IsNullOrEmpty(board.Data.Score.Date)) ? default(DateTime?) : DateTime.Parse(board.Data.Score.Date);
-				Player = new ChamberPlayer(board.Data.User.BoardName, board.Data.User.Avatar, board.Id);
-				PlayerRank = board.Data.Score.PlayerRank;
-				ScoreRank = board.Data.Score.ScoreRank;
-				Score = board.Data.Score.Score;
-				DemoExists = board.Data.Score.HasDemo == "1";
-				YouTubeId = board.Data.Score.YouTubeId;
-				IsSubmission = board.Data.Score.Submission == "1";
-				Comment = board.Data.Score.Note;
+				if (board != default(BoardData))
+				{
+					Id = board.Data.Score.ChangelogId;
+					Date = (string.IsNullOrEmpty(board.Data.Score.Date)) ? default(DateTime?) : DateTime.Parse(board.Data.Score.Date);
+					Player = new User(board.Data.User.BoardName, board.Data.User.Avatar, board.Id);
+					PlayerRank = board.Data.Score.PlayerRank;
+					ScoreRank = board.Data.Score.ScoreRank;
+					Score = board.Data.Score.Score;
+					DemoExists = board.Data.Score.HasDemo == "1";
+					YouTubeId = board.Data.Score.YouTubeId;
+					IsSubmission = board.Data.Score.Submission == "1";
+					Comment = board.Data.Score.Note;
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogEntityException<ChamberData>(e).GetAwaiter().GetResult();
 			}
 		}
 	}

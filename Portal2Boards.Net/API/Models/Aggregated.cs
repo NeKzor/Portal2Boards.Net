@@ -1,37 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Portal2Boards.Net.Entities;
+﻿using System.Collections.Generic;
 
 namespace Portal2Boards.Net.API.Models
 {
-	[DebuggerDisplay("Count = {Data.Count,nq}")]
-	public sealed class Aggregated : IModel//, IEnumerable<ChamberData>
+	public sealed class Aggregated : IModel
     {
-		public IReadOnlyCollection<AggregatedData> Data { get; set; }
+		public IReadOnlyDictionary<ulong, AggregatedEntryData> DataPoints { get; set; }
+		public IReadOnlyDictionary<ulong, AggregatedEntryData> DataTimes { get; set; }
+		public bool EntityExists => false;
 
 		public Aggregated()
 		{
 		}
-		public Aggregated(Dictionary<string, AggregatedEntryData> data)
+		public Aggregated(AggregatedData data)
 		{
-			var temp = new List<AggregatedData>();
-			foreach (var item in data)
-				temp.Add(new AggregatedData(item.Key, item.Value));
-			Data = temp;
+			DataPoints = data.Points;
+			DataTimes = data.Times;
 		}
-
-		//public IReadOnlyCollection<ChamberData> ConvertToEntries(IReadOnlyCollection<AggregatedData> data = default(IReadOnlyCollection<AggregatedData>))
-		//{
-		//	var temp = new List<ChamberData>();
-		//	//foreach (ChamberData entry in data ?? Data)
-		//	//	temp.Add(entry);
-		//	return temp;
-		//}
-
-		//IEnumerator IEnumerable.GetEnumerator()
-		//	=> Data.GetEnumerator();
-		//IEnumerator<ChamberData> IEnumerable<ChamberData>.GetEnumerator()
-		//	=> ConvertToEntries(Data).GetEnumerator();
 	}
 }

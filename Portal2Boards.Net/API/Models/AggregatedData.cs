@@ -1,31 +1,24 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Newtonsoft.Json;
-using Portal2Boards.Net.Entities;
 
 namespace Portal2Boards.Net.API.Models
 {
-	[DebuggerDisplay("{Id,nq}")]
+	[DebuggerDisplay("Count = {Points.Count + Times.Count,nq}")]
 	public sealed class AggregatedData
 	{
-		public string Id { get; set; }
-		public AggregatedEntryData Data { get; set; }
-
-		public AggregatedData(string id, AggregatedEntryData data)
-		{
-			Id = id;
-			Data = data;
-		}
-
-		//public static explicit operator ChamberData(BoardData data)
-		//	=> new ChamberData(data);
+		[JsonProperty("Points")]
+		public Dictionary<ulong, AggregatedEntryData> Points { get; set; }
+		[JsonProperty("Times")]
+		public Dictionary<ulong, AggregatedEntryData> Times { get; set; }
 	}
 
 	public sealed class AggregatedEntryData
 	{
 		[JsonProperty("userData")]
-		public AggregatedEntryUserData User { get; set; }
+		public AggregatedEntryUserData UserData { get; set; }
 		[JsonProperty("scoreData")]
-		public AggregatedEntryScoreData Score { get; set; }
+		public AggregatedEntryScoreData ScoreData { get; set; }
 	}
 
 	public sealed class AggregatedEntryUserData

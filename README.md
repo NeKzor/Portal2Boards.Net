@@ -5,11 +5,10 @@
 |Portal2Boards.Net|✔|Client for fetching data.|
 |Portal2Boards.Net.API|✔|Advanced parameters for getting changelog.|
 |Portal2Boards.Net.API.Models|✔|API classes.|
-|Portal2Boards.Net.Entities|✖|API models conversion.|
-|Portal2Boards.Net.Extensions|✖|Game information.|
+|Portal2Boards.Net.Entities|✔|API models conversion.|
+|Portal2Boards.Net.Extensions|✔|Game information.|
 
 ---
-
 # Example: Changelog
 
 ### Simple
@@ -64,3 +63,6 @@ using (var client = new Portal2BoardsClient(parameters))
     }
 }
 ```
+
+---
+#### Check out [Portal2Boards.Net.Test](https://github.com/NeKzor/Portal2Boards.Net/master/Portal2Boards.Net.Test/blob/Program.cs) for more examples.

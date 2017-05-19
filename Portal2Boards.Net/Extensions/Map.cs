@@ -2,6 +2,8 @@
 {
 	public sealed class Map
 	{
+		public static uint Count = 0;
+		public uint Index;
 		public string Name { get; set; }
 		public string Alias { get; set; }
 		public MapType Type { get; set; }
@@ -27,6 +29,8 @@
 			BestTimeId = bestTimeId;
 			BestPortalsId = bestPortalsId;
 			ChapterId = chapterId;
+			Index = Count;
+			Count++;
 		}
 	}
 }

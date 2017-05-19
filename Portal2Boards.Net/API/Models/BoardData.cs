@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Newtonsoft.Json;
 using Portal2Boards.Net.Entities;
 
@@ -47,7 +46,7 @@ namespace Portal2Boards.Net.API.Models
 		public string Date { get; set; }
 		[JsonProperty("hasDemo")]
 		public string HasDemo { get; set; }
-		[JsonProperty("youtubeId")]
+		[JsonProperty("youtubeID")]
 		public string YouTubeId { get; set; }
 	}
 
