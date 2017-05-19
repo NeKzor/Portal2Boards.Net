@@ -65,4 +65,4 @@ using (var client = new Portal2BoardsClient(parameters))
 ```
 
 ---
-#### Check out [Portal2Boards.Net.Test](https://github.com/NeKzor/Portal2Boards.Net/master/Portal2Boards.Net.Test/blob/Program.cs) for more examples.
+#### Check out [Portal2Boards.Net.Test](https://github.com/NeKzor/Portal2Boards.Net/blob/master/Portal2Boards.Net.Test/Program.cs) for more examples.
