@@ -20,8 +20,8 @@ namespace Portal2Boards.Net.Test
 			//GetAggregated();
 			//GetLeaderboard();
 			//GetChangelog();
-			GetProfile();
-			//HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
+			//GetProfile();
+			HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
 		}
 
 		internal static void GetAggregated()
