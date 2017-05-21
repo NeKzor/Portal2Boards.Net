@@ -9,17 +9,18 @@ namespace Portal2Boards.Net.API.Models
 	public sealed class Board : IModel, IEnumerable<ChamberData>
     {
 		public IReadOnlyCollection<BoardData> Data { get; set; }
-		public bool EntityExists => true;
+		public string RequestUrl { get; internal set; }
 
 		public Board()
 		{
 		}
-		public Board(IReadOnlyDictionary<ulong, BoardEntryData> data)
+		public Board(IReadOnlyDictionary<ulong, BoardEntryData> data, string url)
 		{
 			var temp = new List<BoardData>();
 			foreach (var item in data)
 				temp.Add(new BoardData(item.Key, item.Value));
 			Data = temp;
+			RequestUrl = url;
 		}
 
 		public IReadOnlyCollection<ChamberData> ConvertToEntries(IReadOnlyCollection<BoardData> data = default(IReadOnlyCollection<BoardData>))

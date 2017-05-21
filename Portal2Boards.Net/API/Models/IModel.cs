@@ -2,6 +2,6 @@
 {
 	public interface IModel
     {
-		bool EntityExists { get; }
+		string RequestUrl { get; }
     }
 }

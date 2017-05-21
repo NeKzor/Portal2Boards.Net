@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFramework>netstandard1.2</TargetFramework>
     <Authors>NeKz</Authors>
     <Description>ok</Description>
     <Copyright>Copyright © NeKz 2017</Copyright>

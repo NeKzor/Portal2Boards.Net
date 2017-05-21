@@ -23,6 +23,12 @@ namespace Portal2Boards.Net.Entities
 		public string Comment { get; set; }
 		public string DemoLink
 			=> $"https://board.iverb.me/getDemo?id={Id}";
+		public bool VideoExists
+			=> !(string.IsNullOrEmpty(YouTubeId));
+		public string VideoLink
+			=> $"https://youtu.be/{YouTubeId}";
+		public string Link
+			=> $"https://board.iverb.me/chamber/{Id}";
 
 		public EntryData()
 		{

@@ -6,14 +6,15 @@ namespace Portal2Boards.Net.API.Models
 	public sealed class Profile : IModel
 	{
 		public ProfileData Data { get; set; }
-		public bool EntityExists => true;
+		public string RequestUrl { get; internal set; }
 
 		public Profile()
 		{
 		}
-		public Profile(ProfileData data)
+		public Profile(ProfileData data, string url)
 		{
 			Data = data;
+			RequestUrl = url;
 		}
 	}
 }

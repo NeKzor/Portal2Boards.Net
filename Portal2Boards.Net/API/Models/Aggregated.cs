@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Portal2Boards.Net.API.Models
 {
@@ -6,15 +7,16 @@ namespace Portal2Boards.Net.API.Models
     {
 		public IReadOnlyDictionary<ulong, AggregatedEntryData> DataPoints { get; set; }
 		public IReadOnlyDictionary<ulong, AggregatedEntryData> DataTimes { get; set; }
-		public bool EntityExists => false;
+		public string RequestUrl { get; internal set; }
 
 		public Aggregated()
 		{
 		}
-		public Aggregated(AggregatedData data)
+		public Aggregated(AggregatedData data, string url)
 		{
 			DataPoints = data.Points;
 			DataTimes = data.Times;
+			RequestUrl = url;
 		}
 	}
 }

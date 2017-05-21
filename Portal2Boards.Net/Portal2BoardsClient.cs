@@ -14,6 +14,7 @@ namespace Portal2Boards.Net
 	{
 		public const string BaseApiUrl = "https://board.iverb.me";
 		public ChangelogParameters Parameters { get; set; }
+		public ResponseType LastResponse { get; internal set; } = ResponseType.Unknown;
 		private WebClient _client { get; set; }
 
 		public Portal2BoardsClient(HttpClient client = default(HttpClient))
@@ -31,11 +32,14 @@ namespace Portal2Boards.Net
 			var result = default(Changelog);
 			try
 			{
-				result = new Changelog(await _client.GetJsonObjectAsync<ChangelogData[]>($"{BaseApiUrl}/changelog/json{((string.IsNullOrEmpty(query)) ? await Parameters.ToQuery().ConfigureAwait(false) : query)}").ConfigureAwait(false));
+				var url = $"{BaseApiUrl}/changelog/json{((string.IsNullOrEmpty(query)) ? await Parameters.ToQuery().ConfigureAwait(false) : query)}";
+				var obj = await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
+				result = new Changelog(obj, url);
+				LastResponse = ResponseType.Success;
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<Changelog>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<Changelog>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
@@ -44,11 +48,14 @@ namespace Portal2Boards.Net
 			var result = default(Board);
 			try
 			{
-				result = new Board(await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>($"{BaseApiUrl}/chamber/{chamberId}/json").ConfigureAwait(false));
+				var url = $"{BaseApiUrl}/chamber/{chamberId}/json";
+				var obj = await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+				result = new Board(obj, url);
+				LastResponse = ResponseType.Success;
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<Board>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<Board>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
@@ -57,11 +64,14 @@ namespace Portal2Boards.Net
 			var result = default(Board);
 			try
 			{
-				result = new Board(await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>($"{BaseApiUrl}/chamber/{map.BestTimeId}/json").ConfigureAwait(false));
+				var url = $"{BaseApiUrl}/chamber/{map.BestTimeId}/json";
+				var obj = await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+				result = new Board(obj, url);
+				LastResponse = ResponseType.Success;
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<Board>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<Board>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
@@ -70,11 +80,14 @@ namespace Portal2Boards.Net
 			var result = default(Profile);
 			try
 			{
-				result = new Profile(await _client.GetJsonObjectAsync<ProfileData>($"{BaseApiUrl}/profile/{boardName.Trim()}/json").ConfigureAwait(false));
+				var url = $"{BaseApiUrl}/profile/{boardName.Trim()}/json";
+				var obj = await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+				result = new Profile(obj, url);
+				LastResponse = ResponseType.Success;
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<Profile>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<Profile>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
@@ -83,11 +96,14 @@ namespace Portal2Boards.Net
 			var result = default(Profile);
 			try
 			{
-				result = new Profile(await _client.GetJsonObjectAsync<ProfileData>($"{BaseApiUrl}/profile/{steamId}/json").ConfigureAwait(false));
+				var url = $"{BaseApiUrl}/profile/{steamId}/json";
+				var obj = await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+				result = new Profile(obj, url);
+				LastResponse = ResponseType.Success;
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<Profile>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<Profile>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
@@ -96,15 +112,18 @@ namespace Portal2Boards.Net
 			var result = default(Aggregated);
 			try
 			{
-				result = new Aggregated(await _client.GetJsonObjectAsync<AggregatedData>($"{BaseApiUrl}/aggregated/{await GetMode(id).ConfigureAwait(false)}/json").ConfigureAwait(false));
+				var url = $"{BaseApiUrl}/aggregated/{await GetMode(id).ConfigureAwait(false)}/json";
+				var obj = await _client.GetJsonObjectAsync<AggregatedData>(url).ConfigureAwait(false);
+				result = new Aggregated(obj, url);
+				LastResponse = ResponseType.Success;
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<Aggregated>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<Aggregated>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
-		public async Task<T> Get<T>(dynamic obj)
+		public async Task<T> Get<T>(dynamic parameter)
 			where T : class, IModel, new()
 		{
 			var result = new T();
@@ -113,25 +132,37 @@ namespace Portal2Boards.Net
 				// Would look better with switch case, have to wait for c# 7.1 tho...
 				if (result is Changelog)
 				{
-					result = new Changelog(await _client.GetJsonObjectAsync<ChangelogData[]>($"{BaseApiUrl}/changelog/json{((string.IsNullOrEmpty(obj)) ? await Parameters.ToQuery().ConfigureAwait(false) : obj)}").ConfigureAwait(false)) as T;
+					var url = $"{BaseApiUrl}/changelog/json{((string.IsNullOrEmpty(parameter)) ? await Parameters.ToQuery().ConfigureAwait(false) : parameter)}";
+					var obj = await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
+					result = new Changelog(obj, url) as T;
+					LastResponse = ResponseType.Success;
 				}
 				else if (result is Board)
 				{
-					result = new Board(await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>($"{BaseApiUrl}/chamber/{((obj is Map) ? obj.BestTimeId : obj)}/json").ConfigureAwait(false)) as T;
+					var url = $"{BaseApiUrl}/chamber/{((parameter is Map) ? parameter.BestTimeId : parameter)}/json";
+					var obj = await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+					result = new Board(obj, url) as T;
+					LastResponse = ResponseType.Success;
 				}
 				else if (result is Profile)
 				{
-					result = new Profile(await _client.GetJsonObjectAsync<ProfileData>($"{BaseApiUrl}/profile/{((obj is string) ? obj.Trim() : obj)}/json").ConfigureAwait(false)) as T;
+					var url = $"{BaseApiUrl}/profile/{((parameter is string) ? parameter.Trim() : parameter)}/json";
+					var obj = await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+					result = new Profile(obj, url) as T;
+					LastResponse = ResponseType.Success;
 				}
 				else if (result is Aggregated)
 				{
-					Enum.TryParse<Chapter>(obj?.ToString(), out Chapter id);
-					result = new Aggregated(await _client.GetJsonObjectAsync<AggregatedData>($"{BaseApiUrl}/aggregated/{await GetMode(id).ConfigureAwait(false)}/json").ConfigureAwait(false)) as T;
+					Enum.TryParse<Chapter>(parameter?.ToString(), out Chapter id);
+					var url = $"{BaseApiUrl}/aggregated/{await GetMode(id).ConfigureAwait(false)}/json";
+					var obj = await _client.GetJsonObjectAsync<AggregatedData>(url).ConfigureAwait(false);
+					result = new Aggregated(obj, url) as T;
+					LastResponse = ResponseType.Success;
 				}
 			}
 			catch (Exception e)
 			{
-				await Logger.LogModelException<T>(e).ConfigureAwait(false);
+				LastResponse = await Logger.LogModelException<T>(e).ConfigureAwait(false);
 			}
 			return result;
 		}
