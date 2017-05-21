@@ -14,6 +14,12 @@
 			=> ((Type == MapType.SinglePlayer) || Type == (MapType.Cooperative))
 				&& (BestTimeId != default(uint?))
 				&& (BestPortalsId != default(uint?));
+		public string Link
+			=> $"https://board.iverb.me/chamber/{BestTimeId}";
+		public string BestTimeSteamLink
+			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestTimeId}";
+		public string BestPortalsSteamLink
+			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestPortalsId}";
 
 		public Map(
 			string name = default(string),

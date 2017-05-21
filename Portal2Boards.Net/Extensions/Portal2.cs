@@ -142,11 +142,26 @@ namespace Portal2Boards.Net.Extensions
 
 		public static float? AsTime(this uint? time)
 			=> (time != default(uint?)) ? (float)Math.Floor((float)time / 100) : default(float?);
+		public static float AsTime(this uint time)
+			=> (time != default(uint)) ? (float)Math.Floor((float)time / 100) : default(float);
 
-		public static string ToString(this uint? time)
+		public static string AsTimeToString(this uint? time)
 		{
 			if (time == default(uint?))
-				return string.Empty;
+				return default(string);
+
+			var centi = time % 100;
+			var totalsec = Math.Floor((decimal)time / 100);
+			var sec = totalsec % 60;
+			var min = Math.Floor(totalsec / 60);
+			return (min > 0)
+				? $"{min}:{((sec < 10) ? $"0{sec}" : sec.ToString())}.{((centi < 10) ? $"0{centi}" : centi.ToString())}"
+				: $"{sec}.{((centi < 10) ? $"0{centi}" : centi.ToString())}";
+		}
+		public static string AsTimeToString(this uint time)
+		{
+			if (time == default(uint))
+				return default(string);
 
 			var centi = time % 100;
 			var totalsec = Math.Floor((decimal)time / 100);
@@ -157,7 +172,9 @@ namespace Portal2Boards.Net.Extensions
 				: $"{sec}.{((centi < 10) ? $"0{centi}" : centi.ToString())}";
 		}
 
-		public static string ToString(this DateTime? date)
+		public static string DateTimeToString(this DateTime? date)
 			=> (date != default(DateTime?)) ? date?.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
+		public static string DateTimeToString(this DateTime date)
+			=> (date != default(DateTime)) ? date.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
 	}
 }
