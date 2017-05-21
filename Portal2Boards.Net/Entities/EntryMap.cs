@@ -6,7 +6,7 @@
 		public uint ChapterId { get; set; }
 		public string Name { get; set; }
 		public string Link
-			=> $"http://board.iverb.me/chamber/{SteamId}";
+			=> $"https://board.iverb.me/chamber/{SteamId}";
 		public string SteamLink
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{SteamId}";
 

@@ -24,9 +24,9 @@ namespace Portal2Boards.Net.Entities
 		public DataPoints Points { get; set; }
 		public DataTimes Times { get; set; }
 		public string Link
-			=> $"http://board.iverb.me/profile/{SteamId}";
+			=> $"https://board.iverb.me/profile/{SteamId}";
 		public string SteamLink
-			=> $"http://steamcommunity.com/profiles/{SteamId}";
+			=> $"https://steamcommunity.com/profiles/{SteamId}";
 
 		public UserData()
 		{

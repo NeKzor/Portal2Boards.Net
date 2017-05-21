@@ -6,9 +6,9 @@
 		public string SteamAvatarLink { get; set; }
 		public ulong SteamId { get; set; }
 		public string Link
-			=> $"http://board.iverb.me/profile/{SteamId}";
+			=> $"https://board.iverb.me/profile/{SteamId}";
 		public string SteamLink
-			=> $"http://steamcommunity.com/profiles/{SteamId}";
+			=> $"https://steamcommunity.com/profiles/{SteamId}";
 
 		public User(
 			string name = default(string),
