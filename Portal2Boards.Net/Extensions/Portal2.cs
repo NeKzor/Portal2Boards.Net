@@ -141,9 +141,9 @@ namespace Portal2Boards.Net.Extensions
 		public const uint DefaultMaxFps = 300;
 
 		public static float? AsTime(this uint? time)
-			=> (time != default(uint?)) ? (float)Math.Floor((float)time / 100) : default(float?);
+			=> (time != default(uint?)) ? (float)Math.Round((float)time / 100, 2) : default(float?);
 		public static float AsTime(this uint time)
-			=> (time != default(uint)) ? (float)Math.Floor((float)time / 100) : default(float);
+			=> (time != default(uint)) ? (float)Math.Round((float)time / 100, 2) : default(float);
 
 		public static string AsTimeToString(this uint? time)
 		{

@@ -111,7 +111,7 @@ namespace Portal2Boards.Net.Test
 
 			// Second table
 			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Official World Record Holders</h3>");
+			_page.Add("<br><h3 align=\"center\">World Record Holders</h3>");
 			_page.Add("<table align=\"center\" class=\"wrholders\">");
 			_page.Add("<thead><tr>");
 			_page.Add("<th>Player</th>");
@@ -133,7 +133,7 @@ namespace Portal2Boards.Net.Test
 
 			// Third table
 			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Official Duration</h3>");
+			_page.Add("<br><h3 align=\"center\">Duration</h3>");
 			_page.Add("<table align=\"center\" class=\"wrholders\">");
 			_page.Add("<thead><tr>");
 			_page.Add("<th>Player</th>");
