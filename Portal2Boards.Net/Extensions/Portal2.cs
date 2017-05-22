@@ -82,7 +82,7 @@ namespace Portal2Boards.Net.Extensions
 			new Map("mp_coop_teambts", "Behind The Scenes", MapType.Cooperative, 46362, 46361, 1),
 			new Map("mp_coop_fling_3", "Flings", MapType.Cooperative, 47831, 47832, 2),
 			new Map("mp_coop_infinifling_train", "Infinifling", MapType.Cooperative, 47833, 47834, 2),
-			new Map("mp_coop_come_along", "Team Retreival", MapType.Cooperative, 47835, 47836, 2),
+			new Map("mp_coop_come_along", "Team Retrieval", MapType.Cooperative, 47835, 47836, 2),
 			new Map("mp_coop_fling_1", "Vertical Flings", MapType.Cooperative, 47837, 47838, 2),
 			new Map("mp_coop_catapult_1", "Catapults", MapType.Cooperative, 47840, 47839, 2),
 			new Map("mp_coop_multifling_1", "Multifling", MapType.Cooperative, 47841, 47842, 2),
