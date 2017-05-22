@@ -10,7 +10,6 @@ namespace Portal2Boards.Net.Extensions
 		public static IReadOnlyCollection<Map> CampaignMaps = new List<Map>()
 		{
 			// Generated with NeKzBot lol
-			// TODO: fix chapter ids
 			new Map("sp_a1_intro1", "Container Ride", MapType.SinglePlayer, 62761, null, 7),
 			new Map("sp_a1_intro2", "Portal Carousel", MapType.SinglePlayer, 62758, null, 7),
 			new Map("sp_a1_intro3", "Portal Gun", MapType.SinglePlayer, 47458, 47459, 7),
@@ -112,7 +111,7 @@ namespace Portal2Boards.Net.Extensions
 			new Map("mp_coop_paint_walljumps", "Wall Repulsion", MapType.Cooperative, 52715, 52716, 5),
 			new Map("mp_coop_paint_speed_fling", "Propulsion Crushers", MapType.Cooperative, 52717, 52718, 5),
 			new Map("mp_coop_paint_red_racer", "Turret Ninja", MapType.Cooperative, 52735, 52736, 5),
-			new Map("mp_coop_paint_speed_catch", "Propulsion Retreival", MapType.Cooperative, 52738, 52737, 5),
+			new Map("mp_coop_paint_speed_catch", "Propulsion Retrieval", MapType.Cooperative, 52738, 52737, 5),
 			new Map("mp_coop_paint_longjump_intro", "Vault Entrance", MapType.Cooperative, 52740, 52739, 5),
 			new Map("mp_coop_separation_1", "Separation", MapType.Cooperative, 49341, 49342, 6),
 			new Map("mp_coop_tripleaxis", "Triple Axis", MapType.Cooperative, 49343, 49344, 6),
