@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Portal2Boards.Net.API.Models;
+using Portal2Boards.Net.Extensions;
 using Portal2Boards.Net.Utilities;
 
 namespace Portal2Boards.Net.Entities
@@ -155,14 +156,22 @@ namespace Portal2Boards.Net.Entities
 		public DateTime? Date { get; set; }
 		public bool DemoExists { get; set; }
 		public string YouTubeId { get; set; }
+		public bool CommentExists
+			=> !(string.IsNullOrEmpty(Comment));
 		public string DemoLink
 			=> $"https://board.iverb.me/getDemo?id={Id}";
 		public bool VideoExists
 			=> !(string.IsNullOrEmpty(YouTubeId));
 		public string VideoLink
 			=> $"https://youtu.be/{YouTubeId}";
+		public Map ParsedMap
+			=> Portal2.GetMapByName(MapName).GetAwaiter().GetResult();
 		public string Link
-			=> $"https://board.iverb.me/chamber/{Id}";
+			=> $"https://board.iverb.me/chamber/{ParsedMap?.BestTimeId}";
+		public string ImageLink
+			=> $"https://board.iverb.me/images/chambers/{ParsedMap?.BestTimeId}.jpg";
+		public string ImageLinkFull
+			=> $"https://board.iverb.me/images/chambers_full/{ParsedMap?.BestTimeId}.jpg";
 
 		public DataScore()
 		{

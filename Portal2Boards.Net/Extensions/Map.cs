@@ -16,6 +16,10 @@
 				&& (BestPortalsId != default(uint?));
 		public string Link
 			=> $"https://board.iverb.me/chamber/{BestTimeId}";
+		public string ImageLink
+			=> $"https://board.iverb.me/images/chambers/{BestTimeId}.jpg";
+		public string ImageLinkFull
+			=> $"https://board.iverb.me/images/chambers_full/{BestTimeId}.jpg";
 		public string BestTimeSteamLink
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestTimeId}";
 		public string BestPortalsSteamLink

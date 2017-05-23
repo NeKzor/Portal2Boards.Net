@@ -9,7 +9,9 @@ namespace Portal2Boards.Net.API.Models
 	public sealed class Board : IModel, IEnumerable<ChamberData>
     {
 		public IReadOnlyCollection<BoardData> Data { get; set; }
-		public string RequestUrl { get; internal set; }
+		public string ApiRequestUrl { get; internal set; }
+		public string RequestUrl
+			=> ApiRequestUrl.Substring(0, ApiRequestUrl.IndexOf("/json"));
 
 		public Board()
 		{
@@ -20,7 +22,7 @@ namespace Portal2Boards.Net.API.Models
 			foreach (var item in data)
 				temp.Add(new BoardData(item.Key, item.Value));
 			Data = temp;
-			RequestUrl = url;
+			ApiRequestUrl = url;
 		}
 
 		public IReadOnlyCollection<ChamberData> ConvertToEntries(IReadOnlyCollection<BoardData> data = default(IReadOnlyCollection<BoardData>))

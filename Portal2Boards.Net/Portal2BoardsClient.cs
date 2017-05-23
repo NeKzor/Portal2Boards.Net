@@ -32,7 +32,7 @@ namespace Portal2Boards.Net
 			var result = default(Changelog);
 			try
 			{
-				var url = $"{BaseApiUrl}/changelog/json{((string.IsNullOrEmpty(query)) ? await Parameters.ToQuery().ConfigureAwait(false) : query)}";
+				var url = $"{BaseApiUrl}/changelog/json{((query == default(string)) ? await Parameters.ToQuery().ConfigureAwait(false) : query)}";
 				var obj = await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
 				result = new Changelog(obj, url);
 				LastResponse = ResponseType.Success;

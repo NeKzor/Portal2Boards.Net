@@ -2,6 +2,7 @@
 {
 	public interface IModel
     {
+		string ApiRequestUrl { get; }
 		string RequestUrl { get; }
     }
 }

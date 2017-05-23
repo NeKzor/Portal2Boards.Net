@@ -6,7 +6,9 @@ namespace Portal2Boards.Net.API.Models
 	public sealed class Profile : IModel
 	{
 		public ProfileData Data { get; set; }
-		public string RequestUrl { get; internal set; }
+		public string ApiRequestUrl { get; internal set; }
+		public string RequestUrl
+			=> ApiRequestUrl.Substring(0, ApiRequestUrl.IndexOf("/json"));
 
 		public Profile()
 		{
@@ -14,7 +16,7 @@ namespace Portal2Boards.Net.API.Models
 		public Profile(ProfileData data, string url)
 		{
 			Data = data;
-			RequestUrl = url;
+			ApiRequestUrl = url;
 		}
 	}
 }

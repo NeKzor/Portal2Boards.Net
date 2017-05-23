@@ -9,7 +9,9 @@ namespace Portal2Boards.Net.API.Models
 	public sealed class Changelog : IModel, IEnumerable<EntryData>
     {
 		public IReadOnlyCollection<ChangelogData> Data { get; set; }
-		public string RequestUrl { get; internal set; }
+		public string ApiRequestUrl { get; internal set; }
+		public string RequestUrl
+			=> ApiRequestUrl.Substring(0, ApiRequestUrl.IndexOf("/json")) + ApiRequestUrl.Substring(ApiRequestUrl.IndexOf("/json") + 1);
 
 		public Changelog()
 		{
@@ -17,7 +19,7 @@ namespace Portal2Boards.Net.API.Models
 		public Changelog(IReadOnlyCollection<ChangelogData> data, string url)
 		{
 			Data = data;
-			RequestUrl = url;
+			ApiRequestUrl = url;
 		}
 
 		public IReadOnlyCollection<EntryData> ConvertToEntries(IEnumerable<ChangelogData> data = default(IEnumerable<ChangelogData>))

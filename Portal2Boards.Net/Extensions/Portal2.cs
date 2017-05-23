@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Portal2Boards.Net.Entities;
 
 namespace Portal2Boards.Net.Extensions
 {
@@ -175,5 +176,13 @@ namespace Portal2Boards.Net.Extensions
 			=> (date != default(DateTime?)) ? date?.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
 		public static string DateTimeToString(this DateTime date)
 			=> (date != default(DateTime)) ? date.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
+
+		public static MapData GetMapData(this DataTimes times, Map map)
+			=> times.SinglePlayer.Chapters.Chambers
+				.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value.Data
+				.FirstOrDefault(chamber => chamber.Value.Id == map.BestTimeId).Value
+					?? times.Cooperative.Chapters.Chambers
+						.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value.Data
+						.FirstOrDefault(chamber => chamber.Value.Id == map.BestTimeId).Value;
 	}
 }

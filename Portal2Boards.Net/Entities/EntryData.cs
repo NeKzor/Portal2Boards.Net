@@ -21,6 +21,8 @@ namespace Portal2Boards.Net.Entities
 		public bool DemoExists { get; set; }
 		public string YouTubeId { get; set; }
 		public string Comment { get; set; }
+		public bool CommentExists
+			=> !(string.IsNullOrEmpty(Comment));
 		public string DemoLink
 			=> $"https://board.iverb.me/getDemo?id={Id}";
 		public bool VideoExists
@@ -28,7 +30,11 @@ namespace Portal2Boards.Net.Entities
 		public string VideoLink
 			=> $"https://youtu.be/{YouTubeId}";
 		public string Link
-			=> $"https://board.iverb.me/chamber/{Id}";
+			=> $"https://board.iverb.me/chamber/{Map.SteamId}";
+		public string ImageLink
+			=> $"https://board.iverb.me/images/chambers/{Map.SteamId}.jpg";
+		public string ImageLinkFull
+			=> $"https://board.iverb.me/images/chambers_full/{Map.SteamId}.jpg";
 
 		public EntryData()
 		{
