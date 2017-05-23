@@ -18,9 +18,9 @@ namespace Portal2Boards.Net.Test
 		private static void Main(string[] args)
 		{
 			//GetAggregated();
-			GetLeaderboard();
+			//GetLeaderboard();
 			//GetChangelog();
-			//GetProfile();
+			GetProfile();
 			//HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
 		}
 
@@ -89,7 +89,7 @@ namespace Portal2Boards.Net.Test
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				var profile = client.GetProfileAsync("iVerb").GetAwaiter().GetResult();
+				var profile = client.GetProfileAsync("cojosao").GetAwaiter().GetResult();
 				var user = (UserData)profile.Data;
 
 				WriteLine($"User profile of: {user.BoardName}");
@@ -98,7 +98,7 @@ namespace Portal2Boards.Net.Test
 					WriteLine($"[{Enum.GetName(typeof(Chapter), chapter.Key).FormatChapterTitle()}]");
 					foreach (var chamber in chapter.Value.Data)
 					{
-						WriteLine($"[{chamber.Key}]\t{chamber.Value.MapName} in {chamber.Value.Score} : Rank {chamber.Value.PlayerRank}");
+						WriteLine($"[{chamber.Key}]\t{chamber.Value.MapId} in {chamber.Value.Score} : Rank {chamber.Value.PlayerRank}");
 					}
 				}
 				ReadKey();
