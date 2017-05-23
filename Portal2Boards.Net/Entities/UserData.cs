@@ -103,7 +103,6 @@ namespace Portal2Boards.Net.Entities
 				DeltaToNextRank = data.NextRankDiff;
 			}
 		}
-
 	}
 
 	public class DataTimes
@@ -216,7 +215,7 @@ namespace Portal2Boards.Net.Entities
 				ScoreRank = data.ScoreRank;
 				DeltaToWorldRecord = data.WrDiff;
 				DeltaToNextRank = data.NextRankDiff;
-				if (data.Chambers != null)
+				if (data.Chambers != default(ProfileTimesChamberData))
 					Chapters = new DataChapters(data.Chambers);
 			}
 		}
@@ -251,13 +250,16 @@ namespace Portal2Boards.Net.Entities
 				OldestScore = new DataScore(data.OldestScore);
 				NewestScore = new DataScore(data.NewestScore);
 				AveragePlace = data.AveragePlace;
-				var temp = new Dictionary<Chapter, DataChambers>();
-				foreach (var item in data.Chamber)
+				if (data.Chamber != default(IReadOnlyDictionary<uint, IReadOnlyDictionary<uint, ProfileTimesMapData>>))
 				{
-					Enum.TryParse<Chapter>(item.Key.ToString(), out var chapter);
-					temp.Add(chapter, new DataChambers(item.Value));
+					var temp = new Dictionary<Chapter, DataChambers>();
+					foreach (var item in data.Chamber)
+					{
+						Enum.TryParse<Chapter>(item.Key.ToString(), out var chapter);
+						temp.Add(chapter, new DataChambers(item.Value));
+					}
+					Chambers = temp;
 				}
-				Chambers = temp;
 			}
 		}
 	}
