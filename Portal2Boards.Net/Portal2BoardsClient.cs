@@ -13,8 +13,8 @@ namespace Portal2Boards.Net
 {
 	public sealed class Portal2BoardsClient : IDisposable
 	{
-		public static bool NoSsl;
-		public static string BaseApiUrl => $"http{((NoSsl) ? string.Empty : "s")}://board.iverb.me";
+		public bool NoSsl;
+		public string BaseApiUrl => $"http{((NoSsl) ? string.Empty : "s")}://board.iverb.me";
 		public ChangelogParameters Parameters { get; set; }
 		public ResponseType LastResponse { get; internal set; } = ResponseType.Unknown;
 		public bool AutoCache
@@ -26,7 +26,7 @@ namespace Portal2Boards.Net
 				if (_autoCache)
 					_timer = new Timer(TimerCallback, _autoCache, (int)_cacheResetTime, (int)_cacheResetTime);
 				else
-					_timer.Dispose();
+					_timer?.Dispose();
 			}
 		}
 		public uint CacheResetTime
@@ -40,20 +40,22 @@ namespace Portal2Boards.Net
 		private bool _autoCache;
 		private uint _cacheResetTime;
 
-		public Portal2BoardsClient(HttpClient client = default(HttpClient), bool autoCache = true, uint cacheResetTime = 5)
+		public Portal2BoardsClient(HttpClient client = default(HttpClient), bool autoCache = true, uint cacheResetTime = 5, bool noSsl = false)
 		{
 			_client = new WebClient(client);
 			_cache = new Cache();
 			CacheResetTime = cacheResetTime;
 			AutoCache = autoCache;
+			NoSsl = noSsl;
 		}
-		public Portal2BoardsClient(ChangelogParameters parameters, HttpClient client = default(HttpClient), bool autoCache = true, uint cacheResetTime = 5)
+		public Portal2BoardsClient(ChangelogParameters parameters, HttpClient client = default(HttpClient), bool autoCache = true, uint cacheResetTime = 5, bool noSsl = false)
 		{
 			_client = new WebClient(client);
 			_cache = new Cache();
 			CacheResetTime = cacheResetTime;
 			AutoCache = autoCache;
 			Parameters = parameters;
+			NoSsl = noSsl;
 		}
 
 		public async Task<Changelog> GetChangelogAsync(string query = default(string))
