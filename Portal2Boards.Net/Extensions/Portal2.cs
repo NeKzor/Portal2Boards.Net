@@ -179,10 +179,10 @@ namespace Portal2Boards.Net.Extensions
 
 		public static MapData GetMapData(this DataTimes times, Map map)
 			=> times.SinglePlayer.Chapters.Chambers
-				.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value.Data
-				.FirstOrDefault(chamber => chamber.Value.Id == map.BestTimeId).Value
+				.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
+				.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value
 					?? times.Cooperative.Chapters.Chambers
-						.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value.Data
-						.FirstOrDefault(chamber => chamber.Value.Id == map.BestTimeId).Value;
+						.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
+						.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value;
 	}
 }

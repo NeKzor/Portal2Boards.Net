@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using Portal2Boards.Net.API.Models;
 using Portal2Boards.Net.Utilities;
 
@@ -57,7 +58,7 @@ namespace Portal2Boards.Net.Entities
 					IsWorldRecord = changelog.WrGain == "1";
 					DemoExists = changelog.HasDemo == "1";
 					YouTubeId = changelog.YouTubeId;
-					Comment = changelog.Note;
+					Comment = WebUtility.HtmlDecode(changelog.Note);
 				}
 			}
 			catch (Exception e)

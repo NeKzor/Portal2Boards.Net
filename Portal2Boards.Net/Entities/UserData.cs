@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using Portal2Boards.Net.API.Models;
 using Portal2Boards.Net.Extensions;
 using Portal2Boards.Net.Utilities;
@@ -186,7 +187,7 @@ namespace Portal2Boards.Net.Entities
 			if (data != default(ProfileScore))
 			{
 				MapId = data.Map;
-				Comment = data.ScoreData.Note;
+				Comment = WebUtility.HtmlDecode(data.ScoreData.Note);
 				IsSubmission = data.ScoreData.Submission == "1";
 				Id = data.ScoreData.ChangelogId;
 				PlayerRank = data.ScoreData.PlayerRank;
@@ -295,8 +296,7 @@ namespace Portal2Boards.Net.Entities
 		{
 			if (data != default(ProfileTimesMapData))
 			{
-				//MapName = data.Map;
-				Comment = data.Note;
+				Comment = WebUtility.HtmlDecode(data.Note);
 				IsSubmission = data.Submission == "1";
 				Id = data.ChangelogId;
 				PlayerRank = data.PlayerRank;

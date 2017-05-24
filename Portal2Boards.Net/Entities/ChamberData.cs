@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using Portal2Boards.Net.API.Models;
-using Portal2Boards.Net.Extensions;
 using Portal2Boards.Net.Utilities;
 
 namespace Portal2Boards.Net.Entities
@@ -46,7 +46,7 @@ namespace Portal2Boards.Net.Entities
 					DemoExists = board.Data.Score.HasDemo == "1";
 					YouTubeId = board.Data.Score.YouTubeId;
 					IsSubmission = board.Data.Score.Submission == "1";
-					Comment = board.Data.Score.Note;
+					Comment = WebUtility.HtmlDecode(board.Data.Score.Note);
 				}
 			}
 			catch (Exception e)
