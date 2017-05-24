@@ -127,19 +127,14 @@ namespace Portal2Boards.Net.Extensions
 		public static IReadOnlyCollection<Map> SinglePlayerMaps = CampaignMaps.Where(m => m.Type == MapType.SinglePlayer).ToList();
 		public static IReadOnlyCollection<Map> CooperativeMaps = CampaignMaps.Where(m => m.Type == MapType.Cooperative).ToList();
 
-		public static Task<Map> GetMapByName(string name, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
-			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => string.Equals(m.Name, name, comparison) || string.Equals(m.Alias, name, comparison)));
-		public static Task<Map> GetMapById(uint id)
-			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => (m.BestTimeId == id) || (m.BestPortalsId == id)));
-
 		public const uint AppId = 620;
 		public const string ProtocolVersion = "2001";
 		public const string ExeVersion = "2.0.0.1";
 		public const string ExeBuild = "6388";
 		public const string ExeBuildDate = "12:19:28 May 4 2016";
-		public const uint DefaulTickrate = 60;
-		public const uint DefaultMaxFps = 300;
+		public const uint DefaultTickrate = 60;
 
+		public const uint DefaultMaxFps = 300;
 		public static float? AsTime(this uint? time)
 			=> (time != default(uint?)) ? (float)Math.Round((float)time / 100, 2) : default(float?);
 		public static float AsTime(this uint time)
@@ -177,12 +172,16 @@ namespace Portal2Boards.Net.Extensions
 		public static string DateTimeToString(this DateTime date)
 			=> (date != default(DateTime)) ? date.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
 
-		public static MapData GetMapData(this DataTimes times, Map map)
-			=> times.SinglePlayer.Chapters.Chambers
-				.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
-				.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value
-					?? times.Cooperative.Chapters.Chambers
-						.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
-						.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value;
+		public static Task<Map> GetMapByName(string name, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
+			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => string.Equals(m.Name, name, comparison) || string.Equals(m.Alias, name, comparison)));
+		public static Task<Map> GetMapById(uint id)
+			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => (m.BestTimeId == id) || (m.BestPortalsId == id)));
+		public static Task<MapData> GetMapData(this DataTimes times, Map map)
+			=> Task.FromResult(times.SinglePlayer.Chapters.Chambers
+									.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
+									.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value
+								?? times.Cooperative.Chapters.Chambers
+									.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
+									.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value);
 	}
 }

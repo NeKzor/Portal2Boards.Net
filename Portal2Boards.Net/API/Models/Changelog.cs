@@ -11,7 +11,7 @@ namespace Portal2Boards.Net.API.Models
 		public IReadOnlyCollection<ChangelogData> Data { get; set; }
 		public string ApiRequestUrl { get; internal set; }
 		public string RequestUrl
-			=> ApiRequestUrl.Substring(0, ApiRequestUrl.IndexOf("/json")) + ApiRequestUrl.Substring(ApiRequestUrl.IndexOf("/json") + 1);
+			=> ApiRequestUrl.Remove(ApiRequestUrl.IndexOf("/json"), "/json".Length);
 
 		public Changelog()
 		{

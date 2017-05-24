@@ -8,7 +8,7 @@ namespace Portal2Boards.Net.API.Models
 		public ProfileData Data { get; set; }
 		public string ApiRequestUrl { get; internal set; }
 		public string RequestUrl
-			=> ApiRequestUrl.Substring(0, ApiRequestUrl.IndexOf("/json"));
+			=> ApiRequestUrl.Remove(ApiRequestUrl.LastIndexOf("/json"), "/json".Length);
 
 		public Profile()
 		{

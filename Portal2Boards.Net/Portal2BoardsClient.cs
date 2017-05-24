@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Portal2Boards.Net.API;
 using Portal2Boards.Net.API.Models;
@@ -12,18 +13,46 @@ namespace Portal2Boards.Net
 {
 	public sealed class Portal2BoardsClient : IDisposable
 	{
-		public const string BaseApiUrl = "https://board.iverb.me";
+		public static bool NoSsl;
+		public static string BaseApiUrl => $"http{((NoSsl) ? string.Empty : "s")}://board.iverb.me";
 		public ChangelogParameters Parameters { get; set; }
 		public ResponseType LastResponse { get; internal set; } = ResponseType.Unknown;
-		private WebClient _client { get; set; }
-
-		public Portal2BoardsClient(HttpClient client = default(HttpClient))
+		public bool AutoCache
 		{
-			_client = new WebClient(client);
+			get => _autoCache;
+			set
+			{
+				_autoCache = value;
+				if (_autoCache)
+					_timer = new Timer(TimerCallback, _autoCache, (int)_cacheResetTime, (int)_cacheResetTime);
+				else
+					_timer.Dispose();
+			}
 		}
-		public Portal2BoardsClient(ChangelogParameters parameters, HttpClient client = default(HttpClient))
+		public uint CacheResetTime
+		{
+			get => _cacheResetTime / 60 / 1000;
+			set => _cacheResetTime = ((value == 0) ? 5 : value) * 60 * 1000;
+		}
+		private WebClient _client { get; set; }
+		private Cache _cache { get; set; }
+		private Timer _timer { get; set; }
+		private bool _autoCache;
+		private uint _cacheResetTime;
+
+		public Portal2BoardsClient(HttpClient client = default(HttpClient), bool autoCache = true, uint cacheResetTime = 5)
 		{
 			_client = new WebClient(client);
+			_cache = new Cache();
+			CacheResetTime = cacheResetTime;
+			AutoCache = autoCache;
+		}
+		public Portal2BoardsClient(ChangelogParameters parameters, HttpClient client = default(HttpClient), bool autoCache = true, uint cacheResetTime = 5)
+		{
+			_client = new WebClient(client);
+			_cache = new Cache();
+			CacheResetTime = cacheResetTime;
+			AutoCache = autoCache;
 			Parameters = parameters;
 		}
 
@@ -33,7 +62,9 @@ namespace Portal2Boards.Net
 			try
 			{
 				var url = $"{BaseApiUrl}/changelog/json{((query == default(string)) ? await Parameters.ToQuery().ConfigureAwait(false) : query)}";
-				var obj = await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
+				var obj = await _cache.Get<ChangelogData[]>(url).ConfigureAwait(false)
+					?? await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
+				await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 				result = new Changelog(obj, url);
 				LastResponse = ResponseType.Success;
 			}
@@ -49,7 +80,9 @@ namespace Portal2Boards.Net
 			try
 			{
 				var url = $"{BaseApiUrl}/chamber/{chamberId}/json";
-				var obj = await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+				var obj = await _cache.Get<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false)
+					  ?? await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+				await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 				result = new Board(obj, url);
 				LastResponse = ResponseType.Success;
 			}
@@ -65,7 +98,9 @@ namespace Portal2Boards.Net
 			try
 			{
 				var url = $"{BaseApiUrl}/chamber/{map.BestTimeId}/json";
-				var obj = await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+				var obj = await _cache.Get<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false)
+					?? await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+				await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 				result = new Board(obj, url);
 				LastResponse = ResponseType.Success;
 			}
@@ -81,7 +116,9 @@ namespace Portal2Boards.Net
 			try
 			{
 				var url = $"{BaseApiUrl}/profile/{boardName.Trim()}/json";
-				var obj = await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+				var obj = await _cache.Get<ProfileData>(url).ConfigureAwait(false)
+					?? await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+				await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 				result = new Profile(obj, url);
 				LastResponse = ResponseType.Success;
 			}
@@ -97,7 +134,9 @@ namespace Portal2Boards.Net
 			try
 			{
 				var url = $"{BaseApiUrl}/profile/{steamId}/json";
-				var obj = await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+				var obj = await _cache.Get<ProfileData>(url).ConfigureAwait(false)
+					?? await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+				await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 				result = new Profile(obj, url);
 				LastResponse = ResponseType.Success;
 			}
@@ -113,7 +152,9 @@ namespace Portal2Boards.Net
 			try
 			{
 				var url = $"{BaseApiUrl}/aggregated/{await GetMode(id).ConfigureAwait(false)}/json";
-				var obj = await _client.GetJsonObjectAsync<AggregatedData>(url).ConfigureAwait(false);
+				var obj = await _cache.Get<AggregatedData>(url).ConfigureAwait(false)
+					?? await _client.GetJsonObjectAsync<AggregatedData>(url).ConfigureAwait(false);
+				await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 				result = new Aggregated(obj, url);
 				LastResponse = ResponseType.Success;
 			}
@@ -133,21 +174,26 @@ namespace Portal2Boards.Net
 				if (result is Changelog)
 				{
 					var url = $"{BaseApiUrl}/changelog/json{((string.IsNullOrEmpty(parameter)) ? await Parameters.ToQuery().ConfigureAwait(false) : parameter)}";
-					var obj = await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
+					var obj = await _cache.Get<ChangelogData[]>(url).ConfigureAwait(false)
+						?? await _client.GetJsonObjectAsync<ChangelogData[]>(url).ConfigureAwait(false);
+					await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 					result = new Changelog(obj, url) as T;
 					LastResponse = ResponseType.Success;
 				}
 				else if (result is Board)
 				{
 					var url = $"{BaseApiUrl}/chamber/{((parameter is Map) ? parameter.BestTimeId : parameter)}/json";
-					var obj = await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
+					var obj = await _cache.Get<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false)
+						?? await _client.GetJsonObjectAsync<IReadOnlyDictionary<ulong, BoardEntryData>>(url).ConfigureAwait(false);
 					result = new Board(obj, url) as T;
 					LastResponse = ResponseType.Success;
 				}
 				else if (result is Profile)
 				{
 					var url = $"{BaseApiUrl}/profile/{((parameter is string) ? parameter.Trim() : parameter)}/json";
-					var obj = await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+					var obj = await _cache.Get<ProfileData>(url).ConfigureAwait(false)
+						?? await _client.GetJsonObjectAsync<ProfileData>(url).ConfigureAwait(false);
+					await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 					result = new Profile(obj, url) as T;
 					LastResponse = ResponseType.Success;
 				}
@@ -155,7 +201,9 @@ namespace Portal2Boards.Net
 				{
 					Enum.TryParse<Chapter>(parameter?.ToString(), out Chapter id);
 					var url = $"{BaseApiUrl}/aggregated/{await GetMode(id).ConfigureAwait(false)}/json";
-					var obj = await _client.GetJsonObjectAsync<AggregatedData>(url).ConfigureAwait(false);
+					var obj = await _cache.Get<AggregatedData>(url).ConfigureAwait(false)
+						?? await _client.GetJsonObjectAsync<AggregatedData>(url).ConfigureAwait(false);
+					await _cache.AddOrUpdate(url, obj).ConfigureAwait(false);
 					result = new Aggregated(obj, url) as T;
 					LastResponse = ResponseType.Success;
 				}
@@ -165,6 +213,28 @@ namespace Portal2Boards.Net
 				LastResponse = await Logger.LogModelException<T>(e).ConfigureAwait(false);
 			}
 			return result;
+		}
+
+		public Task ResetCacheTimer()
+		{
+			if (AutoCache)
+			{
+				AutoCache = false;
+				AutoCache = true;
+			}
+			return Task.FromResult(0);
+		}
+
+		public Task ClearCache()
+		{
+			_cache.Reset();
+			return Task.FromResult(0);
+		}
+
+		internal void TimerCallback(Object stateInfo)
+		{
+			if ((bool)stateInfo)
+				_cache.Reset();
 		}
 
 		internal Task<string> GetMode(Chapter id)
@@ -199,6 +269,8 @@ namespace Portal2Boards.Net
 		{
 			Parameters = null;
 			_client = null;
+			_cache = null;
+			_timer = null;
 			GC.Collect();
 		}
 	}

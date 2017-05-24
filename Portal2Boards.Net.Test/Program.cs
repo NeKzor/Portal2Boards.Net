@@ -19,8 +19,8 @@ namespace Portal2Boards.Net.Test
 		{
 			//GetAggregated();
 			//GetLeaderboard();
-			//GetChangelog();
-			GetProfile();
+			GetChangelog();
+			//GetProfile();
 			//HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
 		}
 
@@ -67,9 +67,25 @@ namespace Portal2Boards.Net.Test
 
 		internal static void GetChangelog()
 		{
-			using (var client = new Portal2BoardsClient(_latestWorldRecords))
+			using (var client = new Portal2BoardsClient(_latestWorldRecords, cacheResetTime: 1))
 			{
 				var changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
+
+				WriteLine($"Fetched {changelog.Data.Count} entries.");
+				foreach (var entry in changelog)
+				{
+					WriteLine($"[{entry.Id}]\t" +
+							  $"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
+							  $"{entry.Map.Name} in " +
+							  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
+							  $"{entry.Player.Name}");
+				}
+				ReadKey();
+				Clear();
+
+				// Cache test
+				//client.ClearCache().GetAwaiter().GetResult();
+				changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
 
 				WriteLine($"Fetched {changelog.Data.Count} entries.");
 				foreach (var entry in changelog)
