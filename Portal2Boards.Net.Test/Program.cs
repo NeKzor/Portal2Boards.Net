@@ -19,9 +19,11 @@ namespace Portal2Boards.Net.Test
 		{
 			//GetAggregated();
 			//GetLeaderboard();
-			GetChangelog();
+			//GetChangelog();
 			//GetProfile();
 			//HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
+			TwitterBot.InitAsync().GetAwaiter().GetResult();
+			TwitterBot.RunAsync().GetAwaiter().GetResult();
 		}
 
 		internal static void GetAggregated()

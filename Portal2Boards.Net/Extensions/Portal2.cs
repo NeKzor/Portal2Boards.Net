@@ -168,9 +168,9 @@ namespace Portal2Boards.Net.Extensions
 		}
 
 		public static string DateTimeToString(this DateTime? date)
-			=> (date != default(DateTime?)) ? date?.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
+			=> (date != default(DateTime?)) ? date?.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 		public static string DateTimeToString(this DateTime date)
-			=> (date != default(DateTime)) ? date.ToString("yyyy-MM-dd hh:mm:ss") : "Unknown";
+			=> (date != default(DateTime)) ? date.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 
 		public static Task<Map> GetMapByName(string name, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
 			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => string.Equals(m.Name, name, comparison) || string.Equals(m.Alias, name, comparison)));
