@@ -2,6 +2,7 @@
 using System.Linq;
 using Portal2Boards.Net.API;
 using Portal2Boards.Net.Entities;
+using Portal2Boards.Net.Extensions;
 using static System.Console;
 
 namespace Portal2Boards.Net.Test
@@ -19,9 +20,10 @@ namespace Portal2Boards.Net.Test
 		{
 			//GetAggregated();
 			//GetLeaderboard();
-			GetChangelog();
+			//GetChangelog();
 			//GetProfile();
-			//HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
+			HtmlGenerator.GeneratePage(@"index.html", MapType.SinglePlayer).GetAwaiter().GetResult();
+			HtmlGenerator.GeneratePage(@"coop.html", MapType.Cooperative).GetAwaiter().GetResult();
 			//TwitterBot.InitAsync().GetAwaiter().GetResult();
 			//TwitterBot.RunAsync().GetAwaiter().GetResult();
 		}
