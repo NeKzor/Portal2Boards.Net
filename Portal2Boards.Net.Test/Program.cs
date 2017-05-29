@@ -19,11 +19,11 @@ namespace Portal2Boards.Net.Test
 		{
 			//GetAggregated();
 			//GetLeaderboard();
-			//GetChangelog();
+			GetChangelog();
 			//GetProfile();
 			//HtmlGenerator.GeneratePages().GetAwaiter().GetResult();
-			TwitterBot.InitAsync().GetAwaiter().GetResult();
-			TwitterBot.RunAsync().GetAwaiter().GetResult();
+			//TwitterBot.InitAsync().GetAwaiter().GetResult();
+			//TwitterBot.RunAsync().GetAwaiter().GetResult();
 		}
 
 		internal static void GetAggregated()
@@ -72,6 +72,7 @@ namespace Portal2Boards.Net.Test
 			using (var client = new Portal2BoardsClient(_latestWorldRecords, cacheResetTime: 1))
 			{
 				var changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
+				changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
 
 				WriteLine($"Fetched {changelog.Data.Count} entries.");
 				foreach (var entry in changelog)

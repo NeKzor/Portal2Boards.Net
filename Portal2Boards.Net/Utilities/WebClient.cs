@@ -6,7 +6,7 @@ namespace Portal2Boards.Utilities
 {
 	internal sealed class WebClient
 	{
-		private static HttpClient _client { get; set; }
+		private HttpClient _client { get; }
 
 		public WebClient(HttpClient client = default(HttpClient))
 		{

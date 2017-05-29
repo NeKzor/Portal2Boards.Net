@@ -5,18 +5,10 @@ namespace Portal2Boards.Net.Utilities
 {
 	internal class Cache
 	{
-		private static ConcurrentDictionary<string, object> _appCache;
+		private ConcurrentDictionary<string, object> _appCache { get; }
 
-		public Cache()
-		{
-			_appCache = new ConcurrentDictionary<string, object>();
-		}
+		public Cache() => _appCache = new ConcurrentDictionary<string, object>();
 
-		public Task Reset()
-		{
-			_appCache = new ConcurrentDictionary<string, object>();
-			return Task.FromResult(0);
-		}
 		public Task<T> Get<T>(string key)
 		{
 			if (_appCache.ContainsKey(key))

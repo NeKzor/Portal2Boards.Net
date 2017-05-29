@@ -19,8 +19,10 @@ namespace Portal2Boards.Net.Test
 
 		public static async Task GeneratePages()
 		{
+#if RELEASE
 			if (File.Exists(_path))
 				File.Delete(_path);
+#endif
 			_page.Clear();
 
 			var watch = Stopwatch.StartNew();
@@ -160,7 +162,9 @@ namespace Portal2Boards.Net.Test
 			// Rest
 			_page.Add("</body>");
 			_page.Add("</html>");
+#if RELEASE
 			File.AppendAllLines(_path, _page);
+#endif
 		}
 
 		private static Task<uint?> GetDuration(DateTime? time)
