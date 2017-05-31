@@ -2,7 +2,6 @@
 using System.Linq;
 using Portal2Boards.Net.API;
 using Portal2Boards.Net.Entities;
-using Portal2Boards.Net.Extensions;
 using static System.Console;
 
 namespace Portal2Boards.Net.Test
@@ -22,8 +21,9 @@ namespace Portal2Boards.Net.Test
 			//GetLeaderboard();
 			//GetChangelog();
 			//GetProfile();
-			HtmlGenerator.GeneratePage(@"index.html", MapType.SinglePlayer).GetAwaiter().GetResult();
-			HtmlGenerator.GeneratePage(@"coop.html", MapType.Cooperative).GetAwaiter().GetResult();
+			GetDemo();
+			//HtmlGenerator.GeneratePage(@"index.html", MapType.SinglePlayer).GetAwaiter().GetResult();
+			//HtmlGenerator.GeneratePage(@"coop.html", MapType.Cooperative).GetAwaiter().GetResult();
 			//TwitterBot.InitAsync().GetAwaiter().GetResult();
 			//TwitterBot.RunAsync().GetAwaiter().GetResult();
 		}
@@ -110,9 +110,11 @@ namespace Portal2Boards.Net.Test
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				var profile = client.GetProfileAsync("cojosao").GetAwaiter().GetResult();
+				var profile = client.GetProfileAsync("Nik :D <2").GetAwaiter().GetResult();
 				var user = (UserData)profile.Data;
 
+				WriteLine($"User profile of: {user.SteamName}");
+				WriteLine($"User profile of: {user.DisplayName}");
 				WriteLine($"User profile of: {user.BoardName}");
 				foreach (var chapter in user.Times.SinglePlayer.Chapters.Chambers)
 				{
@@ -122,6 +124,17 @@ namespace Portal2Boards.Net.Test
 						WriteLine($"[{chamber.Key}]\t{chamber.Value.MapId} in {chamber.Value.Score} : Rank {chamber.Value.PlayerRank}");
 					}
 				}
+				ReadKey();
+				Clear();
+			}
+		}
+
+		internal static void GetDemo()
+		{
+			using (var client = new Portal2BoardsClient())
+			{
+				var demo = client.GetDemoContentAsync(64230).GetAwaiter().GetResult();
+				// Do stuff with content
 				ReadKey();
 				Clear();
 			}

@@ -115,7 +115,7 @@ namespace Portal2Boards.Net
 			var result = default(Profile);
 			try
 			{
-				var url = $"{BaseApiUrl}/profile/{boardName.Trim()}/json";
+				var url = $"{BaseApiUrl}/profile/{boardName.Replace(" ", string.Empty)}/json";
 				result = new Profile(await GetCacheOrFetch<ProfileData>(url).ConfigureAwait(false), url);
 				LastResponse = ResponseType.Success;
 			}
@@ -152,6 +152,30 @@ namespace Portal2Boards.Net
 			catch (Exception e)
 			{
 				LastResponse = await Logger.LogModelException<Aggregated>(e).ConfigureAwait(false);
+			}
+			return result;
+		}
+		public async Task<string> GetDemoContentAsync(uint changelogId)
+		{
+			var result = default(string);
+			try
+			{
+				var url = $"{BaseApiUrl}/getDemo?id={changelogId}";
+				if (!_autoCache)
+				{
+					result = await _client.GetRawContentAsync(url).ConfigureAwait(false);
+				}
+				else
+				{
+					result = await _cache.Get<string>(url).ConfigureAwait(false) ?? await _client.GetRawContentAsync(url).ConfigureAwait(false);
+					await _cache.AddOrUpdate(url, result).ConfigureAwait(false);
+				}
+				LastResponse = ResponseType.Success;
+			}
+			catch (Exception e)
+			{
+				LastResponse = (e is HttpRequestException) ? ResponseType.HttpRequestError : ResponseType.Unknown;
+				await Logger.LogException<string>(e).ConfigureAwait(false);
 			}
 			return result;
 		}

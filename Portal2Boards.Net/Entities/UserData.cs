@@ -42,9 +42,9 @@ namespace Portal2Boards.Net.Entities
 					SteamId = data.ProfileNumber;
 					IsRegistered = data.IsRegistered == "1";
 					HasRecords = data.HasRecords == "1";
-					DisplayName = data.UserData.DisplayName;
-					BoardName = data.UserData.BoardName;
-					SteamName = data.UserData.SteamName;
+					DisplayName = WebUtility.HtmlDecode(data.UserData.DisplayName);
+					BoardName = WebUtility.HtmlDecode(data.UserData.BoardName);
+					SteamName = WebUtility.HtmlDecode(data.UserData.SteamName);
 					IsBanned = data.UserData.Banned == "1";
 					SteamAvatarLink = data.UserData.Avatar;
 					TwitchLink = data.UserData.Twitch;

@@ -14,11 +14,14 @@ namespace Portal2Boards.Utilities
 			_client.DefaultRequestHeaders.UserAgent.ParseAdd("Portal2Boards.Net/1.0");
 		}
 
-		public async Task<T> GetJsonObjectAsync<T>(string url)
+		public async Task<string> GetRawContentAsync(string url)
 		{
 			var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url), HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
-			return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
+			return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 		}
+
+		public async Task<T> GetJsonObjectAsync<T>(string url)
+			=> JsonConvert.DeserializeObject<T>(await GetRawContentAsync(url).ConfigureAwait(false));
 	}
 }

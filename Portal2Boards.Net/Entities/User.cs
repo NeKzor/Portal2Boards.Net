@@ -1,4 +1,6 @@
-﻿namespace Portal2Boards.Net.Entities
+﻿using System.Net;
+
+namespace Portal2Boards.Net.Entities
 {
 	public class User
 	{
@@ -15,7 +17,7 @@
 			string steamAvatarLink = default(string),
 			ulong steamId = default(ulong))
 		{
-			Name = name;
+			Name = WebUtility.HtmlDecode(name);
 			SteamAvatarLink = steamAvatarLink;
 			SteamId = steamId;
 		}

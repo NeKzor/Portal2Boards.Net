@@ -10,6 +10,12 @@ namespace Portal2Boards.Net.Utilities
 {
 	internal static class Logger
 	{
+		public static Task LogException<T>(Exception e)
+		{
+			Debug.WriteLine($"[Portal2Boards.Net] Failed to create {typeof(T)} object.\n --- Stack Trace ---\n{e}\n -------------------");
+			return Task.FromResult(0);
+		}
+
 		public static Task<ResponseType> LogModelException<T>(Exception e)
 			where T : class, IModel
 		{

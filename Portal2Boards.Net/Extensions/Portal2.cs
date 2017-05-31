@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Portal2Boards.Net.API.Models;
 using Portal2Boards.Net.Entities;
 
 namespace Portal2Boards.Net.Extensions
@@ -133,8 +134,8 @@ namespace Portal2Boards.Net.Extensions
 		public const string ExeBuild = "6388";
 		public const string ExeBuildDate = "12:19:28 May 4 2016";
 		public const uint DefaultTickrate = 60;
-
 		public const uint DefaultMaxFps = 300;
+
 		public static float? AsTime(this uint? time)
 			=> (time != default(uint?)) ? (float)Math.Round((float)time / 100, 2) : default(float?);
 		public static float AsTime(this uint time)
@@ -150,8 +151,8 @@ namespace Portal2Boards.Net.Extensions
 			var sec = totalsec % 60;
 			var min = Math.Floor(totalsec / 60);
 			return (min > 0)
-				? $"{min}:{((sec < 10) ? $"0{sec}" : sec.ToString())}.{((centi < 10) ? $"0{centi}" : centi.ToString())}"
-				: $"{sec}.{((centi < 10) ? $"0{centi}" : centi.ToString())}";
+				? $"{min}:{((sec < 10) ? $"0{sec}" : $"{sec}")}.{((centi < 10) ? $"0{centi}" : $"{centi}")}"
+				: $"{sec}.{((centi < 10) ? $"0{centi}" : $"{centi}")}";
 		}
 		public static string AsTimeToString(this uint time)
 		{
@@ -163,8 +164,8 @@ namespace Portal2Boards.Net.Extensions
 			var sec = totalsec % 60;
 			var min = Math.Floor(totalsec / 60);
 			return (min > 0)
-				? $"{min}:{((sec < 10) ? $"0{sec}" : sec.ToString())}.{((centi < 10) ? $"0{centi}" : centi.ToString())}"
-				: $"{sec}.{((centi < 10) ? $"0{centi}" : centi.ToString())}";
+				? $"{min}:{((sec < 10) ? $"0{sec}" : $"{sec}")}.{((centi < 10) ? $"0{centi}" : $"{centi}")}"
+				: $"{sec}.{((centi < 10) ? $"0{centi}" : $"{centi}")}";
 		}
 
 		public static string DateTimeToString(this DateTime? date)
@@ -172,10 +173,18 @@ namespace Portal2Boards.Net.Extensions
 		public static string DateTimeToString(this DateTime date)
 			=> (date != default(DateTime)) ? date.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 
+		public static ChamberData Convert(this BoardData data)
+			=> new ChamberData(data);
+		public static EntryData Convert(this ChangelogData data)
+			=> new EntryData(data);
+		public static UserData Convert(this ProfileData data)
+			=> new UserData(data);
+
 		public static Task<Map> GetMapByName(string name, StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
 			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => string.Equals(m.Name, name, comparison) || string.Equals(m.Alias, name, comparison)));
 		public static Task<Map> GetMapById(uint id)
 			=> Task.FromResult(CampaignMaps.FirstOrDefault(m => (m.BestTimeId == id) || (m.BestPortalsId == id)));
+
 		public static Task<MapData> GetMapData(this DataTimes times, Map map)
 			=> Task.FromResult(times.SinglePlayer.Chapters.Chambers
 									.FirstOrDefault(chapter => chapter.Key == (Chapter)map.ChapterId).Value?.Data
