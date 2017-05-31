@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Portal2Boards.Net.API;
 using Portal2Boards.Net.Entities;
 using static System.Console;
@@ -133,8 +135,11 @@ namespace Portal2Boards.Net.Test
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				var demo = client.GetDemoContentAsync(64230).GetAwaiter().GetResult();
+				var content = client.GetDemoContentAsync(64230).GetAwaiter().GetResult();
 				// Do stuff with content
+				using (var stream = new FileStream("not_rank_2.dem", FileMode.Create))
+				using (var memory = new MemoryStream(content))
+					memory.CopyToAsync(stream).GetAwaiter().GetResult();
 				ReadKey();
 				Clear();
 			}

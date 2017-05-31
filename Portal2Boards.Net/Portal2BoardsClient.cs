@@ -155,19 +155,19 @@ namespace Portal2Boards.Net
 			}
 			return result;
 		}
-		public async Task<string> GetDemoContentAsync(uint changelogId)
+		public async Task<byte[]> GetDemoContentAsync(uint changelogId)
 		{
-			var result = default(string);
+			var result = default(byte[]);
 			try
 			{
 				var url = $"{BaseApiUrl}/getDemo?id={changelogId}";
 				if (!_autoCache)
 				{
-					result = await _client.GetRawContentAsync(url).ConfigureAwait(false);
+					result = await _client.GetBytesAsync(url).ConfigureAwait(false);
 				}
 				else
 				{
-					result = await _cache.Get<string>(url).ConfigureAwait(false) ?? await _client.GetRawContentAsync(url).ConfigureAwait(false);
+					result = await _cache.Get<byte[]>(url).ConfigureAwait(false) ?? await _client.GetBytesAsync(url).ConfigureAwait(false);
 					await _cache.AddOrUpdate(url, result).ConfigureAwait(false);
 				}
 				LastResponse = ResponseType.Success;
