@@ -1,0 +1,5 @@
+language: csharp
+script:
+  - nuget restore Portal2Boards.Net.sln
+  - msbuild /p:Configuration=Release Portal2Boards.Net.sln
+  - mono Portal2Boards.Net.Test/bin/Release/Portal2Boards.Net.Test.exe

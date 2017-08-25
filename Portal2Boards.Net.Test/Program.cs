@@ -21,9 +21,9 @@ namespace Portal2Boards.Net.Test
 		{
 			//GetAggregated();
 			//GetLeaderboard();
-			//GetChangelog();
+			GetChangelog();
 			//GetProfile();
-			GetDemo();
+			//GetDemo();
 			//HtmlGenerator.GeneratePage(@"index.html", MapType.SinglePlayer).GetAwaiter().GetResult();
 			//HtmlGenerator.GeneratePage(@"coop.html", MapType.Cooperative).GetAwaiter().GetResult();
 			//TwitterBot.InitAsync().GetAwaiter().GetResult();
@@ -76,7 +76,7 @@ namespace Portal2Boards.Net.Test
 			using (var client = new Portal2BoardsClient(_latestWorldRecords, cacheResetTime: 1))
 			{
 				var changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
-				changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
+				//changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
 
 				WriteLine($"Fetched {changelog.Data.Count} entries.");
 				foreach (var entry in changelog)
@@ -87,7 +87,7 @@ namespace Portal2Boards.Net.Test
 							  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
 							  $"{entry.Player.Name}");
 				}
-				ReadKey();
+				/*ReadKey();
 				Clear();
 
 				// Cache test
@@ -104,7 +104,7 @@ namespace Portal2Boards.Net.Test
 							  $"{entry.Player.Name}");
 				}
 				ReadKey();
-				Clear();
+				Clear();*/
 			}
 		}
 
