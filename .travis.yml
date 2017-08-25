@@ -1,5 +1,14 @@
 language: csharp
+mono: none
+dotnet: 1.0.4
+dist: trusty
+solution: Portal2Boards.Net.sln
 script:
   - nuget restore Portal2Boards.Net.sln
-  - msbuild /p:Configuration=Release Portal2Boards.Net.sln
-  - mono Portal2Boards.Net.Test/bin/Release/Portal2Boards.Net.Test.exe
+  - cd Portal2Boards.Net/
+  - dotnet restore
+  - dotnet build --configuration Release
+  - cd ../Portal2Boards.Net.Test
+  - dotnet restore
+  - dotnet build --configuration Release
+  - dotnet run --project Portal2Boards.Net.Test.csproj --configuration Release
