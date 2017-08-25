@@ -4,7 +4,6 @@ dotnet: 1.0.4
 dist: trusty
 solution: Portal2Boards.Net.sln
 script:
-  - nuget restore Portal2Boards.Net.sln
   - cd Portal2Boards.Net/
   - dotnet restore
   - dotnet build --configuration Release
