@@ -1,68 +1,24 @@
-﻿# Overview
+﻿[![Build Status](https://travis-ci.org/NeKzor/Portal2Boards.Net.svg?branch=master)](https://travis-ci.org/NeKzor/Portal2Boards.Net)
+[![Build Version](https://img.shields.io/badge/version-v1.1-yellow.svg)](https://github.com/NeKzor/Portal2Boards.Net/projects/2)
+[![Release Status](https://img.shields.io/github/release/NeKzor/Portal2Boards.Net.svg)](https://github.com/NeKzor/Portal2Boards.Net/releases)
 
-|Namespace|Status|Description|
-|---|:-:|---|
-|Portal2Boards.Net|✔|Client for fetching data.|
-|Portal2Boards.Net.API|✔|Advanced parameters for getting changelog.|
-|Portal2Boards.Net.API.Models|✔|API classes.|
-|Portal2Boards.Net.Entities|✔|API models conversion.|
-|Portal2Boards.Net.Extensions|✔|Game information.|
+# Portal2Boards.Net
 
----
-# Example: Changelog
+Retrieve Portal 2 challenge mode data from the speedrunning community [board.iverb.me](https://board.iverb.me).
+Client includes automatic caching system and exception event for logging purposes.
 
-### Simple
+# Overview
 
-#### 1.)
-```cs
-using Portal2Boards.Net;
-```
+|Namespace|Description|
+|---|---|
+|[Portal2Boards.Net](Portal2Boards.Net)|Client for fetching changelog, leaderboard, profile, aggregated data and demo content.|
+|[Portal2Boards.Net.API](Portal2Boards.Net/API)|Advanced usage for getting changelog with customised parameters.|
+|[Portal2Boards.Net.API.Models](Portal2Boards.Net/API/Models)|API classes converted from raw json.|
+|[Portal2Boards.Net.Entities](Portal2Boards.Net/Entities)|Convert models to more suitable reference types.|
+|[Portal2Boards.Net.Extensions](Portal2Boards.Net/Extensions)|Extension methods and useful non-API data.|
 
-#### 2.)
-```cs
-var client = new Portal2BoardsClient();
-// Async
-var changelog = await client.GetChangelogAsync("?maxDaysAgo=1&wr=1");
-// Sync
-changelog = client.GetChangelogAsync("?maxDaysAgo=1&wr=1").GetAwaiter().GetResult();
-```
+# [C# Documentation](DOCS.md)
 
-### 3.)
-```cs
-var dontclipthis = changelog.Data.Where(d => d.PlayerName == "Msushi" && d.PostRank == 2);
-```
-
----
-### Advanced
-
-#### 1.)
-```cs
-using Portal2Boards.Net.API;
-```
-
-#### 2.)
-```cs
-var parameters = new ChangelogParameters()
-{
-    [Parameters.MaxDaysAgo] = 7,
-    [Parameters.WorldRecord] = 1
-};
-
-using (var client = new Portal2BoardsClient(parameters))
-{
-    var changelog = await client.GetChangelogAsync();
-...
-```
-
-#### 3.)
-```cs
-...
-    foreach (var entry in changelog)
-    {
-        Console.WriteLine($"ID = {entry.EntryId}");
-    }
-}
-```
-
----
-#### Check out [Portal2Boards.Net.Test](https://github.com/NeKzor/Portal2Boards.Net/blob/master/Portal2Boards.Net.Test/Program.cs) for more examples.
+# Credits
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
+- [Portal2Boards](https://github.com/iVerb1/Portal2Boards) by @iVerb1

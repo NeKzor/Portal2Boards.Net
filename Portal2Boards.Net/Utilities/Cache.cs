@@ -11,9 +11,8 @@ namespace Portal2Boards.Net.Utilities
 
 		public Task<T> Get<T>(string key)
 		{
-			if (_appCache.ContainsKey(key))
-				if (_appCache.TryGetValue(key, out var cache))
-					return Task.FromResult((T)cache);
+			if ((_appCache.ContainsKey(key)) && (_appCache.TryGetValue(key, out var cache)))
+				return Task.FromResult((T)cache);
 			return Task.FromResult(default(T));
 		}
 		public Task<bool> AddOrUpdate(string key, object cache)

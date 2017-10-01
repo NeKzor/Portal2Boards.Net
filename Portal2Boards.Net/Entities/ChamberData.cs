@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Net;
 using Portal2Boards.Net.API.Models;
-using Portal2Boards.Net.Utilities;
 
 namespace Portal2Boards.Net.Entities
 {
@@ -33,25 +32,18 @@ namespace Portal2Boards.Net.Entities
 		}
 		public ChamberData(BoardData board)
 		{
-			try
+			if (board != default(BoardData))
 			{
-				if (board != default(BoardData))
-				{
-					Id = board.Data.Score.ChangelogId;
-					Date = (string.IsNullOrEmpty(board.Data.Score.Date)) ? default(DateTime?) : DateTime.Parse(board.Data.Score.Date);
-					Player = new User(board.Data.User.BoardName, board.Data.User.Avatar, board.Id);
-					PlayerRank = board.Data.Score.PlayerRank;
-					ScoreRank = board.Data.Score.ScoreRank;
-					Score = board.Data.Score.Score;
-					DemoExists = board.Data.Score.HasDemo == "1";
-					YouTubeId = board.Data.Score.YouTubeId;
-					IsSubmission = board.Data.Score.Submission == "1";
-					Comment = WebUtility.HtmlDecode(board.Data.Score.Note);
-				}
-			}
-			catch (Exception e)
-			{
-				Logger.LogEntityException<ChamberData>(e).GetAwaiter().GetResult();
+				Id = board.Data.Score.ChangelogId;
+				Date = (string.IsNullOrEmpty(board.Data.Score.Date)) ? default(DateTime?) : DateTime.Parse(board.Data.Score.Date);
+				Player = new User(board.Data.User.BoardName, board.Data.User.Avatar, board.Id);
+				PlayerRank = board.Data.Score.PlayerRank;
+				ScoreRank = board.Data.Score.ScoreRank;
+				Score = board.Data.Score.Score;
+				DemoExists = board.Data.Score.HasDemo == "1";
+				YouTubeId = board.Data.Score.YouTubeId;
+				IsSubmission = board.Data.Score.Submission == "1";
+				Comment = WebUtility.HtmlDecode(board.Data.Score.Note);
 			}
 		}
 	}

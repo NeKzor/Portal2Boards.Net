@@ -128,13 +128,12 @@ namespace Portal2Boards.Net.Extensions
 		public static IReadOnlyCollection<Map> SinglePlayerMaps = CampaignMaps.Where(m => m.Type == MapType.SinglePlayer).ToList();
 		public static IReadOnlyCollection<Map> CooperativeMaps = CampaignMaps.Where(m => m.Type == MapType.Cooperative).ToList();
 
-		public const uint AppId = 620;
+		public const uint AppId = 620u;
 		public const string ProtocolVersion = "2001";
 		public const string ExeVersion = "2.0.0.1";
-		public const string ExeBuild = "6388";
-		public const string ExeBuildDate = "12:19:28 May 4 2016";
-		public const uint DefaultTickrate = 60;
-		public const uint DefaultMaxFps = 300;
+		public const string ExeBuild = "6879";
+		public const string ExeBuildDate = "16:13:49 Sep 7 2017";
+		public const uint DefaultTickrate = 60u;
 
 		public static float? AsTime(this uint? time)
 			=> (time != default(uint?)) ? (float)Math.Round((float)time / 100, 2) : default(float?);
@@ -194,3 +193,4 @@ namespace Portal2Boards.Net.Extensions
 									.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value);
 	}
 }
+ 

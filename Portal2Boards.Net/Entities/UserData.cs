@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Net;
 using Portal2Boards.Net.API.Models;
 using Portal2Boards.Net.Extensions;
-using Portal2Boards.Net.Utilities;
 
 namespace Portal2Boards.Net.Entities
 {
@@ -35,42 +34,35 @@ namespace Portal2Boards.Net.Entities
 		}
 		public UserData(ProfileData data)
 		{
-			try
+			if (data != default(ProfileData))
 			{
-				if (data != default(ProfileData))
+				SteamId = data.ProfileNumber;
+				IsRegistered = data.IsRegistered == "1";
+				HasRecords = data.HasRecords == "1";
+				DisplayName = WebUtility.HtmlDecode(data.UserData.DisplayName);
+				BoardName = WebUtility.HtmlDecode(data.UserData.BoardName);
+				SteamName = WebUtility.HtmlDecode(data.UserData.SteamName);
+				IsBanned = data.UserData.Banned == "1";
+				SteamAvatarLink = data.UserData.Avatar;
+				TwitchLink = data.UserData.Twitch;
+				YouTubeLink = data.UserData.YouTube;
+				Title = data.UserData.Title;
+				IsAdmin = data.UserData.Admin == "1";
+				Points = new DataPoints
 				{
-					SteamId = data.ProfileNumber;
-					IsRegistered = data.IsRegistered == "1";
-					HasRecords = data.HasRecords == "1";
-					DisplayName = WebUtility.HtmlDecode(data.UserData.DisplayName);
-					BoardName = WebUtility.HtmlDecode(data.UserData.BoardName);
-					SteamName = WebUtility.HtmlDecode(data.UserData.SteamName);
-					IsBanned = data.UserData.Banned == "1";
-					SteamAvatarLink = data.UserData.Avatar;
-					TwitchLink = data.UserData.Twitch;
-					YouTubeLink = data.UserData.YouTube;
-					Title = data.UserData.Title;
-					IsAdmin = data.UserData.Admin == "1";
-					Points = new DataPoints
-					{
-						SinglePlayer = new Points(data.Points.Sp),
-						Cooperative = new Points(data.Points.Coop),
-						Global = new Points(data.Points.Global)
-					};
-					var temp = new Dictionary<Chapter, Points>();
-					foreach (var item in data.Points.Chapters)
-					{
-						Enum.TryParse<Chapter>(item.Key, out var chapter);
-						temp.Add(chapter, new Points(item.Value));
-					}
-					Points.Chapters = temp;
-					Times = new DataTimes(data.Times);
+					SinglePlayer = new Points(data.Points.Sp),
+					Cooperative = new Points(data.Points.Coop),
+					Global = new Points(data.Points.Global)
+				};
+				var temp = new Dictionary<Chapter, Points>();
+				foreach (var item in data.Points.Chapters)
+				{
+					Enum.TryParse<Chapter>(item.Key, out var chapter);
+					temp.Add(chapter, new Points(item.Value));
 				}
-			}
-			catch (Exception e)
-			{
-				Logger.LogEntityException<UserData>(e).GetAwaiter().GetResult();
-			}
+				Points.Chapters = temp;
+				Times = new DataTimes(data.Times);
+				}
 		}
 	}
 

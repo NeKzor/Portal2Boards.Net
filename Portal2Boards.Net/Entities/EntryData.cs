@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Net;
 using Portal2Boards.Net.API.Models;
-using Portal2Boards.Net.Utilities;
 
 namespace Portal2Boards.Net.Entities
 {
@@ -42,28 +41,21 @@ namespace Portal2Boards.Net.Entities
 		}
 		public EntryData(ChangelogData changelog)
 		{
-			try
+			if (changelog != default(ChangelogData))
 			{
-				if (changelog != default(ChangelogData))
-				{
-					Id = changelog.Id;
-					Date = (string.IsNullOrEmpty(changelog.TimeGained)) ? default(DateTime?) : DateTime.Parse(changelog.TimeGained);
-					Map = new EntryMap(changelog.MapId, changelog.ChapterId, changelog.ChamberName);
-					Score = new EntryScore(changelog.Score, changelog.PreviousScore, changelog.Improvement);
-					Rank = new EntryRank(changelog.PostRank, changelog.PreRank, changelog.RankImprovement);
-					Points = new EntryPoints(changelog.PostPoints, changelog.PrePoints, changelog.PointImprovement);
-					Player = new User(changelog.PlayerName, changelog.Avatar, changelog.ProfileNumber);
-					IsBanned = changelog.Banned == "1";
-					IsSubmission = changelog.Submission == "1";
-					IsWorldRecord = changelog.WrGain == "1";
-					DemoExists = changelog.HasDemo == "1";
-					YouTubeId = changelog.YouTubeId;
-					Comment = WebUtility.HtmlDecode(changelog.Note);
-				}
-			}
-			catch (Exception e)
-			{
-				Logger.LogEntityException<EntryData>(e).GetAwaiter().GetResult();
+				Id = changelog.Id;
+				Date = (string.IsNullOrEmpty(changelog.TimeGained)) ? default(DateTime?) : DateTime.Parse(changelog.TimeGained);
+				Map = new EntryMap(changelog.MapId, changelog.ChapterId, changelog.ChamberName);
+				Score = new EntryScore(changelog.Score, changelog.PreviousScore, changelog.Improvement);
+				Rank = new EntryRank(changelog.PostRank, changelog.PreRank, changelog.RankImprovement);
+				Points = new EntryPoints(changelog.PostPoints, changelog.PrePoints, changelog.PointImprovement);
+				Player = new User(changelog.PlayerName, changelog.Avatar, changelog.ProfileNumber);
+				IsBanned = changelog.Banned == "1";
+				IsSubmission = changelog.Submission == "1";
+				IsWorldRecord = changelog.WrGain == "1";
+				DemoExists = changelog.HasDemo == "1";
+				YouTubeId = changelog.YouTubeId;
+				Comment = WebUtility.HtmlDecode(changelog.Note);
 			}
 		}
 	}
