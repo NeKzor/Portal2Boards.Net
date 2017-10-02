@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Portal2Boards.Net</id>
+	<title>Portal2Boards.Net</title>
+    <version>1.1.0</version>
+    <authors>NeKz</authors>
+    <owners>NeKz</owners>
+    <description>Retrieve Portal 2 challenge mode data from the speedrunning community board.iverb.me. Client includes automatic caching system and exception event for logging purposes.</description>
+    <projectUrl>https://github.com/NeKzor/Portal2Boards.Net</projectUrl>
+	<tags>portal2;speedrun;speedrunning</tags>
+  </metadata>
+</package>

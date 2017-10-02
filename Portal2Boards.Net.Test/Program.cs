@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define GEN_SP
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -39,13 +40,13 @@ namespace Portal2Boards.Net.Test
 				var aggregated = client.GetAggregatedAsync().GetAwaiter().GetResult();
 
 				WriteLine("Global points:");
-				foreach (var points in aggregated.DataPoints)
+				foreach (var points in aggregated.DataPoints.Take(10))
 				{
 					WriteLine($"[{points.Key}]\t{points.Value.UserData.BoardName} : {points.Value.ScoreData.Score}");
 				}
 
 				WriteLine("Global times:");
-				foreach (var points in aggregated.DataTimes)
+				foreach (var points in aggregated.DataTimes.Take(10))
 				{
 					WriteLine($"[{points.Key}]\t{points.Value.UserData.BoardName} : {points.Value.ScoreData.Score}");
 				}

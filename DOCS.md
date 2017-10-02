@@ -96,7 +96,7 @@ using Portal2Boards.Net.API;
 static ChangelogParameters _parameters = new ChangelogParameters()
 {
     [Parameters.MaxDaysAgo]= 7,
-    [Parameters.WorldRecord] = 1
+    [Parameters.WorldRecord] = 1,
     // Everything else will be null by default
     
     // Strings will be escaped automatically

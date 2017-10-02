@@ -1,6 +1,7 @@
 ﻿[![Build Status](https://travis-ci.org/NeKzor/Portal2Boards.Net.svg?branch=master)](https://travis-ci.org/NeKzor/Portal2Boards.Net)
-[![Build Version](https://img.shields.io/badge/version-v1.1-yellow.svg)](https://github.com/NeKzor/Portal2Boards.Net/projects/2)
+[![Build Version](https://img.shields.io/badge/version-v1.1-brightgreen.svg)](https://github.com/NeKzor/Portal2Boards.Net/projects/2)
 [![Release Status](https://img.shields.io/github/release/NeKzor/Portal2Boards.Net.svg)](https://github.com/NeKzor/Portal2Boards.Net/releases)
+[![Nuget Status](https://img.shields.io/nuget/v/Portal2Boards.Net.svg)](https://www.nuget.org/packages/Portal2Boards.Net)
 
 # Portal2Boards.Net
 
@@ -21,4 +22,4 @@ Client includes automatic caching system and exception event for logging purpose
 
 # Credits
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [Portal2Boards](https://github.com/iVerb1/Portal2Boards) by @iVerb1
+- [Portal2Boards](https://github.com/iVerb1/Portal2Boards) by [iVerb](https://github.com/iVerb1)
