@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal2Boards.Net", "Portal2Boards.Net\Portal2Boards.Net.csproj", "{735F5B0B-8968-4CF8-ADC9-8B31CC437335}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal2Boards.Net", "src\Portal2Boards.Net\Portal2Boards.Net.csproj", "{735F5B0B-8968-4CF8-ADC9-8B31CC437335}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{37FDB6F9-B3EF-497B-8F0C-E76FC2111F29}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal2Boards.Net.Test", "Portal2Boards.Net.Test\Portal2Boards.Net.Test.csproj", "{8ACFC7CF-1BF0-4705-8D46-CC4D0C290E84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portal2Boards.Net.Test", "src\Portal2Boards.Net.Test\Portal2Boards.Net.Test.csproj", "{8ACFC7CF-1BF0-4705-8D46-CC4D0C290E84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
