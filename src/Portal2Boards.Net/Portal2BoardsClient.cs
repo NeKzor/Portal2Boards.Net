@@ -51,16 +51,12 @@ namespace Portal2Boards
 			CacheResetTime = cacheResetTime ?? 5;
 			NoSsl = noSsl;
 		}
-
-		public async Task<IChangelog> GetChangelogAsync(Action<ChangelogParameters> setChangelog)
+		
+		public async Task<IChangelog> GetChangelogAsync(string query = "")
 		{
 			var result = default(IChangelog);
 			try
 			{
-				var parameters = new ChangelogParameters();
-				setChangelog.Invoke(parameters);
-				
-				var query = await parameters.GetQuery();
 				var get = $"/changelog/json{query}";
 				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
 				result = Changelog.Create(this, query, model);
@@ -72,19 +68,15 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-
-		public async Task<IChangelog> GetChangelogAsync(string query = "?")
+		public async Task<IChangelog> GetChangelogAsync(Action<ChangelogQuery> setChangelog)
 		{
-			if (string.IsNullOrEmpty(query))
-				throw new InvalidOperationException("Query string is null or empty.");
-			if (!query.StartsWith("?"))
-				throw new InvalidOperationException("Missing \"?\" in query string.");
-			if (query.IndexOf(" ") != -1)
-				throw new InvalidOperationException("Query string not escaped.");
-
 			var result = default(IChangelog);
 			try
 			{
+				var parameters = new ChangelogQuery();
+				setChangelog.Invoke(parameters);
+				
+				var query = await parameters.GetQuery();
 				var get = $"/changelog/json{query}";
 				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
 				result = Changelog.Create(this, query, model);

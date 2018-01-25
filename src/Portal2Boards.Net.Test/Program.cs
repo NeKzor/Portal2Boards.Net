@@ -13,7 +13,7 @@ namespace Portal2Boards.Test
 	internal static class Program
 	{
 		// Recommended
-		private static readonly ChangelogParameters _latestWorldRecords = new ChangelogParameters()
+		private static readonly ChangelogQueryBuilder _latestWorldRecords = new ChangelogQueryBuilder()
 		{
 			[Parameters.MaxDaysAgo] = 7,
 			[Parameters.WorldRecord] = 1

@@ -17,14 +17,14 @@ namespace Portal2Boards.Test
 
 	internal static class TwitterBot
     {
-		private static ChangelogParameters _latestWorldRecords { get; set; }
+		private static ChangelogQueryBuilder _latestWorldRecords { get; set; }
 		private static Portal2BoardsClient _client { get; set; }
 		private static readonly List<string> _tweets = new List<string>();
 		private const string _path = @"tweets.txt";
 
 		public static Task InitAsync()
 		{
-			_latestWorldRecords = new ChangelogParameters
+			_latestWorldRecords = new ChangelogQueryBuilder
 			{
 				[Parameters.WorldRecord] = 1,
 				[Parameters.MaxDaysAgo] = 4

@@ -15,7 +15,7 @@ namespace Portal2Boards.API
 			_client.DefaultRequestHeaders.UserAgent.ParseAdd
 			(
 				"Portal2Boards.Net/2.0" +
-				((!string.IsNullOrEmpty(userAgent)) ? userAgent : string.Empty)
+				((!string.IsNullOrEmpty(userAgent)) ? $" {userAgent}" : string.Empty)
 			);
 		}
 

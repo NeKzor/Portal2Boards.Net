@@ -15,7 +15,7 @@ Client includes automatic caching system and exception event for logging purpose
     - [Debugging](#debugging)
   - [Changelog](#changelog)
     - [Query](#query)
-    - [Parameters](#parameters)
+    - [Advanced](#advanced)
   - [Chamber](#chamber)
   - [Profile](#profile)
   - [Aggregated](#aggregated)
@@ -29,7 +29,7 @@ Client includes automatic caching system and exception event for logging purpose
 
 | Namespace | Description |
 | --- | --- |
-| Portal2Boards.Net | Client for fetching changelog, leaderboard, profile, aggregated data and demo content. |
+| Portal2Boards.Net | Client for fetching changelog, chamber, profile, aggregated data and demo content. |
 | Portal2Boards.Net.API.Models | API models converted from raw json. |
 | Portal2Boards.Net.Extensions | Useful extension methods. |
 
@@ -79,18 +79,31 @@ Task LogPortal2Boards(object sender, LogMessage msg)
 
 #### Query
 ```cs
-// Default query
+// Default
 var changelog = await _client.GetChangelogAsync();
 
-// Query example: gets all wrs within 24h
+// Get all wrs within 24h
 changelog = await _client.GetChangelogAsync("?maxDaysAgo=1&wr=1");
 ```
 
-#### Parameters
+#### Advanced
 
 ```cs
-// TODO
-var changelog = await client.GetChangelogAsync();
+var changelog = await _client.GetChangelogAsync(q =>
+{
+  // Names will be escaped automatically
+  q.ProfileName = "Portal Rex";
+  q.WorldRecord = true;
+});
+
+// With builder
+changelog = await _client.GetChangelogAsync
+(
+  new ChangelogQueryBuilder()
+    .WithWorldRecord(true)
+    .WithDemo(true)
+    .Build()
+);
 ```
 
 ### Leaderboard
@@ -99,14 +112,14 @@ var changelog = await client.GetChangelogAsync();
 var leaderboard = await _client.GetLeaderboardAsync(id);
 
 // With extensions
-using Portal2Boards.Net.Extensions
+using Portal2Boards.Net.Extensions;
 var map = await Portal2Map.Search("Smooth Jazz");
 leaderboard = await _client.GetLeaderboardAsync(map);
 ```
 
 ### Profile
 ```cs
-// By name (string will be escaped automatically)
+// By name (spaces will be removed automatically)
 var profile = await _client.GetProfileAsync("Portal Rex");
 
 // By steam id (ulong)
@@ -125,7 +138,7 @@ aggregated = await _client.GetAggregatedAsync(Chapter.ThePartWhereHeKillsYou);
 
 ### Demo Content
 ```cs
-var id = changelog.Data.First().Id;
+// Use changelog id (ulong)
 var bytes = await _client.GetDemoContentAsync(id);
 ```
 
