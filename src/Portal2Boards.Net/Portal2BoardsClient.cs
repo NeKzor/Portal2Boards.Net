@@ -4,9 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Portal2Boards.API;
-using Portal2Boards.API.Models;
 using Portal2Boards.Extensions;
-using Portal2Boards.Utilities;
 
 namespace Portal2Boards
 {
@@ -17,8 +15,6 @@ namespace Portal2Boards
 
 		// Config
 		public bool NoSsl { get; set; }
-		public ChangelogParameters Parameters { get; set; }
-
 		public bool AutoCache
 		{
 			get => _autoCache;
@@ -38,7 +34,7 @@ namespace Portal2Boards
 			set => _cacheResetTime = ((value == 0) ? 5 : value) * 60 * 1000;
 		}
 
-		private WebClient _client;
+		private ApiClient _client;
 		private Cache _cache;
 		private Timer _timer;
 		private bool _autoCache;
@@ -50,24 +46,24 @@ namespace Portal2Boards
 			uint? cacheResetTime = default,
 			bool noSsl = false)
 		{
-			_client = new WebClient(userAgent);
+			_client = new ApiClient(userAgent);
 			_autoCache = autoCache;
 			CacheResetTime = cacheResetTime ?? 5;
 			NoSsl = noSsl;
 		}
 
-		public async Task<IChangelog> GetChangelogAsync()
+		public async Task<IChangelog> GetChangelogAsync(Action<ChangelogParameters> setChangelog)
 		{
-			if (Parameters == null)
-				throw new InvalidOperationException("Empty query string and/or parameters are not set.");
-			
 			var result = default(IChangelog);
 			try
 			{
-				var query = await Parameters.ToQuery().ConfigureAwait(false);
+				var parameters = new ChangelogParameters();
+				setChangelog.Invoke(parameters);
+				
+				var query = await parameters.GetQuery();
 				var get = $"/changelog/json{query}";
 				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
-				result = Changelog.Create(model);
+				result = Changelog.Create(this, query, model);
 			}
 			catch (Exception ex)
 			{
@@ -91,7 +87,7 @@ namespace Portal2Boards
 			{
 				var get = $"/changelog/json{query}";
 				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
-				result = Changelog.Create(model);
+				result = Changelog.Create(this, query, model);
 			}
 			catch (Exception ex)
 			{
@@ -116,7 +112,7 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IChamber> GetChamberAsync(Map map)
+		public async Task<IChamber> GetChamberAsync(Portal2Map map)
 		{
 			var result = default(IChamber);
 			try
@@ -167,14 +163,14 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<Aggregated> GetAggregatedAsync(Chapter id = default(Chapter))
+		public async Task<Aggregated> GetAggregatedAsync(Chapter id = default)
 		{
 			var result = default(Aggregated);
 			try
 			{
 				var mode = await GetMode(id).ConfigureAwait(false);
 				var model = await GetCacheOrFetch<AggregatedModel>($"/aggregated/{mode}/json").ConfigureAwait(false);
-				result = Aggregated.Create(this, model);
+				result = Aggregated.Create(this, id, model);
 			}
 			catch (Exception ex)
 			{
@@ -183,7 +179,7 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<byte[]> GetDemoContentAsync(uint changelogId)
+		public async Task<byte[]> GetDemoContentAsync(ulong changelogId)
 		{
 			var result = default(byte[]);
 			try
@@ -274,11 +270,10 @@ namespace Portal2Boards
 		{
 			_client.Dispose();
 			// Stop auto cache, because callback can still happen after disposing
-			_autoCache = default(bool);
+			_autoCache = default;
 			_timer?.Dispose();
 			_cache = null;
 			Log = null;
-			Parameters = null;
 		}
 	}
 }

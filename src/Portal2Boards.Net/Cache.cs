@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Portal2Boards.Utilities
+namespace Portal2Boards
 {
 	internal class Cache
 	{
@@ -13,7 +13,7 @@ namespace Portal2Boards.Utilities
 		{
 			if ((_appCache.ContainsKey(key)) && (_appCache.TryGetValue(key, out var cache)))
 				return Task.FromResult((T)cache);
-			return Task.FromResult(default(T));
+			return Task.FromResult<T>(default);
 		}
 		public Task<bool> AddOrUpdate(string key, object cache)
 		{

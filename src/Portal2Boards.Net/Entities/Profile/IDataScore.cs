@@ -2,17 +2,17 @@ using System;
 
 namespace Portal2Boards
 {
-    public interface IChamberEntry
+    public interface IDataScore
 	{
-		uint ChangelogId { get; }
-		DateTime? Date { get; }
-		ISteamUser Player { get; }
+		string MapId { get; }
+		string Comment { get; }
+		bool IsSubmission { get; }
+		uint Id { get; }
 		uint? PlayerRank { get; }
 		uint? ScoreRank { get; }
 		uint? Score { get; }
+		DateTime? Date { get; }
 		bool DemoExists { get; }
 		string YouTubeId { get; }
-		bool IsSubmission { get; }
-		string Comment { get; }
 	}
 }

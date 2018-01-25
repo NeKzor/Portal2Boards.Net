@@ -3,25 +3,26 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Portal2Boards.Utilities
+namespace Portal2Boards.API
 {
-	internal sealed class WebClient : IDisposable
+	internal sealed class ApiClient : IDisposable
 	{
 		private readonly HttpClient _client;
 
-		public WebClient(string userAgent)
+		public ApiClient(string userAgent)
 		{
 			_client = new HttpClient();
 			_client.DefaultRequestHeaders.UserAgent.ParseAdd
 			(
-				$"Portal2Boards.Net/2.0" +
+				"Portal2Boards.Net/2.0" +
 				((!string.IsNullOrEmpty(userAgent)) ? userAgent : string.Empty)
 			);
 		}
 
 		public async Task<T> GetJsonObjectAsync<T>(string url)
 		{
-			var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url), HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
+			var get = new HttpRequestMessage(HttpMethod.Get, url);
+			var response = await _client.SendAsync(get, HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 			return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
 		}
@@ -29,7 +30,8 @@ namespace Portal2Boards.Utilities
 		// Gets the content of a demo file
 		public async Task<byte[]> GetBytesAsync(string url)
 		{
-			var response = await _client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url), HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
+			var get = new HttpRequestMessage(HttpMethod.Get, url);
+			var response = await _client.SendAsync(get, HttpCompletionOption.ResponseContentRead).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 			return await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
 		}

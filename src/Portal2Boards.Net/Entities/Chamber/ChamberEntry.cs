@@ -2,17 +2,17 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using Model = Portal2Boards.API.Models.ChamberEntryModel;
+using Model = Portal2Boards.API.ChamberEntryModel;
 
 namespace Portal2Boards
 {
     [DebuggerDisplay("{Id,nq}")]
-	public class ChamberEntry : IEntity, IChamberEntry
+	public class ChamberEntry : IEntity<ulong>, IChamberEntry
 	{
 		public ulong Id { get; private set; }
 		public uint ChangelogId { get; private set; }
 		public DateTime? Date { get; private set; }
-		public IUser Player { get; private set; }
+		public ISteamUser Player { get; private set; }
 		public uint? PlayerRank { get; private set; }
 		public uint? ScoreRank { get; private set; }
 		public uint? Score { get; private set; }
@@ -35,6 +35,8 @@ namespace Portal2Boards
 
 		public async Task<IProfile> GetProfileAsync()
 			=> await Client.GetProfileAsync(Id);
+		public async Task<IChangelog> GetChangelogAsync()
+			=> await Client.GetChangelogAsync($"?profileNumber={Id}");
 		public async Task<byte[]> GetDemoContentAsync()
 			=> await Client.GetDemoContentAsync(ChangelogId);
 
@@ -45,9 +47,9 @@ namespace Portal2Boards
 				Id = id,
 				ChangelogId = model.Score.ChangelogId,
 				Date = (string.IsNullOrEmpty(model.Score.Date))
-					? default(DateTime?)
+					? default
 					: DateTime.Parse(model.Score.Date),
-				Player = User.Create(model.User.BoardName, model.User.Avatar, id),
+				Player = SteamUser.Create(client, id, model.User.BoardName, model.User.Avatar),
 				PlayerRank = model.Score.PlayerRank,
 				ScoreRank = model.Score.ScoreRank,
 				Score = model.Score.Score,

@@ -1,12 +1,14 @@
+using System.Diagnostics;
 using System.Threading.Tasks;
-using Model = Portal2Boards.API.Models.AggregatedEntryDataModel;
+using Model = Portal2Boards.API.AggregatedEntryDataModel;
 
 namespace Portal2Boards
 {
-    public class AggregatedEntry : IEntity, IAggregatedEntry
+	[DebuggerDisplay("{Id,nq}")]
+    public class AggregatedEntry : IEntity<ulong>, IAggregatedEntry
 	{
 		public ulong Id { get; private set; }
-		public IUser Player { get; private set; }
+		public ISteamUser User { get; private set; }
 		public uint Score { get; private set; }
 		public uint PlayerRank { get; private set; }
 		public uint ScoreRank { get; private set; }
@@ -21,7 +23,7 @@ namespace Portal2Boards
 			return new AggregatedEntry()
 			{
 				Id = id,
-				Player = User.Create(model.UserData.BoardName, model.UserData.Avatar, id),
+				User = SteamUser.Create(client, id, model.UserData.BoardName, model.UserData.Avatar),
 				Score = uint.Parse(model.ScoreData.Score),
 				PlayerRank = uint.Parse(model.ScoreData.PlayerRank),
 				ScoreRank = uint.Parse(model.ScoreData.ScoreRank),

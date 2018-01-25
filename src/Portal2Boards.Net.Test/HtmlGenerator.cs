@@ -15,7 +15,7 @@ namespace Portal2Boards.Test
 		private static readonly List<string> _page = new List<string>();
 		private static readonly Portal2BoardsClient _client = new Portal2BoardsClient();
 
-		public static async Task GeneratePage(string path, MapType mode)
+		public static async Task GeneratePage(string path, Portal2MapType mode)
 		{
 #if RELEASE
 			if (File.Exists(path))
@@ -55,7 +55,7 @@ namespace Portal2Boards.Test
 			var totalscore = 0u;
 			var totalscorewithnoncm = 0u;
 			var wrholders = new Dictionary<string, UserStats>();
-			var maps = ((mode == MapType.SinglePlayer)
+			var maps = ((mode == Portal2MapType.SinglePlayer)
 				? Portal2.SinglePlayerMaps
 					.Where(m => m.BestTimeId != null)
 				: Portal2.CooperativeMaps
@@ -68,7 +68,7 @@ namespace Portal2Boards.Test
 				var latestwr = changelog.First(e => !e.IsBanned);
 				if (map.IsOfficial)
 					totalscore += latestwr.Score.Current ?? 0;
-				if (mode == MapType.SinglePlayer)
+				if (mode == Portal2MapType.SinglePlayer)
 					totalscorewithnoncm += latestwr.Score.Current ?? 0;
 
 				var wrs = changelog
@@ -105,7 +105,7 @@ namespace Portal2Boards.Test
 					_page.Add("</tr>");
 				}
 			}
-			if (mode == MapType.SinglePlayer)
+			if (mode == Portal2MapType.SinglePlayer)
 			{
 				_page.Add("<tr>");
 				_page.Add("<td><b>Official Total</b></td>");
@@ -122,26 +122,26 @@ namespace Portal2Boards.Test
 
 			// Second table
 			_page.Add("<div>");
-			_page.Add($"<br><h3 align=\"center\">{((mode == MapType.SinglePlayer) ? "Official " : string.Empty)}World Record Holders</h3>");
+			_page.Add($"<br><h3 align=\"center\">{((mode == Portal2MapType.SinglePlayer) ? "Official " : string.Empty)}World Record Holders</h3>");
 			_page.Add("<table align=\"center\" class=\"wrholders\">");
 			_page.Add("<thead><tr>");
 			_page.Add("<th>Player</th>");
-			if (mode == MapType.SinglePlayer)
+			if (mode == Portal2MapType.SinglePlayer)
 				_page.Add("<th>Official</th>");
 			_page.Add("<th>Total</th>");
-			if (mode == MapType.Cooperative)
+			if (mode == Portal2MapType.Cooperative)
 				_page.Add("<th>Percentage</th>");
 			_page.Add("</tr></thead>");
 			_page.Add("<tbody>");
-			foreach (var player in wrholders.OrderByDescending(p => (mode == MapType.SinglePlayer) ? p.Value.OfficialWorldRecords : p.Value.TotalWorldRecords))
+			foreach (var player in wrholders.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer) ? p.Value.OfficialWorldRecords : p.Value.TotalWorldRecords))
 			{
 				_page.Add("<tr>");
 				_page.Add($"<td><a href=\"{player.Value.Player.Link}\">{player.Key}</a></td>");
-				if (mode == MapType.SinglePlayer)
+				if (mode == Portal2MapType.SinglePlayer)
 					_page.Add($"<td title=\"{(int)(Math.Round((decimal)player.Value.OfficialWorldRecords / maps.Count, 2) * 100)}%\">{player.Value.OfficialWorldRecords}</td>");
 				var totalpercentage = (int)(Math.Round((decimal)player.Value.TotalWorldRecords / maps.Count, 2) * 100);
 				_page.Add($"<td title=\"{totalpercentage}%\">{player.Value.TotalWorldRecords}</td>");
-				if (mode == MapType.Cooperative)
+				if (mode == Portal2MapType.Cooperative)
 					_page.Add($"<td>{totalpercentage}%</td>");
 				_page.Add("</tr>");
 			}
@@ -151,20 +151,20 @@ namespace Portal2Boards.Test
 
 			// Third table
 			_page.Add("<div>");
-			_page.Add($"<br><h3 align=\"center\">{((mode == MapType.SinglePlayer) ? "Official " : string.Empty)}Duration</h3>");
+			_page.Add($"<br><h3 align=\"center\">{((mode == Portal2MapType.SinglePlayer) ? "Official " : string.Empty)}Duration</h3>");
 			_page.Add("<table align=\"center\" class=\"wrholders\">");
 			_page.Add("<thead><tr>");
 			_page.Add("<th>Player</th>");
-			if (mode == MapType.SinglePlayer)
+			if (mode == Portal2MapType.SinglePlayer)
 				_page.Add("<th>Official</th>");
 			_page.Add("<th>Total</th>");
 			_page.Add("</tr></thead>");
 			_page.Add("<tbody>");
-			foreach (var player in wrholders.OrderByDescending(p => (mode == MapType.SinglePlayer) ? p.Value.OfficialDuration : p.Value.TotalDuration))
+			foreach (var player in wrholders.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer) ? p.Value.OfficialDuration : p.Value.TotalDuration))
 			{
 				_page.Add("<tr>");
 				_page.Add($"<td><a href=\"{player.Value.Player.Link}\">{player.Key}</a></td>");
-				if (mode == MapType.SinglePlayer)
+				if (mode == Portal2MapType.SinglePlayer)
 					_page.Add($"<td>{player.Value.OfficialDuration}</td>");
 				_page.Add($"<td>{player.Value.TotalDuration}</td>");
 				_page.Add("</tr>");
@@ -175,7 +175,7 @@ namespace Portal2Boards.Test
 
 			watch.Stop();
 			// Footer
-			if (mode == MapType.SinglePlayer)
+			if (mode == Portal2MapType.SinglePlayer)
 				_page.Add("<br><sup>1</sup> Unofficial challenge mode map.");
 			_page.Add($"<br>Generated page in {watch.Elapsed.TotalSeconds.ToString("N3")} seconds.");
 			_page.Add("<br><a href=\"https://github.com/NeKzor/Portal2Boards.Net\">Portal2Boards.Net</a> example made by NeKz.");
@@ -217,6 +217,6 @@ namespace Portal2Boards.Test
 		public uint TotalWorldRecords { get; set; } = 0;
 		public uint OfficialDuration { get; set; } = 0;
 		public uint TotalDuration { get; set; } = 0;
-		public User Player { get; set; }
+		public SteamUser Player { get; set; }
 	}
 }

@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Newtonsoft.Json;
 
-namespace Portal2Boards.API.Models
+namespace Portal2Boards.API
 {
 	public sealed class AggregatedModel
 	{

@@ -1,7 +1,8 @@
 namespace Portal2Boards
 {
-    public interface IEntity
+	public interface IEntity<T>
+		where T : struct
 	{
-		ulong Id { get; }
+		T Id { get; }
 	}
 }

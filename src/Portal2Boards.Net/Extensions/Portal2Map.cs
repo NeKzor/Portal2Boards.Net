@@ -1,24 +1,27 @@
-﻿namespace Portal2Boards.Extensions
+﻿using System;
+using System.Linq;
+
+namespace Portal2Boards.Extensions
 {
-	public sealed class Map
+	public class Portal2Map
 	{
 		public static uint Count = 0;
 		
 		public uint Index;
 		public string Name { get; set; }
 		public string Alias { get; set; }
-		public MapType Type { get; set; }
+		public Portal2MapType Type { get; set; }
 		public ulong? BestTimeId { get; set; }
 		public ulong? BestPortalsId { get; set; }
 		public uint? ChapterId { get; set; }
 
 		public bool IsOfficial
-			=> ((Type == MapType.SinglePlayer) || Type == (MapType.Cooperative))
-				&& (BestTimeId != default(ulong?))
-				&& (BestPortalsId != default(ulong?));
+			=> ((Type == Portal2MapType.SinglePlayer) || Type == (Portal2MapType.Cooperative))
+				&& (BestTimeId != default)
+				&& (BestPortalsId != default);
 		public bool Exists
-			=> ((Type == MapType.SinglePlayer) || Type == (MapType.Cooperative))
-				&& (BestTimeId != default(ulong?));
+			=> ((Type == Portal2MapType.SinglePlayer) || Type == (Portal2MapType.Cooperative))
+				&& (BestTimeId != default);
 		
 		public string Link
 			=> $"https://board.iverb.me/chamber/{BestTimeId}";
@@ -31,10 +34,10 @@
 		public string BestPortalsSteamLink
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestPortalsId}";
 
-		public Map(
+		public Portal2Map(
 			string name = default,
 			string alias = default,
-			MapType type = default,
+			Portal2MapType type = default,
 			uint? bestTimeId = default,
 			uint? bestPortalsId = default,
 			uint? chapterId = default)
@@ -47,6 +50,19 @@
 			ChapterId = chapterId;
 			Index = Count;
 			Count++;
+		}
+
+		public static Portal2Map Search(
+			string name,
+			StringComparison comparison = StringComparison.CurrentCultureIgnoreCase)
+		{
+			return Portal2.CampaignMaps
+				.FirstOrDefault(m => string.Equals(m.Name, name, comparison) || string.Equals(m.Alias, name, comparison));
+		}
+		public static Portal2Map Search(ulong id)
+		{
+			return Portal2.CampaignMaps
+				.FirstOrDefault(m => (m.BestTimeId == id) || (m.BestPortalsId == id));
 		}
 	}
 }

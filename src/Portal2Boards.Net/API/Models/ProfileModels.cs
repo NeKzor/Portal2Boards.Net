@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Newtonsoft.Json;
 
-namespace Portal2Boards.API.Models
+namespace Portal2Boards.API
 {
 	public sealed class ProfileModel
 	{
@@ -14,14 +14,14 @@ namespace Portal2Boards.API.Models
 		[JsonProperty("hasRecords")]
 		public string HasRecords { get; set; }
 		[JsonProperty("userData")]
-		public ProfileUserData UserData { get; set; }
+		public ProfileUserModel UserData { get; set; }
 		[JsonProperty("points")]
-		public ProfilePointsData Points { get; set; }
+		public ProfilePointsModel Points { get; set; }
 		[JsonProperty("times")]
-		public ProfileTimesData Times { get; set; }
+		public ProfileTimesDataModel Times { get; set; }
 	}
 
-	public sealed class ProfileUserData
+	public sealed class ProfileUserModel
 	{
 		[JsonProperty("displayName")]
 		public string DisplayName { get; set; }
@@ -47,19 +47,19 @@ namespace Portal2Boards.API.Models
 		public string Admin { get; set; }
 	}
 
-	public sealed class ProfilePointsData
+	public sealed class ProfilePointsModel
 	{
 		[JsonProperty("SP")]
-		public ProfilePoints Sp { get; set; }
+		public ProfilePointsDataModel Sp { get; set; }
 		[JsonProperty("COOP")]
-		public ProfilePoints Coop { get; set; }
+		public ProfilePointsDataModel Coop { get; set; }
 		[JsonProperty("global")]
-		public ProfilePoints Global { get; set; }
+		public ProfilePointsDataModel Global { get; set; }
 		[JsonProperty("chapters")]
-		public IReadOnlyDictionary<string, ProfilePoints> Chapters { get; set; }
+		public IReadOnlyDictionary<string, ProfilePointsDataModel> Chapters { get; set; }
 	}
 
-	public class ProfilePoints
+	public class ProfilePointsDataModel
 	{
 		[JsonProperty("score")]
 		public uint? Score { get; set; }
@@ -73,37 +73,37 @@ namespace Portal2Boards.API.Models
 		public int? NextRankDiff { get; set; }
 	}
 
-	public sealed class ProfileTimesData
+	public sealed class ProfileTimesDataModel
 	{
 		[JsonProperty("SP")]
-		public ProfileTimes Sp { get; set; }
+		public ProfileTimesModel Sp { get; set; }
 		[JsonProperty("COOP")]
-		public ProfileTimes Coop { get; set; }
+		public ProfileTimesModel Coop { get; set; }
 		[JsonProperty("global")]
-		public ProfileTimes Global { get; set; }
+		public ProfileTimesModel Global { get; set; }
 		[JsonProperty("chapters")]
-		public IReadOnlyDictionary<string, ProfilePoints> Chapters { get; set; }
+		public IReadOnlyDictionary<string, ProfilePointsDataModel> Chapters { get; set; }
 		[JsonProperty("numDemos")]
 		public uint NumDemos { get; set; }
 		[JsonProperty("numYoutubeVideos")]
 		public uint NumYouTubeVideos { get; set; }
 		[JsonProperty("bestRank")]
-		public ProfileScore BestRank { get; set; }
+		public ProfileScoreModel BestRank { get; set; }
 		[JsonProperty("worstRank")]
-		public ProfileScore WorstRank { get; set; }
+		public ProfileScoreModel WorstRank { get; set; }
 		[JsonProperty("oldestScore")]
-		public ProfileScore OldestScore { get; set; }
+		public ProfileScoreModel OldestScore { get; set; }
 		[JsonProperty("newestScore")]
-		public ProfileScore NewestScore { get; set; }
+		public ProfileScoreModel NewestScore { get; set; }
 		[JsonProperty("numWRs")]
 		public uint NumWrs { get; set; }
 		[JsonProperty("globalAveragePlace")]
 		public float? GlobalAveragePlace { get; set; }
 	}
 
-	public sealed class ProfileTimes : ProfilePoints
+	public sealed class ProfileTimesModel : ProfilePointsDataModel
 	{
-		/// <summary> Note: This will be null for Global. </summary>
+		/// <summary> NOTE: This will be null for Global. </summary>
 		[JsonProperty("chambers")]
 		public ProfileTimesChamberData Chambers { get; set; }
 	}
@@ -117,28 +117,28 @@ namespace Portal2Boards.API.Models
 		[JsonProperty("mapCount")]
 		public uint MapCount { get; set; }
 		[JsonProperty("bestRank")]
-		public ProfileTimesScore BestRank { get; set; }
+		public ProfileTimesScoreModel BestRank { get; set; }
 		[JsonProperty("worstRank")]
-		public ProfileTimesScore WorstRank { get; set; }
+		public ProfileTimesScoreModel WorstRank { get; set; }
 		[JsonProperty("oldestScore")]
-		public ProfileTimesScore OldestScore { get; set; }
+		public ProfileTimesScoreModel OldestScore { get; set; }
 		[JsonProperty("newestScore")]
-		public ProfileTimesScore NewestScore { get; set; }
+		public ProfileTimesScoreModel NewestScore { get; set; }
 		[JsonProperty("numDemos")]
 		public uint NumDemos { get; set; }
 		[JsonProperty("numYouTubeVideos")]
 		public uint NumYouTubeVideos { get; set; }
 		[JsonProperty("chamber")]
-		public IReadOnlyDictionary<uint, IReadOnlyDictionary<uint, ProfileTimesMapData>> Chamber { get; set; }
+		public IReadOnlyDictionary<uint, IReadOnlyDictionary<uint, ProfileTimesMapModel>> Chamber { get; set; }
 		[JsonProperty("averagePlace")]
 		public float? AveragePlace { get; set; }
 	}
 
-	public sealed class ProfileTimesScore : ProfileScore
+	public sealed class ProfileTimesScoreModel : ProfileScoreModel
 	{
 	}
 
-	public sealed class ProfileTimesMapData : ProfileScoreData
+	public sealed class ProfileTimesMapModel : ProfileScoreDataModel
 	{
 		[JsonProperty("WRDiff")]
 		public float? WrDiff { get; set; }
@@ -146,15 +146,15 @@ namespace Portal2Boards.API.Models
 		public int? NextRankDiff { get; set; }
 	}
 
-	public class ProfileScore
+	public class ProfileScoreModel
 	{
 		[JsonProperty("scoreData")]
-		public ProfileScoreData ScoreData { get; set; }
+		public ProfileScoreDataModel ScoreData { get; set; }
 		[JsonProperty("map")]
 		public string Map { get; set; }
 	}
 
-	public class ProfileScoreData
+	public class ProfileScoreDataModel
 	{
 		[JsonProperty("note")]
 		public string Note { get; set; }

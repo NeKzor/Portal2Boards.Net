@@ -4,18 +4,19 @@ namespace Portal2Boards
 {
     public interface IChangelogEntry
 	{
-		uint Id { get; set; }
-		DateTime? Date { get; set; }
-		EntryMap Map { get; set; }
-		EntryScore Score { get; set; }
-		EntryRank Rank { get; set; }
-		EntryPoints Points { get; set; }
-		IUser Player { get; set; }
-		bool IsBanned { get; set; }
-		bool IsSubmission { get; set; }
-		bool IsWorldRecord { get; set; }
-		bool DemoExists { get; set; }
-		string YouTubeId { get; set; }
-		string Comment { get; set; }
+		DateTime? Date { get; }
+		uint MapId { get; }
+		uint ChapterId { get; }
+		string Name { get; }
+		IEntryData Score { get; }
+		IEntryData Rank { get; }
+		IEntryData Points { get; }
+		ISteamUser Player { get; }
+		bool IsBanned { get; }
+		bool IsSubmission { get; }
+		bool IsWorldRecord { get; }
+		bool DemoExists { get; }
+		string YouTubeId { get; }
+		string Comment { get; }
 	}
 }

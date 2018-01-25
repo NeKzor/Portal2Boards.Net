@@ -78,7 +78,7 @@ namespace Portal2Boards.Test
 				{
 					var oldwr = entry.Score.Current.AsTime();
 					var newwr = wr.Score.Current.AsTime();
-					if (map.Type == MapType.Cooperative)
+					if (map.Type == Portal2MapType.Cooperative)
 					{
 						if (foundcoop)
 						{
@@ -100,7 +100,7 @@ namespace Portal2Boards.Test
 								return oldwr - newwr;
 						}
 					}
-					else if (map.Type == MapType.SinglePlayer)
+					else if (map.Type == Portal2MapType.SinglePlayer)
 					{
 						if (oldwr == newwr)
 							return 0;

@@ -4,6 +4,7 @@ namespace Portal2Boards
 {
     public interface IChangelog
 	{
-		IReadOnlyCollection<IChangelogEntry> Entries { get; set; }
+		string Query { get; }
+		IReadOnlyCollection<IChangelogEntry> Entries { get; }
 	}
 }

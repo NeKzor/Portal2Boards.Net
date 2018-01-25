@@ -1,21 +1,37 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Model = System.Collections.Generic.IReadOnlyCollection<Portal2Boards.API.Models.ChangelogEntryModel>;
+using System.Threading.Tasks;
+using Model = System.Collections.Generic.IReadOnlyCollection<Portal2Boards.API.ChangelogEntryModel>;
 
 namespace Portal2Boards
 {
     [DebuggerDisplay("Count = {Entries.Count,nq}")]
-	public sealed class Changelog : IChangelog
+	public class Changelog : IChangelog, IUpdatable
     {
-		public IReadOnlyCollection<IChangelogEntry> Entries { get; set; }
+		public string Query { get; private set; }
+		public IReadOnlyCollection<IChangelogEntry> Entries { get; private set; }
 
-		internal static Changelog Create(Model model)
+		internal Portal2BoardsClient Client { get; private set; }
+
+		public async Task UpdateAsync()
+		{
+			var changelog = await Client.GetChangelogAsync(Query);
+			Entries = changelog.Entries;
+		}
+
+		internal static Changelog Create(Portal2BoardsClient client, string query, Model model)
 		{
 			var entries = new List<IChangelogEntry>();
 			foreach (var item in model)
-				entries.Add(ChangelogEntry.Create(item));
-			return new Changelog { Entries = entries };
+				entries.Add(ChangelogEntry.Create(client, item));
+			
+			return new Changelog
+			{
+				Query = query,
+				Entries = entries,
+				Client = client
+			};
 		}
 	}
 }

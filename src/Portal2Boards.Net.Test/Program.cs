@@ -156,10 +156,10 @@ namespace Portal2Boards.Test
 		// Example 1 (HtmlGenerator.cs)
 		[Conditional("GEN_SP")]
 		internal static void GenSpPage()
-			=> HtmlGenerator.GeneratePage(@"index.html", MapType.SinglePlayer).GetAwaiter().GetResult();
+			=> HtmlGenerator.GeneratePage(@"index.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
 		internal static void GenMpPage()
-			=> HtmlGenerator.GeneratePage(@"coop.html", MapType.Cooperative).GetAwaiter().GetResult();
+			=> HtmlGenerator.GeneratePage(@"coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]

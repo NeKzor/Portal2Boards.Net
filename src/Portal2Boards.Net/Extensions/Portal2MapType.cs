@@ -1,6 +1,6 @@
 ﻿namespace Portal2Boards.Extensions
 {
-	public enum MapType
+	public enum Portal2MapType
 	{
 		Unknown,
 		SinglePlayer,

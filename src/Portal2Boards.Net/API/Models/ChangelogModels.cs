@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Newtonsoft.Json;
 
-namespace Portal2Boards.API.Models
+namespace Portal2Boards.API
 {
 	public sealed class ChangelogEntryModel
 	{
@@ -14,7 +14,7 @@ namespace Portal2Boards.API.Models
 		[JsonProperty("score")]
 		public uint? Score { get; set; }
 		[JsonProperty("id")]
-		public uint Id { get; set; }
+		public ulong Id { get; set; }
 		[JsonProperty("pre_rank")]
 		public uint? PreRank { get; set; }
 		[JsonProperty("post_rank")]

@@ -2,28 +2,28 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Model = System.Collections.Generic.IReadOnlyDictionary<ulong, Portal2Boards.API.Models.ChamberEntryModel>;
+using Model = System.Collections.Generic.IReadOnlyDictionary<ulong, Portal2Boards.API.ChamberEntryModel>;
 
 namespace Portal2Boards
 {
-    [DebuggerDisplay("Count = {Entries.Count,nq}")]
-	public sealed class Chamber : IEntity, IChamber, IUpdatable
+    [DebuggerDisplay("[{Id,nq}] Entries = {Entries.Count,nq}")]
+	public class Chamber : IEntity<ulong>, IChamber, IUpdatable
     {
 		public ulong Id { get; private set; }
 		public IReadOnlyCollection<IChamberEntry> Entries { get; private set; }
 
-		internal Portal2BoardsClient _client;
+		internal Portal2BoardsClient Client { get; private set; }
 
 		public async Task UpdateAsync()
 		{
-			var chamber = await _client.GetChamberAsync(Id);
+			var chamber = await Client.GetChamberAsync(Id);
 			Entries = chamber.Entries;
 		}
 
-		internal static Chamber Create(
-			Portal2BoardsClient client,
-			ulong id,
-			Model model)
+		public async Task<IChangelog> GetChangelogAsync()
+			=> await Client.GetChangelogAsync($"?chamber={Id}");
+
+		internal static Chamber Create(Portal2BoardsClient client, ulong id, Model model)
 		{
 			var entries = new List<IChamberEntry>();
 			foreach (var item in model)
@@ -33,7 +33,7 @@ namespace Portal2Boards
 			{
 				Id = id,
 				Entries = entries,
-				_client = client
+				Client = client
 			};
 		}
 	}

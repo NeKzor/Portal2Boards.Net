@@ -1,32 +1,36 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Portal2Boards
 {
-	public interface IUser
+	[DebuggerDisplay("{Id,nq}")]
+    public class SteamUser : IEntity<ulong>, ISteamUser
 	{
-		string Name { get; set; }
-		string SteamAvatarLink { get; set; }
-		ulong SteamId { get; set; }
-	}
-
-	public class User : IUser
-	{
-		public string Name { get; set; }
-		public string SteamAvatarLink { get; set; }
-		public ulong SteamId { get; set; }
+		public ulong Id { get; private set; }
+		public string Name { get; private set; }
+		public string AvatarUrl { get; private set; }
 
 		public string Link
-			=> $"https://board.iverb.me/profile/{SteamId}";
-		public string SteamLink
-			=> $"https://steamcommunity.com/profiles/{SteamId}";
+			=> $"https://steamcommunity.com/profiles/{Id}";
+		
+		internal Portal2BoardsClient Client { get; private set; }
 
-		internal static User Create(string name = default, string steamAvatarLink = default, ulong steamId = default)
+		public async Task<IProfile> GetProfileAsync()
+			=> await Client.GetProfileAsync(Id);
+
+		internal static SteamUser Create(
+			Portal2BoardsClient client,
+			ulong id = default,
+			string name = default,
+			string avatarUrl = default)
 		{
-			return new User()
+			return new SteamUser()
 			{
+				Id = id,
 				Name = WebUtility.HtmlDecode(name),
-				SteamAvatarLink = steamAvatarLink,
-				SteamId = steamId
+				AvatarUrl = avatarUrl,
+				Client = client
 			};
 		}
 	}
