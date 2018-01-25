@@ -65,13 +65,13 @@ namespace Portal2Boards.Test
 			foreach (var map in maps)
 			{
 				var changelog = await _client.GetChangelogAsync($"?wr=1&chamber={map.BestTimeId}");
-				var latestwr = changelog.First(e => !e.IsBanned);
+				var latestwr = changelog.Entries.First(e => !e.IsBanned);
 				if (map.IsOfficial)
 					totalscore += latestwr.Score.Current ?? 0;
 				if (mode == Portal2MapType.SinglePlayer)
 					totalscorewithnoncm += latestwr.Score.Current ?? 0;
 
-				var wrs = changelog
+				var wrs = changelog.Entries
 					.Where(e => e.Score.Current == latestwr.Score.Current)
 					.ToList();
 				var once = false;
@@ -87,7 +87,7 @@ namespace Portal2Boards.Test
 						OfficialWorldRecords = wrholders[wr.Player.Name].OfficialWorldRecords + ((map.IsOfficial) ? 1u : 0),
 						TotalDuration = wrholders[wr.Player.Name].TotalDuration + duration ?? 0,
 						TotalWorldRecords = wrholders[wr.Player.Name].TotalWorldRecords + 1,
-						Player = wr.Player
+						Player = wr.Player as SteamUser
 					};
 
 					_page.Add("<tr>");
@@ -97,11 +97,11 @@ namespace Portal2Boards.Test
 						_page.Add($"<td rowspan=\"{wrs.Count}\">{wr.Score.Current.AsTimeToString() ?? "Error :("}</td>");
 						once = true;
 					}
-					_page.Add($"<td><a href=\"{wr.Player.Link}\">{wr.Player.Name}</a></td>");
+					_page.Add($"<td><a href=\"{(wr.Player as SteamUser).Link}\">{wr.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{wr.Date?.DateTimeToString()}\">{wr.Date?.ToString("yyyy-MM-dd") ?? "Unknown"}</td>");
 					_page.Add($"<td>{duration?.ToString() ?? "<1"}</td>");
-					_page.Add((wr.DemoExists) ? $"<td><a href=\"{wr.DemoLink}\">Download</a></td>" : "<td></td>");
-					_page.Add((wr.VideoExists) ? $"<td><a href=\"{wr.VideoLink}\">Watch</a></td>" : "<td></td>");
+					_page.Add((wr.DemoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).DemoLink}\">Download</a></td>" : "<td></td>");
+					_page.Add(((wr as ChangelogEntry).VideoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).VideoLink}\">Watch</a></td>" : "<td></td>");
 					_page.Add("</tr>");
 				}
 			}

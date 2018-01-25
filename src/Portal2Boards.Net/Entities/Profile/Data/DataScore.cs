@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using Portal2Boards.API;
+using Model = Portal2Boards.API.ProfileScoreModel;
 
 namespace Portal2Boards
 {
@@ -26,22 +27,24 @@ namespace Portal2Boards
 		public string VideoLink
 			=> $"https://youtu.be/{YouTubeId}";
 		
-		internal static DataScore Create(ProfileScoreModel data)
+		internal static DataScore Create(Model model)
 		{
+			if (model == null) return default;
+
 			return new DataScore()
 			{
-				MapId = data.Map,
-				Comment = WebUtility.HtmlDecode(data.ScoreData.Note),
-				IsSubmission = data.ScoreData.Submission == "1",
-				Id = data.ScoreData.ChangelogId,
-				PlayerRank = data.ScoreData.PlayerRank,
-				ScoreRank = data.ScoreData.ScoreRank,
-				Score = data.ScoreData.Score,
-				Date = (string.IsNullOrEmpty(data.ScoreData.Date))
+				MapId = model.Map,
+				Comment = WebUtility.HtmlDecode(model.ScoreData.Note),
+				IsSubmission = model.ScoreData.Submission == "1",
+				Id = model.ScoreData.ChangelogId,
+				PlayerRank = model.ScoreData.PlayerRank,
+				ScoreRank = model.ScoreData.ScoreRank,
+				Score = model.ScoreData.Score,
+				Date = (string.IsNullOrEmpty(model.ScoreData.Date))
 					? default
-					: DateTime.Parse(data.ScoreData.Date),
-				DemoExists = data.ScoreData.HasDemo == "1",
-				YouTubeId = data.ScoreData.YouTubeId
+					: DateTime.Parse(model.ScoreData.Date),
+				DemoExists = model.ScoreData.HasDemo == "1",
+				YouTubeId = model.ScoreData.YouTubeId
 			};
 		}
 	}

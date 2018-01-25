@@ -8,6 +8,7 @@
     <Description>ok²</Description>
     <Copyright>Copyright © NeKz 2017</Copyright>
     <Configurations>Debug</Configurations>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

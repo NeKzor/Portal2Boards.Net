@@ -24,7 +24,7 @@ namespace Portal2Boards
 		public uint? MaxDaysAgo { get; set; }
 		public bool? HasDate { get; set; }
 
-		public Task<string> GetQuery()
+		public string GetString()
 		{
 			var query = new StringBuilder();
 			
@@ -44,7 +44,7 @@ namespace Portal2Boards
 			if (HasDate != null) query.Append($"&hasDate={((bool)HasDate ? 1 : 0)}");
 
 			query[0] = '?';
-			return Task.FromResult($"{query}");
+			return $"{query}";
 		}
 	}
 }

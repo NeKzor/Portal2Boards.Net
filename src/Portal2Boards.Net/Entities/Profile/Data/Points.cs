@@ -12,6 +12,8 @@ namespace Portal2Boards
 
 		internal static Points Create(ProfilePointsDataModel data)
 		{
+			if (data == null) return default;
+
 			return new Points()
 			{
 				Score = data.Score,

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Portal2Boards.API;
-using Portal2Boards.Entities;
 using Portal2Boards.Extensions;
 
 namespace Portal2Boards.Test
@@ -15,43 +13,50 @@ namespace Portal2Boards.Test
 		public const int TweetLimit = 140;
 	}
 
-	internal static class TwitterBot
+	internal class TwitterBot
     {
-		private static ChangelogQueryBuilder _latestWorldRecords { get; set; }
-		private static Portal2BoardsClient _client { get; set; }
-		private static readonly List<string> _tweets = new List<string>();
+		private ChangelogQuery _latestWorldRecords { get; set; }
+		private Portal2BoardsClient _client { get; set; }
+		private readonly List<string> _tweets = new List<string>();
+
 		private const string _path = @"tweets.txt";
 
-		public static Task InitAsync()
+		public Task InitAsync()
 		{
-			_latestWorldRecords = new ChangelogQueryBuilder
-			{
-				[Parameters.WorldRecord] = 1,
-				[Parameters.MaxDaysAgo] = 4
-			};
-			_client = new Portal2BoardsClient(_latestWorldRecords, autoCache: false);
+			_latestWorldRecords = new ChangelogQueryBuilder()
+				.WithWorldRecord(true)
+				.WithMaxDaysAgo(4)
+				.Build();
+			_client = new Portal2BoardsClient(autoCache: false);
 			return Task.CompletedTask;
 		}
 
-		public static async Task RunAsync()
+		public async Task RunAsync()
 		{
 			if (File.Exists(_path))
 				File.Delete(_path);
 			_tweets.Clear();
 
-			var entryupdates = await _client.GetChangelogAsync();
-			if (entryupdates != null)
+			var changelog = await _client.GetChangelogAsync(() => _latestWorldRecords);
+			if (changelog != null)
 			{
-				foreach (var update in entryupdates)
+				foreach (ChangelogEntry update in changelog.Entries)
 				{
-					var delta = await GetWorldRecordDelta(update) ?? -1;
-					var wrdelta = (delta != -1) ? $" (-{delta.ToString("N2")})"
-												: string.Empty;
-					var tweet = await FormatMainTweetAsync($"New World Record in {update.Map.Name}\n" +
-														   $"{update.Score.Current.AsTimeToString()}{wrdelta} by {update.Player.Name}\n" +
-														   $"{update.Date?.DateTimeToString()} (UTC)",
-														   (update.DemoExists) ? update.DemoLink : string.Empty,
-														   (update.VideoExists) ? update.VideoLink : string.Empty);
+					var map = Portal2Map.Search(update.MapId);
+
+					var delta = await GetWorldRecordDelta(map, update) ?? -1;
+					var wrdelta = (delta != -1)
+						? $" (-{delta.ToString("N2")})"
+						: string.Empty;
+					
+					var tweet = await FormatMainTweetAsync
+					(
+						$"New World Record in {update.Name}\n" +
+						$"{update.Score.Current.AsTimeToString()}{wrdelta} by {update.Player.Name}\n" +
+						$"{update.Date?.DateTimeToString()} (CST)",
+						(update.DemoExists) ? update.DemoLink : string.Empty,
+						(update.VideoExists) ? update.VideoLink : string.Empty);
+					
 					if (tweet != string.Empty)
 					{
 						_tweets.Add(tweet);
@@ -65,12 +70,14 @@ namespace Portal2Boards.Test
 			File.AppendAllLines(_path, _tweets);
 		}
 
-		private static async Task<float?> GetWorldRecordDelta(EntryData wr)
+		private async Task<float?> GetWorldRecordDelta(Portal2Map map, IChangelogEntry wr)
 		{
-			var map = await Portal2.GetMapByName(wr.Map.Name);
 			var found = false;
 			var foundcoop = false;
-			foreach (var entry in await _client.GetChangelogAsync($"?wr=1&chamber={map.BestTimeId}"))
+
+			var changelog = await _client.GetChangelogAsync($"?wr=1&chamber={map.BestTimeId}");
+
+			foreach (ChangelogEntry entry in changelog.Entries)
 			{
 				if (entry.IsBanned)
 					continue;
@@ -87,17 +94,17 @@ namespace Portal2Boards.Test
 							if (newwr < oldwr)
 								return oldwr - newwr;
 						}
+						// Tie or partner score
 						else if (oldwr == newwr)
 						{
+							// Cooperative world record without a partner
+							// will be ignored, sadly that's a thing :>
 							foundcoop = true;
 							continue;
 						}
-						else
+						else if (newwr < oldwr)
 						{
-							if (oldwr == newwr)
-								return 0;
-							if (newwr < oldwr)
-								return oldwr - newwr;
+							return oldwr - newwr;
 						}
 					}
 					else if (map.Type == Portal2MapType.SinglePlayer)
@@ -109,13 +116,14 @@ namespace Portal2Boards.Test
 					}
 					break;
 				}
-				if (entry.Id == wr.Id)
+				if (entry.Id == (wr as ChangelogEntry).Id)
 					found = true;
 			}
-			return default(float?);
+
+			return default;
 		}
 
-		private static async Task<string> FormatMainTweetAsync(string msg, params string[] stuff)
+		private async Task<string> FormatMainTweetAsync(string msg, params string[] stuff)
 		{
 			var output = msg;
 			try

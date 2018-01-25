@@ -73,10 +73,27 @@ namespace Portal2Boards
 			var result = default(IChangelog);
 			try
 			{
-				var parameters = new ChangelogQuery();
-				setChangelog.Invoke(parameters);
-				
-				var query = await parameters.GetQuery();
+				var temp = new ChangelogQuery();
+				setChangelog.Invoke(temp);
+
+				var query = temp.GetString();
+				var get = $"/changelog/json{query}";
+				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
+				result = Changelog.Create(this, query, model);
+			}
+			catch (Exception ex)
+			{
+				if (Log != null)
+					await Log.Invoke(this, new LogMessage(typeof(IChangelog), ex)).ConfigureAwait(false);
+			}
+			return result;
+		}
+		public async Task<IChangelog> GetChangelogAsync(Func<ChangelogQuery> setChangelog)
+		{
+			var result = default(IChangelog);
+			try
+			{
+				var query = setChangelog.Invoke().GetString();
 				var get = $"/changelog/json{query}";
 				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
 				result = Changelog.Create(this, query, model);
@@ -161,7 +178,8 @@ namespace Portal2Boards
 			try
 			{
 				var mode = await GetMode(id).ConfigureAwait(false);
-				var model = await GetCacheOrFetch<AggregatedModel>($"/aggregated/{mode}/json").ConfigureAwait(false);
+				var get = $"/aggregated/{mode}/json";
+				var model = await GetCacheOrFetch<AggregatedModel>(get).ConfigureAwait(false);
 				result = Aggregated.Create(this, id, model);
 			}
 			catch (Exception ex)
@@ -179,11 +197,15 @@ namespace Portal2Boards
 				var get = $"/getDemo?id={changelogId}";
 				if (!_autoCache)
 				{
-					result = await _client.GetBytesAsync(get).ConfigureAwait(false);
+					result = await _client.GetBytesAsync(BaseApiUrl + get).ConfigureAwait(false);
 				}
 				else
 				{
-					result = await _cache.Get<byte[]>(get).ConfigureAwait(false) ?? await _client.GetBytesAsync(get).ConfigureAwait(false);
+					_timer = _timer ?? new Timer(TimerCallback, _autoCache, (int)_cacheResetTime, (int)_cacheResetTime);
+					_cache = _cache ?? new Cache();
+					
+					result = await _cache.Get<byte[]>(get).ConfigureAwait(false)
+						?? await _client.GetBytesAsync(BaseApiUrl + get).ConfigureAwait(false);
 					await _cache.AddOrUpdate(get, result).ConfigureAwait(false);
 				}
 			}
@@ -219,7 +241,10 @@ namespace Portal2Boards
 			_cache = _cache ?? new Cache();
 
 			var model = await _cache.Get<T>(url).ConfigureAwait(false)
-				?? await _client.GetJsonObjectAsync<T>(url).ConfigureAwait(false);
+				?? await _client.GetJsonObjectAsync<T>(BaseApiUrl + url).ConfigureAwait(false);
+			
+			// Don't cache BaseApiUrl which ignores changing
+			// http/https (why would you do that anyway)
 			await _cache.AddOrUpdate(url, model).ConfigureAwait(false);
 			return model;
 		}

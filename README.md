@@ -97,8 +97,7 @@ var changelog = await _client.GetChangelogAsync(q =>
 });
 
 // With builder
-changelog = await _client.GetChangelogAsync
-(
+changelog = await _client.GetChangelogAsync(() =>
   new ChangelogQueryBuilder()
     .WithWorldRecord(true)
     .WithDemo(true)
@@ -144,9 +143,9 @@ var bytes = await _client.GetDemoContentAsync(id);
 
 ## Examples
 
-- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs)  generate an example leaderboard web page of all world records ([view static version](https://nekzor.github.io/Portal2Boards.Net)).
+- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs) generates an example leaderboard web page of all world records ([view static version](https://nekzor.github.io/Portal2Boards.Net)).
 - [TwitterBot.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/TwitterBot.cs) generates a list of latest world records for tweets.
-- [NeKzBot](https://github.com/NeKzor/NeKzBot) implemented a notification system for Portal 2 world record updates.
+- [NeKzBot](https://github.com/NeKzor/NeKzBot) implemented a notification system for world record updates.
 
 ## Credits
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)

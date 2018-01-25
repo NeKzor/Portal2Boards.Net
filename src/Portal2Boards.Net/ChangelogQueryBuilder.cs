@@ -84,7 +84,7 @@ namespace Portal2Boards
 			return this;
 		}
 
-		public Task<string> Build()
-			=> _query.GetQuery();
+		public ChangelogQuery Build()
+			=> _query;
 	}
 }

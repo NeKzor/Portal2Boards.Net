@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using Portal2Boards.API;
+using Model = Portal2Boards.API.ProfileModel;
 
 namespace Portal2Boards
 {
@@ -37,45 +38,48 @@ namespace Portal2Boards
 		public string SteamLink
 			=> $"https://steamcommunity.com/profiles/{SteamId}";
 		
-		internal static Profile Create(ProfileModel data)
+		internal static Profile Create(Model model)
 		{
 			var chapters = new Dictionary<Chapter, IPoints>();
-			foreach (var item in data.Points.Chapters)
+			if (model.Points?.Chapters != null)
 			{
-				Enum.TryParse<Chapter>(item.Key, out var chapter);
-				chapters.Add(chapter, Portal2Boards.Points.Create(item.Value));
+				foreach (var item in model.Points.Chapters)
+				{
+					Enum.TryParse<Chapter>(item.Key, out var chapter);
+					chapters.Add(chapter, Portal2Boards.Points.Create(item.Value));
+				}
 			}
 			
 			return new Profile()
 			{
-				SteamId = data.ProfileNumber,
-				IsRegistered = data.IsRegistered == "1",
-				HasRecords = data.HasRecords == "1",
-				DisplayName = WebUtility.HtmlDecode(data.UserData.DisplayName),
-				BoardName = WebUtility.HtmlDecode(data.UserData.BoardName),
-				SteamName = WebUtility.HtmlDecode(data.UserData.SteamName),
-				IsBanned = data.UserData.Banned == "1",
-				SteamAvatarLink = data.UserData.Avatar,
-				TwitchLink = data.UserData.Twitch,
-				YouTubeLink = data.UserData.YouTube,
-				Title = data.UserData.Title,
-				IsAdmin = data.UserData.Admin == "1",
+				SteamId = model.ProfileNumber,
+				IsRegistered = model.IsRegistered == "1",
+				HasRecords = model.HasRecords == "1",
+				DisplayName = WebUtility.HtmlDecode(model.UserData.DisplayName),
+				BoardName = WebUtility.HtmlDecode(model.UserData.BoardName),
+				SteamName = WebUtility.HtmlDecode(model.UserData.SteamName),
+				IsBanned = model.UserData.Banned == "1",
+				SteamAvatarLink = model.UserData.Avatar,
+				TwitchLink = model.UserData.Twitch,
+				YouTubeLink = model.UserData.YouTube,
+				Title = model.UserData.Title,
+				IsAdmin = model.UserData.Admin == "1",
 				Points = DataPoints.Create
 				(
-					Portal2Boards.Points.Create(data.Points.Sp),
-					Portal2Boards.Points.Create(data.Points.Coop),
-					Portal2Boards.Points.Create(data.Points.Global),
+					Portal2Boards.Points.Create(model.Points.Sp),
+					Portal2Boards.Points.Create(model.Points.Coop),
+					Portal2Boards.Points.Create(model.Points.Global),
 					chapters
 				),
-				Times = DataTimes.Create(data.Times),
-				DemoCount = data.Times.NumDemos,
-				YouTubeVideoCount = data.Times.NumYouTubeVideos,
-				BestScore = DataScore.Create(data.Times.BestRank),
-				WorstScore = DataScore.Create(data.Times.WorstRank),
-				OldestScore = DataScore.Create(data.Times.OldestScore),
-				NewestScore = DataScore.Create(data.Times.NewestScore),
-				WorldRecordCount = data.Times.NumWrs,
-				GlobalAveragePlace = data.Times.GlobalAveragePlace
+				Times = DataTimes.Create(model.Times),
+				DemoCount = model.Times.NumDemos,
+				YouTubeVideoCount = model.Times.NumYouTubeVideos,
+				BestScore = DataScore.Create(model.Times.BestRank),
+				WorstScore = DataScore.Create(model.Times.WorstRank),
+				OldestScore = DataScore.Create(model.Times.OldestScore),
+				NewestScore = DataScore.Create(model.Times.NewestScore),
+				WorldRecordCount = model.Times.NumWrs,
+				GlobalAveragePlace = model.Times.GlobalAveragePlace
 			};
 		}
 	}

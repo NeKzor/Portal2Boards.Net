@@ -1,1 +1,1 @@
-dotnet build src/Portal2Boards.Net
+dotnet build

@@ -14,6 +14,8 @@ namespace Portal2Boards
 
 		internal static MapData Create(Model model)
 		{
+			if (model == null) return default;
+			
 			return new MapData()
 			{
 				Comment = WebUtility.HtmlDecode(model.Note),

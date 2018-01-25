@@ -10,6 +10,8 @@ namespace Portal2Boards
 		
 		internal static DataChambers Create(Model model)
 		{
+			if (model == null) return default;
+			
 			var data = new Dictionary<uint, IMapData>();
 			foreach (var item in model)
 				data.Add(item.Key, MapData.Create(item.Value));

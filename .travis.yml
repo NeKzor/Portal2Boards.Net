@@ -7,7 +7,7 @@ script:
   - cd src/Portal2Boards.Net/
   - dotnet restore
   - dotnet build --configuration Release
-  #- cd ../Portal2Boards.Net.Test
-  #- dotnet restore
-  #- dotnet build --configuration Release /p:DefineConstants="AGG"
-  #- dotnet run --project Portal2Boards.Net.Test.csproj --configuration Release
+  - cd src/Portal2Boards.Net.Test/
+  - dotnet restore
+  - dotnet build --configuration Release /p:DefineConstants="CHA"
+  - dotnet run --project Portal2Boards.Net.Test.csproj --configuration Release

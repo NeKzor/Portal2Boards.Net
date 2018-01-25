@@ -13,7 +13,7 @@ namespace Portal2Boards
 		{
 			if ((_appCache.ContainsKey(key)) && (_appCache.TryGetValue(key, out var cache)))
 				return Task.FromResult((T)cache);
-			return Task.FromResult<T>(default);
+			return Task.FromResult(default(T));
 		}
 		public Task<bool> AddOrUpdate(string key, object cache)
 		{

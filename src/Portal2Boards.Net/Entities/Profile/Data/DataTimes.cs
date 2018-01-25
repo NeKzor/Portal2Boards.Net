@@ -26,6 +26,8 @@ namespace Portal2Boards
 		
 		internal static DataTimes Create(Model model)
 		{
+			if (model == null) return default;
+			
 			var chapters = new Dictionary<Chapter, IPoints>();
 			foreach (var item in model.Chapters)
 			{

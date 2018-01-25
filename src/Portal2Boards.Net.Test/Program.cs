@@ -1,5 +1,4 @@
-﻿//#define GEN_SP
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,19 +9,17 @@ using static System.Console;
 
 namespace Portal2Boards.Test
 {
-	internal static class Program
+	internal class Program
 	{
-		// Recommended
-		private static readonly ChangelogQueryBuilder _latestWorldRecords = new ChangelogQueryBuilder()
-		{
-			[Parameters.MaxDaysAgo] = 7,
-			[Parameters.WorldRecord] = 1
-		};
-
+		private static readonly ChangelogQuery _latestWorldRecords = new ChangelogQueryBuilder()
+			.WithMaxDaysAgo(7)
+			.WithWorldRecord(true)
+			.Build();
+		
 		private static void Main()
 		{
 			GetAggregated();
-			GetLeaderboard();
+			GetChamber();
 			GetChangelog();
 			GetProfile();
 			GetDemo();
@@ -36,96 +33,124 @@ namespace Portal2Boards.Test
 		{
 			using (var client = new Portal2BoardsClient())
 			{
+				client.Log += LogPortal2Boards;
+
+				WriteLine("Fetching aggregated...");
 				var aggregated = client.GetAggregatedAsync().GetAwaiter().GetResult();
 
 				WriteLine("Global points:");
-				foreach (var points in aggregated.DataPoints.Take(10))
+				foreach (var points in aggregated.Points.Take(10))
 				{
-					WriteLine($"[{points.Key}]\t{points.Value.UserData.BoardName} : {points.Value.ScoreData.Score}");
+					WriteLine($"[{points.User.Id}]\t{points.User.Name} : {points.Score}");
 				}
 
 				WriteLine("Global times:");
-				foreach (var points in aggregated.DataTimes.Take(10))
+				foreach (var points in aggregated.Times.Take(10))
 				{
-					WriteLine($"[{points.Key}]\t{points.Value.UserData.BoardName} : {points.Value.ScoreData.Score}");
+					WriteLine($"[{points.User.Id}]\t{points.User.Name} : {points.Score}");
 				}
 			}
 		}
-		[Conditional("LB")]
-		internal static void GetLeaderboard()
+		[Conditional("CHA")]
+		internal static void GetChamber()
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				var board = client.GetLeaderboardAsync(47458).GetAwaiter().GetResult();
+				client.Log += LogPortal2Boards;
 
-				WriteLine($"Fetched {board.Data.Count} entries.");
-				foreach (var entry in board.Take(10))
+				WriteLine("Fetching chamber...");
+				var chamber = client.GetChamberAsync(47458).GetAwaiter().GetResult();
+
+				WriteLine($"Fetched {chamber.Entries.Count} entries.");
+				foreach (var entry in chamber.Entries.Take(10))
 				{
-					WriteLine($"[{entry.Id}]\t" +
-							  $"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
-							  $"{((float?)entry.Score / 100)?.ToString("N2") ?? "Unknown"} by " +
-							  $"{entry.Player.Name}");
+					WriteLine
+					(
+						$"[{entry.ChangelogId}]\t" +
+						$"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
+						$"{((float?)entry.Score / 100)?.ToString("N2") ?? "Unknown"} by " +
+						$"{entry.Player.Name}"
+					);
 				}
 			}
 		}
 		[Conditional("CLOG"), Conditional("CACHE")]
 		internal static void GetChangelog()
 		{
-			using (var client = new Portal2BoardsClient(_latestWorldRecords, cacheResetTime: 1))
+			using (var client = new Portal2BoardsClient(cacheResetTime: 1))
 			{
-				// Event test
-				client.Log += LogException;
+				client.Log += LogPortal2Boards;
 
-				var changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
+				WriteLine("Fetching changelog...");
+				var changelog = client.GetChangelogAsync(() => _latestWorldRecords).GetAwaiter().GetResult();
 #if CACHE
 				// Cache test 1
-				changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
+				WriteLine("Cache test 1...");
+				changelog = client.GetChangelogAsync(() => _latestWorldRecords).GetAwaiter().GetResult();
 #endif
 
 				WriteLine($"Fetched {changelog.Entries.Count} entries.");
-				foreach (var entry in changelog)
+				foreach (var entry in changelog.Entries)
 				{
-					WriteLine($"[{entry.Id}]\t" +
-							  $"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
-							  $"{entry.Map.Name} in " +
-							  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
-							  $"{entry.Player.Name}");
+					WriteLine
+					(
+						$"[{(entry as ChangelogEntry).Id}]\t" +
+						$"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
+						$"{entry.Name} in " +
+						$"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
+						$"{entry.Player.Name}"
+					);
 				}
 #if CACHE
 				// Cache test 2
-				client.ClearCache().GetAwaiter().GetResult();
+				WriteLine("Cache test 2...");
+				client.ClearCache();
 				changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
 
-				WriteLine($"Fetched {changelog.Data.Count} entries.");
-				foreach (var entry in changelog)
+				WriteLine($"Fetched {changelog.Entries.Count} entries.");
+				foreach (var entry in changelog.Entries.Take(20))
 				{
-					WriteLine($"[{entry.Id}]\t" +
-							  $"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
-							  $"{entry.Map.Name} in " +
-							  $"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
-							  $"{entry.Player.Name}");
+					WriteLine
+					(
+						$"[{(entry as ChangelogEntry).Id}]\t" +
+						$"[{entry.Date?.ToString("s") ?? "Unknown"}] " +
+						$"{entry.Name} in " +
+						$"{((float?)entry.Score.Current / 100)?.ToString("N2") ?? "Unknown"} by " +
+						$"{entry.Player.Name}"
+					);
 				}
 #endif
 			}
 		}
-		[Conditional("PRO_EX"), Conditional("PRO")]
+		[Conditional("PRO")]
 		internal static void GetProfile()
 		{
+			// Helper
+			string FormatChapterTitle(string str)
+			{
+				var output = string.Empty;
+				if (str?.Length > 0)
+				{
+					output = $"{str[0]}";
+					foreach (var c in str.Skip(1))
+						output += char.IsLower(c) ? $"{c}" : $" {c}";
+				}
+				return output;
+			}
+
 			using (var client = new Portal2BoardsClient())
 			{
-				var profile = client.GetProfileAsync("Nik :D <2").GetAwaiter().GetResult();
-#if PRO_EX
-				// Inject exception
-				profile.Data.Times.BestRank.ScoreData.Date = "AYY LMAO";
-#endif
-				var user = (UserData)profile.Data;
+				client.Log += LogPortal2Boards;
 
-				WriteLine($"User profile of: {user.SteamName}");
-				WriteLine($"User profile of: {user.DisplayName}");
-				WriteLine($"User profile of: {user.BoardName}");
-				foreach (var chapter in user.Times.SinglePlayer.Chapters.Chambers)
+				WriteLine("Fetching profile...");
+				var profile = client.GetProfileAsync("The Nard Dog").GetAwaiter().GetResult();
+
+				WriteLine($"User profile of: {profile.SteamName}");
+				WriteLine($"User profile of: {profile.DisplayName}");
+				WriteLine($"User profile of: {profile.BoardName}");
+				foreach (var chapter in profile.Times.SinglePlayerChapters.Chambers)
 				{
-					WriteLine($"[{Enum.GetName(typeof(Chapter), chapter.Key).FormatChapterTitle()}]");
+					WriteLine($"[{FormatChapterTitle(Enum.GetName(typeof(Chapter), chapter.Key))}]");
 					foreach (var chamber in chapter.Value.Data)
 					{
 						WriteLine($"[{chamber.Key}]\t{chamber.Value.MapId} in {chamber.Value.Score} : Rank {chamber.Value.PlayerRank}");
@@ -138,16 +163,17 @@ namespace Portal2Boards.Test
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				var content = client.GetDemoContentAsync(64230).GetAwaiter().GetResult();
-				// Do stuff with content
-				using (var stream = new FileStream("not_rank_2.dem", FileMode.Create))
-				using (var memory = new MemoryStream(content))
-					memory.CopyToAsync(stream).GetAwaiter().GetResult();
+				client.Log += LogPortal2Boards;
+
+				WriteLine("Fetching demo content...");
+				var content = client.GetDemoContentAsync(79120).GetAwaiter().GetResult();
+				
+				WriteLine($"Bytes: {content?.Length ?? 0}");
 			}
 		}
 
 		// Logger test
-		internal static Task LogException(object _, LogMessage message)
+		internal static Task LogPortal2Boards(object _, LogMessage message)
 		{
 			WriteLine(message.ToString());
 			return Task.CompletedTask;
@@ -165,21 +191,9 @@ namespace Portal2Boards.Test
 		[Conditional("TWBOT")]
 		internal static void StartTwBot()
 		{
-			TwitterBot.InitAsync().GetAwaiter().GetResult();
-			TwitterBot.RunAsync().GetAwaiter().GetResult();
-		}
-
-		// Helper
-		private static string FormatChapterTitle(this string str)
-		{
-			var output = string.Empty;
-			if (str?.Length > 0)
-			{
-				output = $"{str[0]}";
-				foreach (var c in str.Skip(1))
-					output += char.IsLower(c) ? $"{c}" : $" {c}";
-			}
-			return output;
+			var bot = new TwitterBot();
+			_ = bot.InitAsync();
+			_ = bot.RunAsync();
 		}
 	}
 }

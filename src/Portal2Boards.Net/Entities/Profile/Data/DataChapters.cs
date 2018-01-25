@@ -21,14 +21,16 @@ namespace Portal2Boards
 
 		internal static DataChapters Create(Model data)
 		{
-			// Global chapters don't exist
 			if (data == null) return default;
 			
 			var chambers = new Dictionary<Chapter, IDataChambers>();
-			foreach (var item in data.Chamber)
+			if (data.Chamber != null)
 			{
-				Enum.TryParse<Chapter>(item.Key.ToString(), out var chapter);
-				chambers.Add(chapter, DataChambers.Create(item.Value));
+				foreach (var item in data.Chamber)
+				{
+					Enum.TryParse<Chapter>(item.Key.ToString(), out var chapter);
+					chambers.Add(chapter, DataChambers.Create(item.Value));
+				}
 			}
 			
 			return new DataChapters()
