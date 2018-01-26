@@ -6,7 +6,7 @@ namespace Portal2Boards
 	{
 		DateTime? Date { get; }
 		uint MapId { get; }
-		uint ChapterId { get; }
+		ChapterType Chapter { get; }
 		string Name { get; }
 		IEntryData Score { get; }
 		IEntryData Rank { get; }

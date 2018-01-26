@@ -147,7 +147,7 @@ namespace Portal2Boards
 			{
 				var get = $"/profile/{boardName.Replace(" ", string.Empty)}/json";
 				var model = await GetCacheOrFetch<ProfileModel>(get).ConfigureAwait(false);
-				result = Profile.Create(model);
+				result = Profile.Create(this, model);
 			}
 			catch (Exception ex)
 			{
@@ -163,7 +163,7 @@ namespace Portal2Boards
 			{
 				var get = $"/profile/{steamId}/json";
 				var model = await GetCacheOrFetch<ProfileModel>(get).ConfigureAwait(false);
-				result = Profile.Create(model);
+				result = Profile.Create(this, model);
 			}
 			catch (Exception ex)
 			{
@@ -172,15 +172,46 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<Aggregated> GetAggregatedAsync(Chapter id = default)
+		public async Task<Aggregated> GetAggregatedAsync(AggregatedMode mode = default)
 		{
+			var url = "/overall";
+			switch (mode)
+			{
+				case AggregatedMode.SinglePlayer:
+					url = "/sp";
+					break;
+				case AggregatedMode.Cooperative:
+					url = "/coop";
+					break;
+				case AggregatedMode.Chapter:
+					throw new InvalidOperationException("Invalid mode. Use ChapterType instead of AggregatedMode.");
+			}
+			
 			var result = default(Aggregated);
 			try
 			{
-				var mode = await GetMode(id).ConfigureAwait(false);
-				var get = $"/aggregated/{mode}/json";
+				var get = $"/aggregated{url}/json";
 				var model = await GetCacheOrFetch<AggregatedModel>(get).ConfigureAwait(false);
-				result = Aggregated.Create(this, id, model);
+				result = Aggregated.Create(this, mode, ChapterType.None, model);
+			}
+			catch (Exception ex)
+			{
+				if (Log != null)
+					await Log.Invoke(this, new LogMessage(typeof(Aggregated), ex)).ConfigureAwait(false);
+			}
+			return result;
+		}
+		public async Task<Aggregated> GetAggregatedAsync(ChapterType chapter)
+		{
+			if (chapter == ChapterType.None)
+				throw new InvalidOperationException("Invalid chapter.");
+			
+			var result = default(Aggregated);
+			try
+			{
+				var get = $"/aggregated/chapter/{(int)chapter}json";
+				var model = await GetCacheOrFetch<AggregatedModel>(get).ConfigureAwait(false);
+				result = Aggregated.Create(this, AggregatedMode.Chapter, chapter, model);
 			}
 			catch (Exception ex)
 			{
@@ -253,34 +284,6 @@ namespace Portal2Boards
 		{
 			if ((bool)stateInfo)
 				_cache = new Cache();
-		}
-
-		internal Task<string> GetMode(Chapter id)
-		{
-			var mode = "overall";
-			switch (id)
-			{
-				case Chapter.TeamBuilding:
-				case Chapter.MassAndVelocity:
-				case Chapter.HardLight:
-				case Chapter.ExcursionFunnels:
-				case Chapter.MobilityGels:
-				case Chapter.ArtTherapy:
-					mode = $"coop/{id}";
-					break;
-				case Chapter.TheCourtseyCall:
-				case Chapter.TheColdBoot:
-				case Chapter.TheReturn:
-				case Chapter.TheSurprise:
-				case Chapter.TheEscape:
-				case Chapter.TheFall:
-				case Chapter.TheReunion:
-				case Chapter.TheItch:
-				case Chapter.ThePartWhereHeKillsYou:
-					mode = $"sp/{id}";
-					break;
-			}
-			return Task.FromResult(mode);
 		}
 
 		public void Dispose()

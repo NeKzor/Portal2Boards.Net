@@ -10,7 +10,7 @@ namespace Portal2Boards.Test
 	// This is a copy of NeKzBot (https://github.com/NeKzor/NeKzBot)
 	public static class Twitter
 	{
-		public const int TweetLimit = 140;
+		public const int TweetLimit = 280;
 	}
 
 	internal class TwitterBot
@@ -19,7 +19,7 @@ namespace Portal2Boards.Test
 		private Portal2BoardsClient _client { get; set; }
 		private readonly List<string> _tweets = new List<string>();
 
-		private const string _path = @"tweets.txt";
+		private const string _path = "tweets.txt";
 
 		public Task InitAsync()
 		{
@@ -54,8 +54,9 @@ namespace Portal2Boards.Test
 						$"New World Record in {update.Name}\n" +
 						$"{update.Score.Current.AsTimeToString()}{wrdelta} by {update.Player.Name}\n" +
 						$"{update.Date?.DateTimeToString()} (CST)",
-						(update.DemoExists) ? update.DemoLink : string.Empty,
-						(update.VideoExists) ? update.VideoLink : string.Empty);
+						(update.DemoExists) ? update.DemoUrl : string.Empty,
+						(update.VideoExists) ? update.VideoUrl : string.Empty
+					);
 					
 					if (tweet != string.Empty)
 					{

@@ -28,7 +28,7 @@ namespace Portal2Boards.Test
 			_page.Add("<!DOCTYPE html>");
 			_page.Add("<html>");
 			_page.Add("<head>");
-			_page.Add("<title>Portal2Records</title>");
+			_page.Add("<title>Portal2Boards.Net</title>");
 			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
 			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: left;}table.wrs{width:50%;}table.wrholders{width:20%;}th,td{padding: 1px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
 			_page.Add("</head>");
@@ -93,15 +93,15 @@ namespace Portal2Boards.Test
 					_page.Add("<tr>");
 					if (!once)
 					{
-						_page.Add($"<td rowspan=\"{wrs.Count}\" align=\"center\"><a href=\"{map.Link}\" title=\"{map.Name}\">{map.Alias}</a>{((map.IsOfficial) ? string.Empty : "<sup>1</sup>")}</td>");
+						_page.Add($"<td rowspan=\"{wrs.Count}\" align=\"center\"><a href=\"{map.Url}\" title=\"{map.Name}\">{map.Alias}</a>{((map.IsOfficial) ? string.Empty : "<sup>1</sup>")}</td>");
 						_page.Add($"<td rowspan=\"{wrs.Count}\">{wr.Score.Current.AsTimeToString() ?? "Error :("}</td>");
 						once = true;
 					}
-					_page.Add($"<td><a href=\"{(wr.Player as SteamUser).Link}\">{wr.Player.Name}</a></td>");
+					_page.Add($"<td><a href=\"{(wr.Player as SteamUser).Url}\">{wr.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{wr.Date?.DateTimeToString()}\">{wr.Date?.ToString("yyyy-MM-dd") ?? "Unknown"}</td>");
 					_page.Add($"<td>{duration?.ToString() ?? "<1"}</td>");
-					_page.Add((wr.DemoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).DemoLink}\">Download</a></td>" : "<td></td>");
-					_page.Add(((wr as ChangelogEntry).VideoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).VideoLink}\">Watch</a></td>" : "<td></td>");
+					_page.Add((wr.DemoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).DemoUrl}\">Download</a></td>" : "<td></td>");
+					_page.Add(((wr as ChangelogEntry).VideoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).VideoUrl}\">Watch</a></td>" : "<td></td>");
 					_page.Add("</tr>");
 				}
 			}
@@ -136,7 +136,7 @@ namespace Portal2Boards.Test
 			foreach (var player in wrholders.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer) ? p.Value.OfficialWorldRecords : p.Value.TotalWorldRecords))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{player.Value.Player.Link}\">{player.Key}</a></td>");
+				_page.Add($"<td><a href=\"{player.Value.Player.Url}\">{player.Key}</a></td>");
 				if (mode == Portal2MapType.SinglePlayer)
 					_page.Add($"<td title=\"{(int)(Math.Round((decimal)player.Value.OfficialWorldRecords / maps.Count, 2) * 100)}%\">{player.Value.OfficialWorldRecords}</td>");
 				var totalpercentage = (int)(Math.Round((decimal)player.Value.TotalWorldRecords / maps.Count, 2) * 100);
@@ -163,7 +163,7 @@ namespace Portal2Boards.Test
 			foreach (var player in wrholders.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer) ? p.Value.OfficialDuration : p.Value.TotalDuration))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{player.Value.Player.Link}\">{player.Key}</a></td>");
+				_page.Add($"<td><a href=\"{player.Value.Player.Url}\">{player.Key}</a></td>");
 				if (mode == Portal2MapType.SinglePlayer)
 					_page.Add($"<td>{player.Value.OfficialDuration}</td>");
 				_page.Add($"<td>{player.Value.TotalDuration}</td>");

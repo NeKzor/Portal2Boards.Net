@@ -124,7 +124,7 @@ namespace Portal2Boards.Extensions
 		public static IReadOnlyCollection<Portal2Map> SinglePlayerMaps = CampaignMaps
 			.Where(m => m.Type == Portal2MapType.SinglePlayer)
 			.ToList();
-		public static IReadOnlyCollection<Portal2Map> CooperativeMaps => CampaignMaps
+		public static IReadOnlyCollection<Portal2Map> CooperativeMaps = CampaignMaps
 			.Where(m => m.Type == Portal2MapType.Cooperative)
 			.ToList();
 	}

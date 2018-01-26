@@ -21,9 +21,9 @@ namespace Portal2Boards
 		public bool IsSubmission { get; private set; }
 		public string Comment { get; private set; }
 
-		public string DemoLink
+		public string DemoUrl
 			=> $"https://board.iverb.me/getDemo?id={ChangelogId}";
-		public string VideoLink
+		public string VideoUrl
 			=> $"https://youtu.be/{YouTubeId}";
 		
 		public bool CommentExists
@@ -46,9 +46,9 @@ namespace Portal2Boards
 			{
 				Id = id,
 				ChangelogId = model.Score.ChangelogId,
-				Date = (string.IsNullOrEmpty(model.Score.Date))
-					? default
-					: DateTime.Parse(model.Score.Date),
+				Date = (!string.IsNullOrEmpty(model.Score.Date))
+					? DateTime.Parse(model.Score.Date)
+					: default,
 				Player = SteamUser.Create(client, id, model.User.BoardName, model.User.Avatar),
 				PlayerRank = model.Score.PlayerRank,
 				ScoreRank = model.Score.ScoreRank,

@@ -23,15 +23,15 @@ namespace Portal2Boards.Extensions
 			=> ((Type == Portal2MapType.SinglePlayer) || Type == (Portal2MapType.Cooperative))
 				&& (BestTimeId != default);
 		
-		public string Link
+		public string Url
 			=> $"https://board.iverb.me/chamber/{BestTimeId}";
-		public string ImageLink
+		public string ImageUrl
 			=> $"https://board.iverb.me/images/chambers/{BestTimeId}.jpg";
-		public string ImageLinkFull
+		public string ImageFullUrl
 			=> $"https://board.iverb.me/images/chambers_full/{BestTimeId}.jpg";
-		public string BestTimeSteamLink
+		public string BestTimeSteamUrl
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestTimeId}";
-		public string BestPortalsSteamLink
+		public string BestPortalsSteamUrl
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestPortalsId}";
 
 		public Portal2Map(

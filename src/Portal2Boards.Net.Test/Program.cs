@@ -23,9 +23,9 @@ namespace Portal2Boards.Test
 			GetChangelog();
 			GetProfile();
 			GetDemo();
-			GenSpPage();
-			GenMpPage();
-			StartTwBot();
+			GenerateSpPage();
+			GenerateMpPage();
+			StartTwitterBot();
 		}
 
 		[Conditional("AGG")]
@@ -41,13 +41,13 @@ namespace Portal2Boards.Test
 				WriteLine("Global points:");
 				foreach (var points in aggregated.Points.Take(10))
 				{
-					WriteLine($"[{points.User.Id}]\t{points.User.Name} : {points.Score}");
+					WriteLine($"[{(points.Player as IEntity<ulong>).Id}]\t{points.Player.Name} : {points.Score}");
 				}
 
 				WriteLine("Global times:");
 				foreach (var points in aggregated.Times.Take(10))
 				{
-					WriteLine($"[{points.User.Id}]\t{points.User.Name} : {points.Score}");
+					WriteLine($"[{(points.Player as IEntity<ulong>).Id}]\t{points.Player.Name} : {points.Score}");
 				}
 			}
 		}
@@ -143,17 +143,20 @@ namespace Portal2Boards.Test
 				client.Log += LogPortal2Boards;
 
 				WriteLine("Fetching profile...");
-				var profile = client.GetProfileAsync("The Nard Dog").GetAwaiter().GetResult();
+				var profile = client.GetProfileAsync("Xinera").GetAwaiter().GetResult();
 
 				WriteLine($"User profile of: {profile.SteamName}");
 				WriteLine($"User profile of: {profile.DisplayName}");
 				WriteLine($"User profile of: {profile.BoardName}");
 				foreach (var chapter in profile.Times.SinglePlayerChapters.Chambers)
 				{
-					WriteLine($"[{FormatChapterTitle(Enum.GetName(typeof(Chapter), chapter.Key))}]");
+					WriteLine($"[{FormatChapterTitle(chapter.Key.ToString("G"))}]");
 					foreach (var chamber in chapter.Value.Data)
 					{
-						WriteLine($"[{chamber.Key}]\t{chamber.Value.MapId} in {chamber.Value.Score} : Rank {chamber.Value.PlayerRank}");
+						WriteLine
+						(
+							$"[{chamber.Key}]\t{(chamber.Value as IEntity<ulong>).Id} " +
+							$"in {chamber.Value.Score} : Rank {chamber.Value.PlayerRank}");
 					}
 				}
 			}
@@ -181,15 +184,15 @@ namespace Portal2Boards.Test
 
 		// Example 1 (HtmlGenerator.cs)
 		[Conditional("GEN_SP")]
-		internal static void GenSpPage()
-			=> HtmlGenerator.GeneratePage(@"index.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
+		internal static void GenerateSpPage()
+			=> HtmlGenerator.GeneratePage("index.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
-		internal static void GenMpPage()
-			=> HtmlGenerator.GeneratePage(@"coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
+		internal static void GenerateMpPage()
+			=> HtmlGenerator.GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]
-		internal static void StartTwBot()
+		internal static void StartTwitterBot()
 		{
 			var bot = new TwitterBot();
 			_ = bot.InitAsync();

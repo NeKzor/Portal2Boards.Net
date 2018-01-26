@@ -11,7 +11,7 @@ namespace Portal2Boards
 		public string Name { get; private set; }
 		public string AvatarUrl { get; private set; }
 
-		public string Link
+		public string Url
 			=> $"https://steamcommunity.com/profiles/{Id}";
 		
 		internal Portal2BoardsClient Client { get; private set; }

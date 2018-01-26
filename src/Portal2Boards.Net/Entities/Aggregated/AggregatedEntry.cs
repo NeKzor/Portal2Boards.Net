@@ -8,7 +8,7 @@ namespace Portal2Boards
     public class AggregatedEntry : IEntity<ulong>, IAggregatedEntry
 	{
 		public ulong Id { get; private set; }
-		public ISteamUser User { get; private set; }
+		public ISteamUser Player { get; private set; }
 		public uint Score { get; private set; }
 		public uint PlayerRank { get; private set; }
 		public uint ScoreRank { get; private set; }
@@ -23,7 +23,7 @@ namespace Portal2Boards
 			return new AggregatedEntry()
 			{
 				Id = id,
-				User = SteamUser.Create(client, id, model.UserData.BoardName, model.UserData.Avatar),
+				Player = SteamUser.Create(client, id, model.UserData.BoardName, model.UserData.Avatar),
 				Score = uint.Parse(model.ScoreData.Score),
 				PlayerRank = uint.Parse(model.ScoreData.PlayerRank),
 				ScoreRank = uint.Parse(model.ScoreData.ScoreRank),

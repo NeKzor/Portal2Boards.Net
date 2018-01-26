@@ -7,9 +7,10 @@ using Model = Portal2Boards.API.AggregatedModel;
 namespace Portal2Boards
 {
 	[DebuggerDisplay("Points = {Points.Count,nq}, Times = {Points.Count,nq}")]
-    public class Aggregated : IEntity<Chapter>, IAggregated, IUpdatable
+    public class Aggregated : IAggregated, IUpdatable
     {
-		public Chapter Id { get; private set; }
+		public AggregatedMode Mode { get; private set; }
+		public ChapterType Chapter { get; private set; }
 		public IReadOnlyCollection<IAggregatedEntry> Points { get; private set; }
 		public IReadOnlyCollection<IAggregatedEntry> Times { get; private set; }
 		
@@ -22,7 +23,11 @@ namespace Portal2Boards
 			Times = aggregated.Times;
 		}
 
-		internal static Aggregated Create(Portal2BoardsClient client, Chapter id, Model model)
+		internal static Aggregated Create(
+			Portal2BoardsClient client,
+			AggregatedMode mode,
+			ChapterType chapter,
+			Model model)
 		{
 			var points = new List<IAggregatedEntry>();
 			var times = new List<IAggregatedEntry>();
@@ -33,7 +38,8 @@ namespace Portal2Boards
 			
 			return new Aggregated()
 			{
-				Id = id,
+				Mode = mode,
+				Chapter = chapter,
 				Points = points,
 				Times = times,
 				Client = client

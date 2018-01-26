@@ -12,7 +12,7 @@ namespace Portal2Boards
 		public ulong Id { get; private set; }
 		public DateTime? Date { get; private set; }
 		public uint MapId { get; private set; }
-		public uint ChapterId { get; private set; }
+		public ChapterType Chapter { get; private set; }
 		public string Name { get; private set; }
 		public IEntryData Score { get; private set; }
 		public IEntryData Rank { get; private set; }
@@ -30,25 +30,25 @@ namespace Portal2Boards
 		public bool VideoExists
 			=> !(string.IsNullOrEmpty(YouTubeId));
 		
-		public string DemoLink
+		public string DemoUrl
 			=> $"https://board.iverb.me/getDemo?id={Id}";
-		public string VideoLink
+		public string VideoUrl
 			=> $"https://youtu.be/{YouTubeId}";
-		public string Link
+		public string Url
 			=> $"https://board.iverb.me/chamber/{MapId}";
-		public string ImageLink
+		public string ImageUrl
 			=> $"https://board.iverb.me/images/chambers/{MapId}.jpg";
-		public string ImageLinkFull
+		public string ImageFullUrl
 			=> $"https://board.iverb.me/images/chambers_full/{MapId}.jpg";
-		public string SteamLink
+		public string SteamUrl
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{MapId}";
 		
 		internal Portal2BoardsClient Client { get; private set; }
 
 		public async Task<IProfile> GetProfileAsync()
-			=> await Client.GetProfileAsync(Player.Id);
+			=> await Client.GetProfileAsync((Player as IEntity<ulong>).Id);
 		public async Task<IChangelog> GetChangelogAsync()
-			=> await Client.GetChangelogAsync($"?profileNumber={Player.Id}");
+			=> await Client.GetChangelogAsync($"?profileNumber={(Player as IEntity<ulong>).Id}");
 		public async Task<byte[]> GetDemoContentAsync()
 			=> await Client.GetDemoContentAsync(Id);
 		
@@ -57,11 +57,11 @@ namespace Portal2Boards
 			return new ChangelogEntry()
 			{
 				Id = model.Id,
-				Date = (string.IsNullOrEmpty(model.TimeGained))
-					? default
-					: DateTime.Parse(model.TimeGained),
+				Date = (!string.IsNullOrEmpty(model.TimeGained))
+					? DateTime.Parse(model.TimeGained)
+					: default,
 				MapId = model.MapId,
-				ChapterId = model.ChapterId,
+				Chapter = (ChapterType)model.ChapterId,
 				Name = model.ChamberName,
 				Score = EntryScore.Create(model.Score, model.PreviousScore, model.Improvement),
 				Rank = EntryRank.Create(model.PostRank, model.PreRank, model.RankImprovement),

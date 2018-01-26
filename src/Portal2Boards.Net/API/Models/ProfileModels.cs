@@ -151,7 +151,7 @@ namespace Portal2Boards.API
 		[JsonProperty("scoreData")]
 		public ProfileScoreDataModel ScoreData { get; set; }
 		[JsonProperty("map")]
-		public string Map { get; set; }
+		public ulong Map { get; set; }
 	}
 
 	public class ProfileScoreDataModel

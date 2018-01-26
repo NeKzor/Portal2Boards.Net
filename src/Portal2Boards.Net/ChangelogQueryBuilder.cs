@@ -18,7 +18,7 @@ namespace Portal2Boards
 			_query.MapId = mapId;
 			return this;
 		}
-		public ChangelogQueryBuilder WithChapter(Chapter chapter)
+		public ChangelogQueryBuilder WithChapter(ChapterType chapter)
 		{
 			_query.Chapter = chapter;
 			return this;

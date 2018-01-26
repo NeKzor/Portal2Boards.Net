@@ -4,16 +4,16 @@ namespace Portal2Boards
 {
     public interface IDataChapters
 	{
-		uint WorldRecordCount { get; }
-		uint RankSum { get; }
-		uint MapCount { get; }
+		uint WorldRecords { get; }
+		uint SumOfRanks { get; }
+		uint Maps { get; }
 		IDataScore BestScore { get; }
 		IDataScore WorstScore { get; }
 		IDataScore OldestScore { get; }
 		IDataScore NewestScore { get; }
-		uint DemoCount { get; }
-		uint YouTubeVideoCount { get; }
+		uint Demos { get; }
+		uint YouTubeVideos { get; }
 		float? AveragePlace { get; }
-		IReadOnlyDictionary<Chapter, IDataChambers> Chambers { get; }
+		IReadOnlyDictionary<ChapterType, IDataChambers> Chambers { get; }
 	}
 }

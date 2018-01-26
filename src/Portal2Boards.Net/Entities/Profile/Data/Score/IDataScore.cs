@@ -4,10 +4,9 @@ namespace Portal2Boards
 {
     public interface IDataScore
 	{
-		string MapId { get; }
 		string Comment { get; }
 		bool IsSubmission { get; }
-		uint Id { get; }
+		uint ChangelogId { get; }
 		uint? PlayerRank { get; }
 		uint? ScoreRank { get; }
 		uint? Score { get; }

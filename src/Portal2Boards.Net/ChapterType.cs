@@ -1,8 +1,8 @@
 ﻿namespace Portal2Boards
 {
-	public enum Chapter
+    public enum ChapterType
 	{
-		Overall,
+		None,
 		TeamBuilding,
 		MassAndVelocity,
 		HardLight,

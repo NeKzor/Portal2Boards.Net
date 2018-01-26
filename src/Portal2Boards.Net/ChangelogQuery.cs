@@ -10,7 +10,7 @@ namespace Portal2Boards
 	public class ChangelogQuery
 	{
 		public ulong? MapId { get; set; }
-		public Chapter? Chapter { get; set; }
+		public ChapterType? Chapter { get; set; }
 		public string ProfileName { get; set; }
 		public ulong? ProfileId { get; set; }
 		public uint? Type { get; set; }

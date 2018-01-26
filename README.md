@@ -131,8 +131,11 @@ profile = await _client.GetProfileAsync(id);
 // Overall
 var aggregated = await _client.GetAggregatedAsync();
 
+// Mode
+aggregated = await _client.GetAggregatedAsync(AggregatedMode.SinglePlayer);
+
 // Chapter
-aggregated = await _client.GetAggregatedAsync(Chapter.ThePartWhereHeKillsYou);
+aggregated = await _client.GetAggregatedAsync(ChapterType.ThePartWhereHeKillsYou);
 ```
 
 ### Demo Content

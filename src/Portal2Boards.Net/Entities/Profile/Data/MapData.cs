@@ -24,7 +24,9 @@ namespace Portal2Boards
 				PlayerRank = model.PlayerRank,
 				ScoreRank = model.ScoreRank,
 				Score = model.Score,
-				Date = (string.IsNullOrEmpty(model.Date)) ? default : DateTime.Parse(model.Date),
+				Date = (!string.IsNullOrEmpty(model.Date))
+					? DateTime.Parse(model.Date)
+					: default,
 				DemoExists = model.HasDemo == "1",
 				YouTubeId = model.YouTubeId,
 				DeltaToWorldRecord = model.WrDiff,
