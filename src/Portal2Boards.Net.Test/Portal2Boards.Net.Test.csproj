@@ -9,6 +9,7 @@
     <Copyright>Copyright © NeKz 2017</Copyright>
     <Configurations>Debug</Configurations>
     <LangVersion>7.1</LangVersion>
+    <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <ItemGroup>

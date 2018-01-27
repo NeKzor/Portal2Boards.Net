@@ -29,9 +29,9 @@ Client includes automatic caching system and exception event for logging purpose
 
 | Namespace | Description |
 | --- | --- |
-| Portal2Boards.Net | Client for fetching changelog, chamber, profile, aggregated data and demo content. |
-| Portal2Boards.Net.API.Models | API models converted from raw json. |
-| Portal2Boards.Net.Extensions | Useful extension methods. |
+| Portal2Boards | Client for fetching changelog, chamber, profile, aggregated data and demo content. |
+| Portal2Boards.API.Models | API models converted from raw json. |
+| Portal2Boards.Extensions | Useful extension methods. |
 
 ### Client
 

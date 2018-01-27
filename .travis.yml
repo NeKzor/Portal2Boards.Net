@@ -4,10 +4,7 @@ dotnet: 2.0.0
 dist: trusty
 solution: Portal2Boards.Net.sln
 script:
-  - cd src/Portal2Boards.Net/
   - dotnet restore
-  - dotnet build --configuration Release
-  - cd ../Portal2Boards.Net.Test/
-  - dotnet restore
-  - dotnet build --configuration Release /p:DefineConstants="CHA"
-  - dotnet run --project Portal2Boards.Net.Test.csproj --configuration Release
+  - dotnet build src/Portal2Boards.Net/ -c Release
+  - dotnet build src/Portal2Boards.Net.Test/ -c Release /p:DefineConstants="CHA"
+  - dotnet run -p src/Portal2Boards.Net.Test/ -c Release
