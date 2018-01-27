@@ -36,7 +36,10 @@ namespace Portal2Boards.Test
 			// Body
 			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:rgba(200,200,200,1);background-color:rgba(0,0,0,0.9);\">");
 			_page.Add("<div>");
-			_page.Add("<h2 align=\"center\">Portal 2 Challenge Mode World Records</h2>");
+			if (mode == Portal2MapType.Cooperative)
+				_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/sp\">Portal 2 Challenge Mode World Records</a></h2>");
+			else
+				_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/coop\">Portal 2 Challenge Mode World Records</a></h2>");
 			_page.Add($"<h4 align=\"center\">{mode.ToString().ToTitle()}</h4>");
 
 			// First table
@@ -65,7 +68,8 @@ namespace Portal2Boards.Test
 			foreach (var map in maps)
 			{
 				var changelog = await _client.GetChangelogAsync($"?wr=1&chamber={map.BestTimeId}");
-				var latestwr = changelog.Entries.First(e => !e.IsBanned);
+				var latestwr = changelog.Entries
+					.First(e => !e.IsBanned);
 				if (map.IsOfficial)
 					totalscore += latestwr.Score.Current ?? 0;
 				if (mode == Portal2MapType.SinglePlayer)
@@ -73,6 +77,7 @@ namespace Portal2Boards.Test
 
 				var wrs = changelog.Entries
 					.Where(e => e.Score.Current == latestwr.Score.Current)
+					.OrderBy(e => e.Date)
 					.ToList();
 				var once = false;
 				foreach (var wr in wrs)
@@ -81,10 +86,12 @@ namespace Portal2Boards.Test
 					if (!wrholders.Keys.Contains(wr.Player.Name))
 						wrholders.Add(wr.Player.Name, new UserStats());
 
-					wrholders[wr.Player.Name] = new UserStats
+					wrholders[wr.Player.Name] = new UserStats()
 					{
-						OfficialDuration = wrholders[wr.Player.Name].OfficialDuration + ((map.IsOfficial) ? duration ?? 0 : 0),
-						OfficialWorldRecords = wrholders[wr.Player.Name].OfficialWorldRecords + ((map.IsOfficial) ? 1u : 0),
+						OfficialDuration = wrholders[wr.Player.Name].OfficialDuration
+							+ ((map.IsOfficial) ? duration ?? 0 : 0),
+						OfficialWorldRecords = wrholders[wr.Player.Name].OfficialWorldRecords
+							+ ((map.IsOfficial) ? 1u : 0),
 						TotalDuration = wrholders[wr.Player.Name].TotalDuration + duration ?? 0,
 						TotalWorldRecords = wrholders[wr.Player.Name].TotalWorldRecords + 1,
 						Player = wr.Player as SteamUser
@@ -98,7 +105,7 @@ namespace Portal2Boards.Test
 						once = true;
 					}
 					_page.Add($"<td><a href=\"{(wr.Player as SteamUser).Url}\">{wr.Player.Name}</a></td>");
-					_page.Add($"<td title=\"{wr.Date?.DateTimeToString()}\">{wr.Date?.ToString("yyyy-MM-dd") ?? "Unknown"}</td>");
+					_page.Add($"<td title=\"{wr.Date?.DateTimeToString() + " (CST)"}\">{((wr.Date != null) ? wr.Date?.ToString("yyyy-MM-dd") : "Unknown")}</td>");
 					_page.Add($"<td>{duration?.ToString() ?? "<1"}</td>");
 					_page.Add((wr.DemoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).DemoUrl}\">Download</a></td>" : "<td></td>");
 					_page.Add(((wr as ChangelogEntry).VideoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).VideoUrl}\">Watch</a></td>" : "<td></td>");
@@ -133,7 +140,10 @@ namespace Portal2Boards.Test
 				_page.Add("<th>Percentage</th>");
 			_page.Add("</tr></thead>");
 			_page.Add("<tbody>");
-			foreach (var player in wrholders.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer) ? p.Value.OfficialWorldRecords : p.Value.TotalWorldRecords))
+			foreach (var player in wrholders
+				.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer)
+				? p.Value.OfficialWorldRecords
+				: p.Value.TotalWorldRecords))
 			{
 				_page.Add("<tr>");
 				_page.Add($"<td><a href=\"{player.Value.Player.Url}\">{player.Key}</a></td>");
@@ -160,7 +170,10 @@ namespace Portal2Boards.Test
 			_page.Add("<th>Total</th>");
 			_page.Add("</tr></thead>");
 			_page.Add("<tbody>");
-			foreach (var player in wrholders.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer) ? p.Value.OfficialDuration : p.Value.TotalDuration))
+			foreach (var player in wrholders
+				.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer)
+					? p.Value.OfficialDuration
+					: p.Value.TotalDuration))
 			{
 				_page.Add("<tr>");
 				_page.Add($"<td><a href=\"{player.Value.Player.Url}\">{player.Key}</a></td>");
@@ -177,9 +190,9 @@ namespace Portal2Boards.Test
 			// Footer
 			if (mode == Portal2MapType.SinglePlayer)
 				_page.Add("<br><sup>1</sup> Unofficial challenge mode map.");
-			_page.Add($"<br>Generated page in {watch.Elapsed.TotalSeconds.ToString("N3")} seconds.");
+			_page.Add($"<br>Generated static page in {watch.Elapsed.TotalSeconds.ToString("N3")} seconds.");
 			_page.Add("<br><a href=\"https://github.com/NeKzor/Portal2Boards.Net\">Portal2Boards.Net</a> example made by NeKz.");
-			_page.Add($"<br>{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}");
+			_page.Add($"<br>Last update: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss '(UTC)'")}");
 
 			// Rest
 			_page.Add("</body>");

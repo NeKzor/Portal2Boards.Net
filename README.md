@@ -105,15 +105,15 @@ changelog = await _client.GetChangelogAsync(() =>
 );
 ```
 
-### Leaderboard
+### Chamber
 ```cs
 // By map id (ulong)
-var leaderboard = await _client.GetLeaderboardAsync(id);
+var leaderboard = await _client.GetChamberAsync(id);
 
 // With extensions
 using Portal2Boards.Net.Extensions;
 var map = await Portal2Map.Search("Smooth Jazz");
-leaderboard = await _client.GetLeaderboardAsync(map);
+leaderboard = await _client.GetChamberAsync(map);
 ```
 
 ### Profile
@@ -122,7 +122,6 @@ leaderboard = await _client.GetLeaderboardAsync(map);
 var profile = await _client.GetProfileAsync("Portal Rex");
 
 // By steam id (ulong)
-var id = changelog.Data.First().ProfileNumber;
 profile = await _client.GetProfileAsync(id);
 ```
 
@@ -146,7 +145,7 @@ var bytes = await _client.GetDemoContentAsync(id);
 
 ## Examples
 
-- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs) generates an example leaderboard web page of all world records ([view static version](https://nekzor.github.io/Portal2Boards.Net)).
+- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs) generates an example leaderboard web page of all world records ([view static version](https://nekzor.github.io/Portal2Boards.Net/sp)).
 - [TwitterBot.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/TwitterBot.cs) generates a list of latest world records for tweets.
 - [NeKzBot](https://github.com/NeKzor/NeKzBot) implemented a notification system for world record updates.
 

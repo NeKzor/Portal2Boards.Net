@@ -185,7 +185,7 @@ namespace Portal2Boards.Test
 		// Example 1 (HtmlGenerator.cs)
 		[Conditional("GEN_SP")]
 		internal static void GenerateSpPage()
-			=> HtmlGenerator.GeneratePage("index.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
+			=> HtmlGenerator.GeneratePage("sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
 		internal static void GenerateMpPage()
 			=> HtmlGenerator.GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
