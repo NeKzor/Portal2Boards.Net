@@ -12,7 +12,6 @@ namespace Portal2Boards.Test
 	internal class Program
 	{
 		private static readonly ChangelogQuery _latestWorldRecords = new ChangelogQueryBuilder()
-			.WithMaxDaysAgo(7)
 			.WithWorldRecord(true)
 			.Build();
 		
@@ -82,15 +81,21 @@ namespace Portal2Boards.Test
 				client.Log += LogPortal2Boards;
 
 				WriteLine("Fetching changelog...");
+				var watch = Stopwatch.StartNew();
 				var changelog = client.GetChangelogAsync(() => _latestWorldRecords).GetAwaiter().GetResult();
+				watch.Stop();
+				WriteLine(watch.ElapsedMilliseconds);
 #if CACHE
 				// Cache test 1
 				WriteLine("Cache test 1...");
+				watch = Stopwatch.StartNew();
 				changelog = client.GetChangelogAsync(() => _latestWorldRecords).GetAwaiter().GetResult();
+				watch.Stop();
+				WriteLine(watch.ElapsedMilliseconds);
 #endif
 
 				WriteLine($"Fetched {changelog.Entries.Count} entries.");
-				foreach (var entry in changelog.Entries)
+				foreach (var entry in changelog.Entries.Take(3))
 				{
 					WriteLine
 					(
@@ -105,10 +110,13 @@ namespace Portal2Boards.Test
 				// Cache test 2
 				WriteLine("Cache test 2...");
 				client.ClearCache();
-				changelog = client.GetChangelogAsync().GetAwaiter().GetResult();
+				watch = Stopwatch.StartNew();
+				changelog = client.GetChangelogAsync(q => q.WorldRecord = true).GetAwaiter().GetResult();
+				watch.Stop();
+				WriteLine(watch.ElapsedMilliseconds);
 
 				WriteLine($"Fetched {changelog.Entries.Count} entries.");
-				foreach (var entry in changelog.Entries.Take(20))
+				foreach (var entry in changelog.Entries.Take(3))
 				{
 					WriteLine
 					(

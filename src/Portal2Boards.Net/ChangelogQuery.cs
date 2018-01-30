@@ -43,7 +43,7 @@ namespace Portal2Boards
 			if (MaxDaysAgo != null) query.Append($"&maxDaysAgo={MaxDaysAgo}");
 			if (HasDate != null) query.Append($"&hasDate={((bool)HasDate ? 1 : 0)}");
 
-			query[0] = '?';
+			if (query.Length > 0) query[0] = '?';
 			return $"{query}";
 		}
 	}
