@@ -6,7 +6,7 @@ using Model = Portal2Boards.API.ChamberEntryModel;
 
 namespace Portal2Boards
 {
-    [DebuggerDisplay("{Id,nq}")]
+	[DebuggerDisplay("{Id,nq}")]
 	public class ChamberEntry : IEntity<ulong>, IChamberEntry
 	{
 		public ulong Id { get; private set; }
@@ -25,20 +25,20 @@ namespace Portal2Boards
 			=> $"https://board.iverb.me/getDemo?id={ChangelogId}";
 		public string VideoUrl
 			=> $"https://youtu.be/{YouTubeId}";
-		
+
 		public bool CommentExists
 			=> !(string.IsNullOrEmpty(Comment));
 		public bool VideoExists
 			=> !(string.IsNullOrEmpty(YouTubeId));
-		
+
 		internal Portal2BoardsClient Client { get; private set; }
 
-		public async Task<IProfile> GetProfileAsync()
-			=> await Client.GetProfileAsync(Id);
-		public async Task<IChangelog> GetChangelogAsync()
-			=> await Client.GetChangelogAsync($"?profileNumber={Id}");
-		public async Task<byte[]> GetDemoContentAsync()
-			=> await Client.GetDemoContentAsync(ChangelogId);
+		public async Task<IProfile> GetProfileAsync(bool ignoreCache = false)
+			=> await Client.GetProfileAsync(Id, ignoreCache).ConfigureAwait(false);
+		public async Task<IChangelog> GetChangelogAsync(bool ignoreCache = false)
+			=> await Client.GetChangelogAsync($"?profileNumber={Id}", ignoreCache).ConfigureAwait(false);
+		public async Task<byte[]> GetDemoContentAsync(bool ignoreCache = false)
+			=> await Client.GetDemoContentAsync(ChangelogId, ignoreCache).ConfigureAwait(false);
 
 		internal static ChamberEntry Create(Portal2BoardsClient client, ulong id, Model model)
 		{

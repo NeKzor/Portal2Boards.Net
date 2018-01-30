@@ -1,6 +1,6 @@
 namespace Portal2Boards
 {
-    public interface IProfile
+	public interface IProfile
 	{
 		string DisplayName { get; }
 		string BoardName { get; }

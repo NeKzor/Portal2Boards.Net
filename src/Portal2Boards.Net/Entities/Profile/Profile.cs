@@ -8,7 +8,7 @@ using Model = Portal2Boards.API.ProfileModel;
 
 namespace Portal2Boards
 {
-    [DebuggerDisplay("{SteamId,nq}")]
+	[DebuggerDisplay("{SteamId,nq}")]
 	public class Profile : IEntity<ulong>, IProfile
 	{
 		public ulong Id { get; private set; }
@@ -38,15 +38,15 @@ namespace Portal2Boards
 			=> $"https://board.iverb.me/profile/{Id}";
 		public string SteamUrl
 			=> $"https://steamcommunity.com/profiles/{Id}";
-		
+
 		internal Portal2BoardsClient Client { get; private set; }
 
-		public async Task UpdateAsync()
+		public async Task UpdateAsync(bool ignoreCache = false)
 		{
-			var profile = await Client.GetProfileAsync(Id);
+			var profile = await Client.GetProfileAsync(Id, ignoreCache).ConfigureAwait(false);
 			if (profile == null)
 				throw new Exception("Failed to update profile.");
-			
+
 			IsRegistered = profile.IsRegistered;
 			HasRecords = profile.HasRecords;
 			DisplayName = profile.DisplayName;
@@ -69,7 +69,7 @@ namespace Portal2Boards
 			WorldRecords = profile.WorldRecords;
 			GlobalAveragePlace = profile.GlobalAveragePlace;
 		}
-		
+
 		internal static Profile Create(Portal2BoardsClient client, Model model)
 		{
 			var chapters = new Dictionary<ChapterType, IDataScoreInfo>();
@@ -81,7 +81,7 @@ namespace Portal2Boards
 						chapters.Add(chapter, Portal2Boards.DataScoreInfo.Create(item.Value));
 				}
 			}
-			
+
 			return new Profile()
 			{
 				Id = model.ProfileNumber,

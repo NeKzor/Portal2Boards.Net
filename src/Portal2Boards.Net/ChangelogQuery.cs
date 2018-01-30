@@ -27,7 +27,7 @@ namespace Portal2Boards
 		public string GetString()
 		{
 			var query = new StringBuilder();
-			
+
 			if (MapId != null) query.Append($"&chamber={MapId}");
 			if (Chapter != null) query.Append($"&chapter={(int)Chapter}");
 			if (ProfileName != null) query.Append($"&boardName={WebUtility.HtmlEncode(ProfileName)}");

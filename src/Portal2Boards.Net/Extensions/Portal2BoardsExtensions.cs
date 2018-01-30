@@ -2,7 +2,7 @@ using System;
 
 namespace Portal2Boards.Extensions
 {
-    public static class Portal2BoardsExtensions
+	public static class Portal2BoardsExtensions
 	{
 		public static float? AsTime(this uint? time)
 			=> (time != default) ? (float)Math.Round((float)time / 100, 2) : default;
@@ -37,7 +37,7 @@ namespace Portal2Boards.Extensions
 		}
 
 		public static string DateTimeToString(this DateTime? date)
-			=> (date != default) ? date?.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
+			=> (date != default) ? date.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 		public static string DateTimeToString(this DateTime date)
 			=> (date != default) ? date.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 	}

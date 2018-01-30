@@ -6,7 +6,7 @@ using Model = Portal2Boards.API.ChangelogEntryModel;
 
 namespace Portal2Boards
 {
-    [DebuggerDisplay("{Id,nq}")]
+	[DebuggerDisplay("{Id,nq}")]
 	public class ChangelogEntry : IEntity<ulong>, IChangelogEntry
 	{
 		public ulong Id { get; private set; }
@@ -29,7 +29,7 @@ namespace Portal2Boards
 			=> !(string.IsNullOrEmpty(Comment));
 		public bool VideoExists
 			=> !(string.IsNullOrEmpty(YouTubeId));
-		
+
 		public string DemoUrl
 			=> $"https://board.iverb.me/getDemo?id={Id}";
 		public string VideoUrl
@@ -42,16 +42,16 @@ namespace Portal2Boards
 			=> $"https://board.iverb.me/images/chambers_full/{MapId}.jpg";
 		public string SteamUrl
 			=> $"https://steamcommunity.com/stats/Portal2/leaderboards/{MapId}";
-		
+
 		internal Portal2BoardsClient Client { get; private set; }
 
-		public async Task<IProfile> GetProfileAsync()
-			=> await Client.GetProfileAsync((Player as IEntity<ulong>).Id);
-		public async Task<IChangelog> GetChangelogAsync()
-			=> await Client.GetChangelogAsync($"?profileNumber={(Player as IEntity<ulong>).Id}");
-		public async Task<byte[]> GetDemoContentAsync()
-			=> await Client.GetDemoContentAsync(Id);
-		
+		public async Task<IProfile> GetProfileAsync(bool ignoreCache = false)
+			=> await Client.GetProfileAsync((Player as IEntity<ulong>).Id, ignoreCache).ConfigureAwait(false);
+		public async Task<IChangelog> GetChangelogAsync(bool ignoreCache = false)
+			=> await Client.GetChangelogAsync($"?profileNumber={(Player as IEntity<ulong>).Id}", ignoreCache).ConfigureAwait(false);
+		public async Task<byte[]> GetDemoContentAsync(bool ignoreCache = false)
+			=> await Client.GetDemoContentAsync(Id, ignoreCache).ConfigureAwait(false);
+
 		internal static ChangelogEntry Create(Portal2BoardsClient client, Model model)
 		{
 			return new ChangelogEntry()

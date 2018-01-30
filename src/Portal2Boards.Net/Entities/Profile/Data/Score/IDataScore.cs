@@ -2,7 +2,7 @@ using System;
 
 namespace Portal2Boards
 {
-    public interface IDataScore
+	public interface IDataScore
 	{
 		string Comment { get; }
 		bool IsSubmission { get; }

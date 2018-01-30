@@ -4,6 +4,6 @@ namespace Portal2Boards
 {
 	public interface IUpdatable
 	{
-		Task UpdateAsync();
+		Task UpdateAsync(bool ignoreCache = false);
 	}
 }

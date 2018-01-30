@@ -6,7 +6,7 @@ namespace Portal2Boards.Extensions
 	public class Portal2Map
 	{
 		public static uint Count = 0;
-		
+
 		public uint Index;
 		public string Name { get; set; }
 		public string Alias { get; set; }
@@ -22,7 +22,7 @@ namespace Portal2Boards.Extensions
 		public bool Exists
 			=> ((Type == Portal2MapType.SinglePlayer) || Type == (Portal2MapType.Cooperative))
 				&& (BestTimeId != default);
-		
+
 		public string Url
 			=> $"https://board.iverb.me/chamber/{BestTimeId}";
 		public string ImageUrl

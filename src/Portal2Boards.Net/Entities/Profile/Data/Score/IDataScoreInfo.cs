@@ -1,6 +1,6 @@
 namespace Portal2Boards
 {
-    public interface IDataScoreInfo
+	public interface IDataScoreInfo
 	{
 		uint? Score { get; }
 		uint? PlayerRank { get; }

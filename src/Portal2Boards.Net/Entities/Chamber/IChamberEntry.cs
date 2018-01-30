@@ -2,7 +2,7 @@ using System;
 
 namespace Portal2Boards
 {
-    public interface IChamberEntry
+	public interface IChamberEntry
 	{
 		uint ChangelogId { get; }
 		DateTime? Date { get; }

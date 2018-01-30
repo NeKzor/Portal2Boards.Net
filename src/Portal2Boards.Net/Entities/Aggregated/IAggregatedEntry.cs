@@ -1,6 +1,6 @@
 namespace Portal2Boards
 {
-    public interface IAggregatedEntry
+	public interface IAggregatedEntry
 	{
 		ISteamUser Player { get; }
 		uint Score { get; }

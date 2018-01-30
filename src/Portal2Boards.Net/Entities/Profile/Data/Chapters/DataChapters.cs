@@ -5,7 +5,7 @@ using Model = Portal2Boards.API.ProfileTimesChamberData;
 
 namespace Portal2Boards
 {
-    public class DataChapters : IDataChapters
+	public class DataChapters : IDataChapters
 	{
 		public uint WorldRecords { get; private set; }
 		public uint SumOfRanks { get; private set; }
@@ -22,7 +22,7 @@ namespace Portal2Boards
 		internal static DataChapters Create(Portal2BoardsClient client, Model model)
 		{
 			if (model == null) return default;
-			
+
 			var chambers = new Dictionary<ChapterType, IDataChambers>();
 			if (model.Chamber != null)
 			{
@@ -31,7 +31,7 @@ namespace Portal2Boards
 					chambers.Add((ChapterType)item.Key, DataChambers.Create(item.Value));
 				}
 			}
-			
+
 			return new DataChapters()
 			{
 				WorldRecords = model.NumWrs,

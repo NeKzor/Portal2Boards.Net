@@ -51,15 +51,15 @@ namespace Portal2Boards
 			CacheResetTime = cacheResetTime ?? 5;
 			NoSsl = noSsl;
 		}
-		
-		public async Task<IChangelog> GetChangelogAsync(string query = "")
+
+		public async Task<IChangelog> GetChangelogAsync(string query = "", bool ignoreCache = false)
 		{
 			var result = default(IChangelog);
 			try
 			{
 				var get = $"/changelog/json{query}";
-				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
-				result = Changelog.Create(this, query, model);
+				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Changelog.Create(this, query, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -68,18 +68,18 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IChangelog> GetChangelogAsync(Action<ChangelogQuery> setChangelog)
+		public async Task<IChangelog> GetChangelogAsync(Action<ChangelogQuery> setChangelog, bool ignoreCache = false)
 		{
 			var result = default(IChangelog);
 			try
 			{
 				var temp = new ChangelogQuery();
-				setChangelog.Invoke(temp);
+				await Task.Run(() => setChangelog.Invoke(temp)).ConfigureAwait(false);
 
-				var query = temp.GetString();
+				var query = await Task.Run(() => temp.GetString()).ConfigureAwait(false);
 				var get = $"/changelog/json{query}";
-				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
-				result = Changelog.Create(this, query, model);
+				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Changelog.Create(this, query, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -88,15 +88,15 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IChangelog> GetChangelogAsync(Func<ChangelogQuery> setChangelog)
+		public async Task<IChangelog> GetChangelogAsync(Func<ChangelogQuery> setChangelog, bool ignoreCache = false)
 		{
 			var result = default(IChangelog);
 			try
 			{
-				var query = setChangelog.Invoke().GetString();
+				var query = await Task.Run(() => setChangelog.Invoke().GetString()).ConfigureAwait(false);
 				var get = $"/changelog/json{query}";
-				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get).ConfigureAwait(false);
-				result = Changelog.Create(this, query, model);
+				var model = await GetCacheOrFetch<ChangelogEntryModel[]>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Changelog.Create(this, query, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -105,14 +105,14 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IChamber> GetChamberAsync(ulong chamberId)
+		public async Task<IChamber> GetChamberAsync(ulong chamberId, bool ignoreCache = false)
 		{
 			var result = default(IChamber);
 			try
 			{
 				var get = $"/chamber/{chamberId}/json";
-				var model = await GetCacheOrFetch<IReadOnlyDictionary<ulong, ChamberEntryModel>>(get).ConfigureAwait(false);
-				result = Chamber.Create(this, chamberId, model);
+				var model = await GetCacheOrFetch<IReadOnlyDictionary<ulong, ChamberEntryModel>>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Chamber.Create(this, chamberId, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -121,17 +121,17 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IChamber> GetChamberAsync(Portal2Map map)
+		public async Task<IChamber> GetChamberAsync(Portal2Map map, bool ignoreCache = false)
 		{
 			var result = default(IChamber);
 			try
 			{
 				if (!map.Exists)
 					throw new InvalidOperationException("Map does not have a leaderboard.");
-				
+
 				var get = $"/chamber/{map.BestTimeId}/json";
-				var model = await GetCacheOrFetch<IReadOnlyDictionary<ulong, ChamberEntryModel>>(get).ConfigureAwait(false);
-				result = Chamber.Create(this, (ulong)map.BestTimeId, model);
+				var model = await GetCacheOrFetch<IReadOnlyDictionary<ulong, ChamberEntryModel>>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Chamber.Create(this, (ulong)map.BestTimeId, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -140,14 +140,14 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IProfile> GetProfileAsync(string boardName)
+		public async Task<IProfile> GetProfileAsync(string boardName, bool ignoreCache = false)
 		{
 			var result = default(IProfile);
 			try
 			{
 				var get = $"/profile/{boardName.Replace(" ", string.Empty)}/json";
-				var model = await GetCacheOrFetch<ProfileModel>(get).ConfigureAwait(false);
-				result = Profile.Create(this, model);
+				var model = await GetCacheOrFetch<ProfileModel>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Profile.Create(this, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -156,14 +156,14 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<IProfile> GetProfileAsync(ulong steamId)
+		public async Task<IProfile> GetProfileAsync(ulong steamId, bool ignoreCache = false)
 		{
 			var result = default(IProfile);
 			try
 			{
 				var get = $"/profile/{steamId}/json";
-				var model = await GetCacheOrFetch<ProfileModel>(get).ConfigureAwait(false);
-				result = Profile.Create(this, model);
+				var model = await GetCacheOrFetch<ProfileModel>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Profile.Create(this, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -172,7 +172,7 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<Aggregated> GetAggregatedAsync(AggregatedMode mode = default)
+		public async Task<Aggregated> GetAggregatedAsync(AggregatedMode mode = default, bool ignoreCache = false)
 		{
 			var url = "/overall";
 			switch (mode)
@@ -186,13 +186,13 @@ namespace Portal2Boards
 				case AggregatedMode.Chapter:
 					throw new InvalidOperationException("Invalid mode. Use ChapterType instead of AggregatedMode.");
 			}
-			
+
 			var result = default(Aggregated);
 			try
 			{
 				var get = $"/aggregated{url}/json";
-				var model = await GetCacheOrFetch<AggregatedModel>(get).ConfigureAwait(false);
-				result = Aggregated.Create(this, mode, ChapterType.None, model);
+				var model = await GetCacheOrFetch<AggregatedModel>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Aggregated.Create(this, mode, ChapterType.None, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -201,17 +201,17 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<Aggregated> GetAggregatedAsync(ChapterType chapter)
+		public async Task<Aggregated> GetAggregatedAsync(ChapterType chapter, bool ignoreCache = false)
 		{
 			if (chapter == ChapterType.None)
 				throw new InvalidOperationException("Invalid chapter.");
-			
+
 			var result = default(Aggregated);
 			try
 			{
 				var get = $"/aggregated/chapter/{(int)chapter}json";
-				var model = await GetCacheOrFetch<AggregatedModel>(get).ConfigureAwait(false);
-				result = Aggregated.Create(this, AggregatedMode.Chapter, chapter, model);
+				var model = await GetCacheOrFetch<AggregatedModel>(get, ignoreCache).ConfigureAwait(false);
+				result = await Task.Run(() => Aggregated.Create(this, AggregatedMode.Chapter, chapter, model)).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -220,13 +220,13 @@ namespace Portal2Boards
 			}
 			return result;
 		}
-		public async Task<byte[]> GetDemoContentAsync(ulong changelogId)
+		public async Task<byte[]> GetDemoContentAsync(ulong changelogId, bool ignoreCache = false)
 		{
 			var result = default(byte[]);
 			try
 			{
 				var get = $"/getDemo?id={changelogId}";
-				if (!_autoCache)
+				if (!_autoCache || ignoreCache)
 				{
 					result = await _client.GetBytesAsync(BaseApiUrl + get).ConfigureAwait(false);
 				}
@@ -234,7 +234,7 @@ namespace Portal2Boards
 				{
 					_timer = _timer ?? new Timer(TimerCallback, _autoCache, (int)_cacheResetTime, (int)_cacheResetTime);
 					_cache = _cache ?? new Cache();
-					
+
 					result = await _cache.Get<byte[]>(get).ConfigureAwait(false)
 						?? await _client.GetBytesAsync(BaseApiUrl + get).ConfigureAwait(false);
 					await _cache.AddOrUpdate(get, result).ConfigureAwait(false);
@@ -257,13 +257,13 @@ namespace Portal2Boards
 		public Task ClearCache()
 		{
 			_cache = new Cache();
-			return Task.FromResult(true);
+			return Task.FromResult(false);
 		}
 
-		internal async Task<T> GetCacheOrFetch<T>(string url)
+		internal async Task<T> GetCacheOrFetch<T>(string url, bool ignoreCache)
 			where T : class
 		{
-			if (!_autoCache)
+			if (!_autoCache || ignoreCache)
 				return await _client.GetJsonObjectAsync<T>(BaseApiUrl + url).ConfigureAwait(false);
 
 			// Make sure that time and cache exist
@@ -273,7 +273,7 @@ namespace Portal2Boards
 
 			var model = await _cache.Get<T>(url).ConfigureAwait(false)
 				?? await _client.GetJsonObjectAsync<T>(BaseApiUrl + url).ConfigureAwait(false);
-			
+
 			// Don't cache BaseApiUrl which ignores changing
 			// http/https (why would you do that anyway)
 			await _cache.AddOrUpdate(url, model).ConfigureAwait(false);

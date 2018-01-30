@@ -1,6 +1,6 @@
 ﻿namespace Portal2Boards
 {
-    public enum ChapterType
+	public enum ChapterType
 	{
 		None,
 		TeamBuilding,

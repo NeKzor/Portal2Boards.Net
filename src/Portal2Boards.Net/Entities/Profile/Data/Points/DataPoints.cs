@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Portal2Boards
 {
-    public class DataPoints : IDataPoints
+	public class DataPoints : IDataPoints
 	{
 		public IDataScoreInfo SinglePlayer { get; private set; }
 		public IDataScoreInfo Cooperative { get; private set; }

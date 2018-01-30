@@ -5,7 +5,7 @@ using Model = Portal2Boards.API.AggregatedEntryDataModel;
 namespace Portal2Boards
 {
 	[DebuggerDisplay("{Id,nq}")]
-    public class AggregatedEntry : IEntity<ulong>, IAggregatedEntry
+	public class AggregatedEntry : IEntity<ulong>, IAggregatedEntry
 	{
 		public ulong Id { get; private set; }
 		public ISteamUser Player { get; private set; }
@@ -15,8 +15,8 @@ namespace Portal2Boards
 
 		internal Portal2BoardsClient Client { get; private set; }
 
-		public async Task<IProfile> GetProfileAsync()
-			=> await Client.GetProfileAsync(Id);
+		public async Task<IProfile> GetProfileAsync(bool ignoreCache = false)
+			=> await Client.GetProfileAsync(Id, ignoreCache).ConfigureAwait(false);
 
 		internal static AggregatedEntry Create(Portal2BoardsClient client, ulong id, Model model)
 		{

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Portal2Boards
 {
-    public interface IDataTimes
+	public interface IDataTimes
 	{
 		IDataScoreInfo SinglePlayer { get; }
 		IDataScoreInfo Cooperative { get; }

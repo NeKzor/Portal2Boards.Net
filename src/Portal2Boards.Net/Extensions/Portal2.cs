@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Portal2Boards.Extensions
 {
-    public static class Portal2
+	public static class Portal2
 	{
 		public static IReadOnlyCollection<Portal2Map> CampaignMaps = new List<Portal2Map>()
 		{

@@ -1,6 +1,6 @@
 ﻿namespace Portal2Boards
 {
-    public class EntryScore : IEntryData, IEntryScore
+	public class EntryScore : IEntryData, IEntryScore
 	{
 		public uint? Current { get; private set; }
 		public uint? Previous { get; private set; }

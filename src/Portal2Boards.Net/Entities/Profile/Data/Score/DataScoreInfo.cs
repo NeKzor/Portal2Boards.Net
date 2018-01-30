@@ -3,7 +3,7 @@ using Model = Portal2Boards.API.ProfilePointsDataModel;
 
 namespace Portal2Boards
 {
-    public class DataScoreInfo : IDataScoreInfo
+	public class DataScoreInfo : IDataScoreInfo
 	{
 		public uint? Score { get; protected set; }
 		public uint? PlayerRank { get; protected set; }

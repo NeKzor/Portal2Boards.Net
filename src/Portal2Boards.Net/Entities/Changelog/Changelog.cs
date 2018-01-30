@@ -6,17 +6,17 @@ using Model = System.Collections.Generic.IReadOnlyCollection<Portal2Boards.API.C
 
 namespace Portal2Boards
 {
-    [DebuggerDisplay("Count = {Entries.Count,nq}")]
+	[DebuggerDisplay("Count = {Entries.Count,nq}")]
 	public class Changelog : IChangelog, IUpdatable
-    {
+	{
 		public string Query { get; private set; }
 		public IReadOnlyCollection<IChangelogEntry> Entries { get; private set; }
 
 		internal Portal2BoardsClient Client { get; private set; }
 
-		public async Task UpdateAsync()
+		public async Task UpdateAsync(bool ignoreCache = false)
 		{
-			var changelog = await Client.GetChangelogAsync(Query);
+			var changelog = await Client.GetChangelogAsync(Query, ignoreCache).ConfigureAwait(false);
 			Entries = changelog.Entries;
 		}
 
@@ -25,7 +25,7 @@ namespace Portal2Boards
 			var entries = new List<IChangelogEntry>();
 			foreach (var item in model)
 				entries.Add(ChangelogEntry.Create(client, item));
-			
+
 			return new Changelog
 			{
 				Query = query,

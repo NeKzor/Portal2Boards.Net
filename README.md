@@ -1,5 +1,5 @@
 ﻿[![Build Status](https://travis-ci.org/NeKzor/Portal2Boards.Net.svg?branch=master)](https://travis-ci.org/NeKzor/Portal2Boards.Net)
-[![Build Version](https://img.shields.io/badge/version-v2.0-brightgreen.svg)](https://github.com/NeKzor/Portal2Boards.Net/projects/3)
+[![Build Version](https://img.shields.io/badge/version-v2.1-brightgreen.svg)](https://github.com/NeKzor/Portal2Boards.Net/projects/3)
 [![Release Status](https://img.shields.io/github/release/NeKzor/Portal2Boards.Net.svg)](https://github.com/NeKzor/Portal2Boards.Net/releases)
 [![Nuget Status](https://img.shields.io/nuget/v/Portal2Boards.Net.svg)](https://www.nuget.org/packages/Portal2Boards.Net)
 
@@ -108,12 +108,12 @@ changelog = await _client.GetChangelogAsync(() =>
 ### Chamber
 ```cs
 // By map id (ulong)
-var leaderboard = await _client.GetChamberAsync(id);
+var chamber = await _client.GetChamberAsync(id);
 
 // With extensions
 using Portal2Boards.Net.Extensions;
 var map = await Portal2Map.Search("Smooth Jazz");
-leaderboard = await _client.GetChamberAsync(map);
+chamber = await _client.GetChamberAsync(map);
 ```
 
 ### Profile
@@ -145,7 +145,7 @@ var bytes = await _client.GetDemoContentAsync(id);
 
 ## Examples
 
-- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs) generates an example leaderboard web page of all world records ([view static version](https://nekzor.github.io/Portal2Boards.Net/sp)).
+- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs) generates an example [leaderboard web page](https://nekzor.github.io/Portal2Boards.Net/sp) of all world records.
 - [TwitterBot.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/TwitterBot.cs) generates a list of latest world records for tweets.
 - [NeKzBot](https://github.com/NeKzor/NeKzBot) implemented a notification system for world record updates.
 

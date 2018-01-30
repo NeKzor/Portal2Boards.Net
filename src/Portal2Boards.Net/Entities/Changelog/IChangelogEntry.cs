@@ -2,7 +2,7 @@ using System;
 
 namespace Portal2Boards
 {
-    public interface IChangelogEntry
+	public interface IChangelogEntry
 	{
 		DateTime? Date { get; }
 		uint MapId { get; }

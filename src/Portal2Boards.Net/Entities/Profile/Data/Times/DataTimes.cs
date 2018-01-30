@@ -8,7 +8,7 @@ using Model = Portal2Boards.API.ProfileTimesDataModel;
 
 namespace Portal2Boards
 {
-    public class DataTimes : IDataTimes
+	public class DataTimes : IDataTimes
 	{
 		public IDataScoreInfo SinglePlayer { get; private set; }
 		public IDataScoreInfo Cooperative { get; private set; }
@@ -16,7 +16,7 @@ namespace Portal2Boards
 		public IDataChapters SinglePlayerChapters { get; private set; }
 		public IDataChapters CooperativeChapters { get; private set; }
 		public IReadOnlyDictionary<ChapterType, IDataScoreInfo> Chapters { get; private set; }
-		
+
 		public IMapData GetMapData(Portal2Map map)
 			=> SinglePlayerChapters.Chambers
 				.FirstOrDefault(chapter => chapter.Key == (ChapterType)map.ChapterId).Value?.Data
@@ -24,11 +24,11 @@ namespace Portal2Boards
 			?? CooperativeChapters.Chambers
 				.FirstOrDefault(chapter => chapter.Key == (ChapterType)map.ChapterId).Value?.Data
 				.FirstOrDefault(chamber => chamber.Key == map.BestTimeId).Value;
-		
+
 		internal static DataTimes Create(Portal2BoardsClient client, Model model)
 		{
 			if (model == null) return default;
-			
+
 			var chapters = new Dictionary<ChapterType, IDataScoreInfo>();
 			if (model.Chapters != null)
 			{
@@ -38,7 +38,7 @@ namespace Portal2Boards
 						chapters.Add(chapter, Portal2Boards.DataScoreInfo.Create(item.Value));
 				}
 			}
-			
+
 			return new DataTimes()
 			{
 				SinglePlayer = DataScoreInfo.Create(model.Sp),

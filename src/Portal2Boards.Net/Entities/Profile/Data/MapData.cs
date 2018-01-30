@@ -7,7 +7,7 @@ using Model = Portal2Boards.API.ProfileTimesMapModel;
 
 namespace Portal2Boards
 {
-    public class MapData : DataScore, IMapData
+	public class MapData : DataScore, IMapData
 	{
 		public float? DeltaToWorldRecord { get; private set; }
 		public int? DeltaToNextRank { get; private set; }
@@ -15,7 +15,7 @@ namespace Portal2Boards
 		internal static MapData Create(Model model)
 		{
 			if (model == null) return default;
-			
+
 			return new MapData()
 			{
 				Comment = WebUtility.HtmlDecode(model.Note),

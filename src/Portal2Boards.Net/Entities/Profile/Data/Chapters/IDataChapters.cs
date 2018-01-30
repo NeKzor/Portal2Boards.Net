@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Portal2Boards
 {
-    public interface IDataChapters
+	public interface IDataChapters
 	{
 		uint WorldRecords { get; }
 		uint SumOfRanks { get; }

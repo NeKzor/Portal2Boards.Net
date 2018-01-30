@@ -1,6 +1,6 @@
 namespace Portal2Boards
 {
-    public interface IEntryData
+	public interface IEntryData
 	{
 		uint? Current { get; }
 		uint? Previous { get; }
