@@ -37,7 +37,7 @@ namespace Portal2Boards.Extensions
 		}
 
 		public static string DateTimeToString(this DateTime? date)
-			=> (date != default) ? date.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
+			=> (date != default) ? date?.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 		public static string DateTimeToString(this DateTime date)
 			=> (date != default) ? date.ToString("yyyy-MM-dd HH:mm:ss") : "Unknown";
 	}
