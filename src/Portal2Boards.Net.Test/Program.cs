@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Portal2Boards.API;
 using Portal2Boards.Extensions;
+using Portal2Boards.Test.Examples;
 using static System.Console;
 
 namespace Portal2Boards.Test
@@ -24,6 +25,7 @@ namespace Portal2Boards.Test
 			GetDemo();
 			GenerateSpPage();
 			GenerateMpPage();
+			GenerateStatsPage();
 			StartTwitterBot();
 		}
 
@@ -190,13 +192,16 @@ namespace Portal2Boards.Test
 			return Task.CompletedTask;
 		}
 
-		// Example 1 (HtmlGenerator.cs)
+		// Example 1 (LeaderboardWebPage.cs)
 		[Conditional("GEN_SP")]
 		internal static void GenerateSpPage()
-			=> HtmlGenerator.GeneratePage("sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
+			=> LeaderboardWebPage.GeneratePage("sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
 		internal static void GenerateMpPage()
-			=> HtmlGenerator.GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
+			=> LeaderboardWebPage.GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
+		[Conditional("GEN_STATS")]
+		internal static void GenerateStatsPage()
+			=> LeaderboardWebPage.GenerateStatsPage("stats.html").GetAwaiter().GetResult();
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]

@@ -7,7 +7,7 @@
     <Copyright>Copyright © NeKz 2017-2018</Copyright>
     <Company />
     <Version>2.1</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/NeKzor/Portal2Boards.Net</PackageProjectUrl>
     <RepositoryType />
     <LangVersion>7.1</LangVersion>

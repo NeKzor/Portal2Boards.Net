@@ -145,8 +145,8 @@ var bytes = await _client.GetDemoContentAsync(id);
 
 ## Examples
 
-- [HtmlGenerator.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/HtmlGenerator.cs) generates an example [leaderboard web page](https://nekzor.github.io/Portal2Boards.Net/sp) of all world records.
-- [TwitterBot.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/TwitterBot.cs) generates a list of latest world records for tweets.
+- [LeaderboardWebPage.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/Examples/LeaderboardWebPage.cs) generates an example [leaderboard web page](https://nekzor.github.io/Portal2Boards.Net/sp) of all world records.
+- [TwitterBot.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/Examples/TwitterBot.cs) generates a list of latest world records for tweets.
 - [NeKzBot](https://github.com/NeKzor/NeKzBot) implemented a notification system for world record updates.
 
 ## Credits
