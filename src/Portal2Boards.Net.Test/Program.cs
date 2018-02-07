@@ -27,6 +27,7 @@ namespace Portal2Boards.Test
 			GenerateMpPage();
 			GenerateStatsPage();
 			StartTwitterBot();
+			BugTest();
 		}
 
 		[Conditional("AGG")]
@@ -210,6 +211,36 @@ namespace Portal2Boards.Test
 			var bot = new TwitterBot();
 			_ = bot.InitAsync();
 			_ = bot.RunAsync();
+		}
+
+		[Conditional("BUG_TEST")]
+		internal static void BugTest()
+		{
+			using (var client = new Portal2BoardsClient(autoCache: false))
+			{
+				var query = new ChangelogQueryBuilder()
+					.WithWorldRecord(true)
+					.WithBanned(false);
+				
+				var changelog = client.GetChangelogAsync(() => query.Build())
+					.GetAwaiter()
+					.GetResult();
+				
+				foreach (var entry in changelog.Entries
+					.OrderBy(e => e.MapId))
+				{
+					// Make sure it's wr
+					if (entry.Rank.Current == 1) continue;
+
+					// Ehem?
+					var map = Portal2Map.Search(entry.MapId);
+					Write($"{map.Alias} ");
+					Write($"in {entry.Score.Current.AsTimeToString()} ");
+					Write($"by {entry.Player.Name} ");
+					Write($"at {entry.Date?.ToString("yyyy-MM-dd")}");
+					WriteLine();
+				}
+			}
 		}
 	}
 }
