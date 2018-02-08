@@ -8,7 +8,7 @@ using Portal2Boards.Extensions;
 namespace Portal2Boards.Test.Examples
 {
 	// This is a copy of NeKzBot (https://github.com/NeKzor/NeKzBot)
-	public static class Twitter
+	internal static class Twitter
 	{
 		public const int TweetLimit = 280;
 	}

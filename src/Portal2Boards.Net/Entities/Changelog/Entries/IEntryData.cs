@@ -4,6 +4,6 @@ namespace Portal2Boards
 	{
 		uint? Current { get; }
 		uint? Previous { get; }
-		uint? Improvement { get; }
+		int? Improvement { get; }
 	}
 }

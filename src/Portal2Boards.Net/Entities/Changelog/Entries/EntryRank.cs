@@ -4,12 +4,12 @@
 	{
 		public uint? Current { get; set; }
 		public uint? Previous { get; set; }
-		public uint? Improvement { get; set; }
+		public int? Improvement { get; set; }
 
 		internal static EntryRank Create(
 			uint? current = default,
 			uint? previous = default,
-			uint? improvement = default)
+			int? improvement = default)
 		{
 			return new EntryRank()
 			{

@@ -42,14 +42,14 @@ namespace Portal2Boards.API
 		[JsonProperty("mapid")]
 		public uint MapId { get; set; }
 		[JsonProperty("improvement")]
-		public uint? Improvement { get; set; }
+		public int? Improvement { get; set; }
 		[JsonProperty("rank_improvement")]
-		public uint? RankImprovement { get; set; }
+		public int? RankImprovement { get; set; }
 		[JsonProperty("pre_points")]
 		public uint? PrePoints { get; set; }
 		[JsonProperty("post_point")]
 		public uint? PostPoints { get; set; }
 		[JsonProperty("point_improvement")]
-		public uint? PointImprovement { get; set; }
+		public int? PointImprovement { get; set; }
 	}
 }

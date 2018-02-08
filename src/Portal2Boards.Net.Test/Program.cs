@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Portal2Boards.API;
@@ -10,12 +10,21 @@ using static System.Console;
 
 namespace Portal2Boards.Test
 {
+	internal static class Logger
+	{
+		public static Task LogPortal2Boards(object _, LogMessage message)
+		{
+			WriteLine(message.ToString());
+			return Task.CompletedTask;
+		}
+	}
+
 	internal class Program
 	{
 		private static readonly ChangelogQuery _latestWorldRecords = new ChangelogQueryBuilder()
 			.WithWorldRecord(true)
 			.Build();
-		
+
 		private static void Main()
 		{
 			GetAggregated();
@@ -27,15 +36,17 @@ namespace Portal2Boards.Test
 			GenerateMpPage();
 			GenerateStatsPage();
 			StartTwitterBot();
-			BugTest();
+			BugTestOne();
+			BugTestTwo();
+			BugTestThree();
 		}
 
 		[Conditional("AGG")]
-		internal static void GetAggregated()
+		public static void GetAggregated()
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				client.Log += LogPortal2Boards;
+				client.Log += Logger.LogPortal2Boards;
 
 				WriteLine("Fetching aggregated...");
 				var aggregated = client.GetAggregatedAsync().GetAwaiter().GetResult();
@@ -54,11 +65,11 @@ namespace Portal2Boards.Test
 			}
 		}
 		[Conditional("CHA")]
-		internal static void GetChamber()
+		public static void GetChamber()
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				client.Log += LogPortal2Boards;
+				client.Log += Logger.LogPortal2Boards;
 
 				WriteLine("Fetching chamber...");
 				var chamber = client.GetChamberAsync(47458).GetAwaiter().GetResult();
@@ -77,11 +88,11 @@ namespace Portal2Boards.Test
 			}
 		}
 		[Conditional("CLOG"), Conditional("CACHE")]
-		internal static void GetChangelog()
+		public static void GetChangelog()
 		{
 			using (var client = new Portal2BoardsClient(cacheResetTime: 1))
 			{
-				client.Log += LogPortal2Boards;
+				client.Log += Logger.LogPortal2Boards;
 
 				WriteLine("Fetching changelog...");
 				var watch = Stopwatch.StartNew();
@@ -134,7 +145,7 @@ namespace Portal2Boards.Test
 			}
 		}
 		[Conditional("PRO")]
-		internal static void GetProfile()
+		public static void GetProfile()
 		{
 			// Helper
 			string FormatChapterTitle(string str)
@@ -151,7 +162,7 @@ namespace Portal2Boards.Test
 
 			using (var client = new Portal2BoardsClient())
 			{
-				client.Log += LogPortal2Boards;
+				client.Log += Logger.LogPortal2Boards;
 
 				WriteLine("Fetching profile...");
 				var profile = client.GetProfileAsync("Xinera").GetAwaiter().GetResult();
@@ -173,11 +184,11 @@ namespace Portal2Boards.Test
 			}
 		}
 		[Conditional("DEM")]
-		internal static void GetDemo()
+		public static void GetDemo()
 		{
 			using (var client = new Portal2BoardsClient())
 			{
-				client.Log += LogPortal2Boards;
+				client.Log += Logger.LogPortal2Boards;
 
 				WriteLine("Fetching demo content...");
 				var content = client.GetDemoContentAsync(79120).GetAwaiter().GetResult();
@@ -186,27 +197,20 @@ namespace Portal2Boards.Test
 			}
 		}
 
-		// Logger test
-		internal static Task LogPortal2Boards(object _, LogMessage message)
-		{
-			WriteLine(message.ToString());
-			return Task.CompletedTask;
-		}
-
 		// Example 1 (LeaderboardWebPage.cs)
 		[Conditional("GEN_SP")]
-		internal static void GenerateSpPage()
+		public static void GenerateSpPage()
 			=> LeaderboardWebPage.GeneratePage("sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
-		internal static void GenerateMpPage()
+		public static void GenerateMpPage()
 			=> LeaderboardWebPage.GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
 		[Conditional("GEN_STATS")]
-		internal static void GenerateStatsPage()
+		public static void GenerateStatsPage()
 			=> LeaderboardWebPage.GenerateStatsPage("stats.html").GetAwaiter().GetResult();
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]
-		internal static void StartTwitterBot()
+		public static void StartTwitterBot()
 		{
 			var bot = new TwitterBot();
 			_ = bot.InitAsync();
@@ -214,33 +218,13 @@ namespace Portal2Boards.Test
 		}
 
 		[Conditional("BUG_TEST")]
-		internal static void BugTest()
-		{
-			using (var client = new Portal2BoardsClient(autoCache: false))
-			{
-				var query = new ChangelogQueryBuilder()
-					.WithWorldRecord(true)
-					.WithBanned(false);
-				
-				var changelog = client.GetChangelogAsync(() => query.Build())
-					.GetAwaiter()
-					.GetResult();
-				
-				foreach (var entry in changelog.Entries
-					.OrderBy(e => e.MapId))
-				{
-					// Make sure it's wr
-					if (entry.Rank.Current == 1) continue;
-
-					// Ehem?
-					var map = Portal2Map.Search(entry.MapId);
-					Write($"{map.Alias} ");
-					Write($"in {entry.Score.Current.AsTimeToString()} ");
-					Write($"by {entry.Player.Name} ");
-					Write($"at {entry.Date?.ToString("yyyy-MM-dd")}");
-					WriteLine();
-				}
-			}
-		}
+		public static void BugTestOne()
+			=> new BugHunter().TestOne().GetAwaiter().GetResult();
+		[Conditional("BUG_TEST2")]
+		public static void BugTestTwo()
+			=> new BugHunter().TestTwo().GetAwaiter().GetResult();
+		[Conditional("BUG_TEST3")]
+		public static void BugTestThree()
+			=> new BugHunter().TestThree().GetAwaiter().GetResult();
 	}
 }

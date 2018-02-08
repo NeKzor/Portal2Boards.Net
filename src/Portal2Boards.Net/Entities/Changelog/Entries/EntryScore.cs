@@ -4,13 +4,13 @@
 	{
 		public uint? Current { get; private set; }
 		public uint? Previous { get; private set; }
-		public uint? Improvement { get; private set; }
+		public int? Improvement { get; private set; }
 		public ScoreType Type { get; private set; }
 
 		internal static EntryScore Create(
 			uint? current = default,
 			uint? previous = default,
-			uint? improvement = default,
+			int? improvement = default,
 			ScoreType type = default)
 		{
 			return new EntryScore()
