@@ -27,6 +27,8 @@ namespace Portal2Boards.Test
 
 		private static void Main()
 		{
+			WriteLine();
+
 			GetAggregated();
 			GetChamber();
 			GetChangelog();
