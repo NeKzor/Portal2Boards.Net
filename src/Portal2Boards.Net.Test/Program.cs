@@ -34,10 +34,14 @@ namespace Portal2Boards.Test
 			GetChangelog();
 			GetProfile();
 			GetDemo();
+
 			GenerateSpPage();
 			GenerateMpPage();
+			GenerateWrStatsPage();
 			GenerateStatsPage();
+
 			StartTwitterBot();
+			
 			BugTestOne();
 			BugTestTwo();
 			BugTestThree();
@@ -206,6 +210,9 @@ namespace Portal2Boards.Test
 		[Conditional("GEN_MP")]
 		public static void GenerateMpPage()
 			=> LeaderboardWebPage.GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
+		[Conditional("GEN_WRS")]
+		public static void GenerateWrStatsPage()
+			=> LeaderboardWebPage.GenerateWorldRecordStatsPage("wrs.html").GetAwaiter().GetResult();
 		[Conditional("GEN_STATS")]
 		public static void GenerateStatsPage()
 			=> LeaderboardWebPage.GenerateStatsPage("stats.html").GetAwaiter().GetResult();
