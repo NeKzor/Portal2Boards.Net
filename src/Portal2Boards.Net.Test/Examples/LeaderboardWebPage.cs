@@ -9,13 +9,41 @@ using Portal2Boards.Extensions;
 
 namespace Portal2Boards.Test.Examples
 {
-	internal static class LeaderboardWebPage
+	internal class LeaderboardWebPage
 	{
-		private static readonly List<string> _page = new List<string>();
-		private static readonly Portal2BoardsClient _client = new Portal2BoardsClient("LeaderboardWebPage/2.0", false);
+		private readonly List<string> _page;
+		private readonly Portal2BoardsClient _client;
 
-		public static async Task GeneratePage(string path, Portal2MapType mode)
+		public LeaderboardWebPage()
 		{
+			_page = new List<string>();
+			_client = new Portal2BoardsClient("LeaderboardWebPage/2.0", false);
+			_client.Log += Logger.LogPortal2Boards;
+		}
+
+		public async Task GeneratePage(string path, Portal2MapType mode)
+		{
+			// Local functions
+			Task<uint?> GetDuration(DateTime? time)
+			{
+				if (time == default(DateTime?))
+					return Task.FromResult(default(uint?));
+
+				var duration = Math.Abs((DateTime.UtcNow - time.Value.ToUniversalTime()).TotalDays);
+				return Task.FromResult((duration < 1) ? default(uint?) : (uint)duration);
+			}
+			string ToTitle(string str)
+			{
+				var output = string.Empty;
+				if (str?.Length > 0)
+				{
+					output = $"{str[0]}";
+					foreach (var c in str.Skip(1))
+						output += char.IsLower(c) ? $"{c}" : $" {c}";
+				}
+				return output;
+			}
+
 			if (File.Exists(path))
 				File.Delete(path);
 			
@@ -38,7 +66,7 @@ namespace Portal2Boards.Test.Examples
 				_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/wrs\">Portal2Boards.Net</a></h2>");
 			else
 				_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/coop\">Portal2Boards.Net</a></h2>");
-			_page.Add($"<h4 align=\"center\">{mode.ToString().ToTitle()} World Records</h4>");
+			_page.Add($"<h4 align=\"center\">{ToTitle(mode.ToString())} World Records</h4>");
 
 			// First table
 			_page.Add("<table align=\"center\" class=\"wrs\">");
@@ -211,7 +239,7 @@ namespace Portal2Boards.Test.Examples
 			File.AppendAllLines(path, _page);
 		}
 
-		public static async Task GenerateWorldRecordStatsPage(string path)
+		public async Task GenerateWorldRecordStatsPage(string path)
 		{
 			if (File.Exists(path))
 				File.Delete(path);
@@ -231,7 +259,7 @@ namespace Portal2Boards.Test.Examples
 			// Body
 			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:rgba(200,200,200,1);background-color:rgba(0,0,0,0.9);\">");
 			_page.Add("<div>");
-			_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/sp\">Portal2Boards.Net</a></h2>");
+			_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/stats\">Portal2Boards.Net</a></h2>");
 			_page.Add($"<h4 align=\"center\">World Record Statistics</h4>");
 
 			// Data, single API call
@@ -320,7 +348,9 @@ namespace Portal2Boards.Test.Examples
 				_page.Add($"<th>{year}</th>");
 			_page.Add("</tr></thead>");
 			_page.Add("<tbody>");
-			foreach (var wr in wrh.OrderByDescending(h => h.Records.Count))
+			foreach (var wr in wrh
+				.OrderByDescending(h => h.Records.Count)
+				.ThenBy(r => r.Records.First().Date))
 			{
 				_page.Add("<tr>");
 				_page.Add($"<td><a href=\"{wr.Player.Url}\">{wr.Player.Name}</a></td>");
@@ -412,6 +442,43 @@ namespace Portal2Boards.Test.Examples
 					_page.Add($"<td title=\"{omonth.Count} Official\">{month.Count}</td>");
 				}
 				_page.Add("</tr>");
+			}
+			_page.Add("</tbody>");
+			_page.Add("</table>");
+			_page.Add("</div>");
+
+			// Most World Records per Year
+			_page.Add("<div>");
+			_page.Add("<br><h3 align=\"center\">Most World Records per Year</h3>");
+			_page.Add("<table align=\"center\" class=\"wrholders\">");
+			_page.Add("<thead><tr>");
+			_page.Add("<th>Year</th>");
+			_page.Add("<th>Player</th>");
+			_page.Add("<th>Total</th>");
+			_page.Add("</tr></thead>");
+			_page.Add("<tbody>");
+			for (int year = 2013; year < 2019; year++)
+			{
+				var players = wrh
+					.OrderByDescending(rh => rh.Records
+						.Count(r => r.Date.Value.Year == year));
+				var most = players
+					.First().Records
+					.Count(r => r.Date.Value.Year == year);
+				
+				foreach (var player in players
+					.Where(rh => rh.Records
+						.Count(r => r.Date.Value.Year == year) == most))
+				{
+					var recs = player.Records.Count(r => r.Date.Value.Year == year);
+					var off = player.Records.Count(r => r.Map.IsOfficial);
+
+					_page.Add("<tr>");
+					_page.Add($"<td>{year}</td>");
+					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
+					_page.Add("</tr>");
+				}
 			}
 			_page.Add("</tbody>");
 			_page.Add("</table>");
@@ -676,7 +743,7 @@ namespace Portal2Boards.Test.Examples
 			File.AppendAllLines(path, _page);
 		}
 
-		public static async Task GenerateStatsPage(string path)
+		public async Task GenerateStatsPage(string path)
 		{
 			if (File.Exists(path))
 				File.Delete(path);
@@ -771,22 +838,27 @@ namespace Portal2Boards.Test.Examples
 				_page.Add($"<th>{year}</th>");
 			_page.Add("</tr></thead>");
 			_page.Add("<tbody>");
-			foreach (var wr in all
+			var always = new List<RecordHolder>();
+			foreach (var player in all
 				.OrderByDescending(h => h.Records.Count)
-				.Take(50))
+				.Take(100))
 			{
-				var recs = wr.Records.Count;
-				var off = wr.Records.Count(r => r.Map.IsOfficial);
+				var recs = player.Records.Count;
+				var off = player.Records.Count(r => r.Map.IsOfficial);
 
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{wr.Player.Url}\">{wr.Player.Name}</a></td>");
+				_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
 				_page.Add($"<td title=\"{off} Official\">{recs}</td>");
+				var active = 0;
 				for (int year = 2013; year < 2019; year++)
 				{
-					var total = wr.Records.Where(r => r.Date.Value.Year == year);
+					var total = player.Records.Where(r => r.Date.Value.Year == year);
 					var official = total.Where(r => r.Map.IsOfficial);
+					if (total.Count() > 0) active++;
 					_page.Add($"<td title=\"{official.Count()} Official\">{total.Count()}</td>");
 				}
+				if (active == 6)
+					always.Add(player);
 				_page.Add("</tr>");
 			}
 			_page.Add("</tbody>");
@@ -840,6 +912,76 @@ namespace Portal2Boards.Test.Examples
 						.ToList();
 
 					_page.Add($"<td title=\"{omonth.Count} Official\">{month.Count}</td>");
+				}
+				_page.Add("</tr>");
+			}
+			_page.Add("</tbody>");
+			_page.Add("</table>");
+			_page.Add("</div>");
+
+			// Most Records per Year
+			_page.Add("<div>");
+			_page.Add("<br><h3 align=\"center\">Most Records per Year</h3>");
+			_page.Add("<table align=\"center\" class=\"wrholders\">");
+			_page.Add("<thead><tr>");
+			_page.Add("<th>Year</th>");
+			_page.Add("<th>Player</th>");
+			_page.Add("<th>Total</th>");
+			_page.Add("</tr></thead>");
+			_page.Add("<tbody>");
+			for (int year = 2013; year < 2019; year++)
+			{
+				var players = all
+					.OrderByDescending(rh => rh.Records
+						.Count(r => r.Date.Value.Year == year));
+				var most = players
+					.First().Records
+					.Count(r => r.Date.Value.Year == year);
+				
+				foreach (var player in players
+					.Where(rh => rh.Records
+						.Count(r => r.Date.Value.Year == year) == most))
+				{
+					var recs = player.Records.Count(r => r.Date.Value.Year == year);
+					var off = player.Records.Count(r => r.Map.IsOfficial);
+
+					_page.Add("<tr>");
+					_page.Add($"<td>{year}</td>");
+					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
+					_page.Add("</tr>");
+				}
+			}
+			_page.Add("</tbody>");
+			_page.Add("</table>");
+			_page.Add("</div>");
+
+			// At Least One Record Every Year
+			_page.Add("<div>");
+			_page.Add("<br><h3 align=\"center\">At Least One Record Every Year</h3>");
+			_page.Add("<table align=\"center\" class=\"wrholders\">");
+			_page.Add("<thead><tr>");
+			_page.Add("<th>Player</th>");
+			_page.Add("<th>Total</th>");
+			for (int year = 2013; year < 2019; year++)
+				_page.Add($"<th>{year}</th>");
+			_page.Add("</tr></thead>");
+			_page.Add("<tbody>");
+			foreach (var player in always
+				.OrderByDescending(h => h.Records.Count)
+				.Take(10))
+			{
+				var recs = player.Records.Count;
+				var off = player.Records.Count(r => r.Map.IsOfficial);
+
+				_page.Add("<tr>");
+				_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+				_page.Add($"<td title=\"{off} Official\">{recs}</td>");
+				for (int year = 2013; year < 2019; year++)
+				{
+					var total = player.Records.Where(r => r.Date.Value.Year == year);
+					var official = total.Where(r => r.Map.IsOfficial);
+					_page.Add($"<td title=\"{official.Count()} Official\">{total.Count()}</td>");
 				}
 				_page.Add("</tr>");
 			}
@@ -1052,27 +1194,6 @@ namespace Portal2Boards.Test.Examples
 			_page.Add("</html>");
 
 			File.AppendAllLines(path, _page);
-		}
-
-		private static Task<uint?> GetDuration(DateTime? time)
-		{
-			if (time == default(DateTime?))
-				return Task.FromResult(default(uint?));
-
-			var duration = Math.Abs((DateTime.UtcNow - time.Value.ToUniversalTime()).TotalDays);
-			return Task.FromResult((duration < 1) ? default(uint?) : (uint)duration);
-		}
-
-		private static string ToTitle(this string str)
-		{
-			var output = string.Empty;
-			if (str?.Length > 0)
-			{
-				output = $"{str[0]}";
-				foreach (var c in str.Skip(1))
-					output += char.IsLower(c) ? $"{c}" : $" {c}";
-			}
-			return output;
 		}
 	}
 

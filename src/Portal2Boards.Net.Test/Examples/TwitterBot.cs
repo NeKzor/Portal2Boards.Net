@@ -179,14 +179,14 @@ namespace Portal2Boards.Test.Examples
 			}
 			return string.Empty;
 		}
-	}
 
-	internal static class Logger
-	{
-		public static Task LogException(string msg, Exception e)
+		internal static class Logger
 		{
-			Debug.WriteLine($"{msg}\n{e}");
-			return Task.CompletedTask;
+			public static Task LogException(string msg, Exception e)
+			{
+				Debug.WriteLine($"{msg}\n{e}");
+				return Task.CompletedTask;
+			}
 		}
 	}
 }
