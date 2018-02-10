@@ -5,11 +5,9 @@
     <Authors>NeKz</Authors>
     <Description>Retrieve Portal 2 challenge mode data from the speedrunning community board.iverb.me. Client includes automatic caching system and exception event for logging purposes.</Description>
     <Copyright>Copyright © NeKz 2017-2018</Copyright>
-    <Company />
-    <Version>2.1</Version>
+    <Version>2.2</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/NeKzor/Portal2Boards.Net</PackageProjectUrl>
-    <RepositoryType />
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
