@@ -32,17 +32,6 @@ namespace Portal2Boards.Test.Examples
 				var duration = Math.Abs((DateTime.UtcNow - time.Value.ToUniversalTime()).TotalDays);
 				return Task.FromResult((duration < 1) ? default(uint?) : (uint)duration);
 			}
-			string ToTitle(string str)
-			{
-				var output = string.Empty;
-				if (str?.Length > 0)
-				{
-					output = $"{str[0]}";
-					foreach (var c in str.Skip(1))
-						output += char.IsLower(c) ? $"{c}" : $" {c}";
-				}
-				return output;
-			}
 
 			if (File.Exists(path))
 				File.Delete(path);
@@ -54,19 +43,27 @@ namespace Portal2Boards.Test.Examples
 			_page.Add("<!DOCTYPE html>");
 			_page.Add("<html>");
 			_page.Add("<head>");
-			_page.Add("<title>Portal2Boards.Net</title>");
+			if (mode == Portal2MapType.Cooperative)
+				_page.Add("<title>Portal2Boards.Net | Cooperative WRs</title>");
+			else
+				_page.Add("<title>Portal2Boards.Net | Single Player WRs</title>");
 			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
 			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: left;}table.wrs{width:50%;}table.wrholders{width:20%;}th,td{padding: 3px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
 			_page.Add("</head>");
 
 			// Body
-			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:rgba(200,200,200,1);background-color:rgba(0,0,0,0.9);\">");
+			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:#FFFFFF;background-color:#23272A;\">");
 			_page.Add("<div>");
-			if (mode == Portal2MapType.Cooperative)
-				_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/wrs\">Portal2Boards.Net</a></h2>");
-			else
-				_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/coop\">Portal2Boards.Net</a></h2>");
-			_page.Add($"<h4 align=\"center\">{ToTitle(mode.ToString())} World Records</h4>");
+			_page.Add("<h1 align=\"center\"><a href=\"/Portal2Boards.Net\">Portal2Boards.Net</a></h1>");
+			_page.Add
+			(
+				"<h4 align=\"center\">" +
+				"<a href=\"/Portal2Boards.Net/sp\">Single Player WRs</a> | " +
+				"<a href=\"/Portal2Boards.Net/mp\">Cooperative WRs</a> | " +
+				"<a href=\"/Portal2Boards.Net/wrs\">WRs Statistics</a> | " +
+				"<a href=\"/Portal2Boards.Net/stats\">Overall Statistics</a>" +
+				"</h4>"
+			);
 
 			// First table
 			_page.Add("<table align=\"center\" class=\"wrs\">");
@@ -251,16 +248,24 @@ namespace Portal2Boards.Test.Examples
 			_page.Add("<!DOCTYPE html>");
 			_page.Add("<html>");
 			_page.Add("<head>");
-			_page.Add("<title>Portal2Boards.Net</title>");
+			_page.Add("<title>Portal2Boards.Net | WRs Statistics</title>");
 			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
 			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: center;padding: 10px;}table.wrs{width:50%;}table.wrholders{margin:0px auto;}th,td{padding: 3px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
 			_page.Add("</head>");
 
 			// Body
-			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:rgba(200,200,200,1);background-color:rgba(0,0,0,0.9);\">");
+			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:#FFFFFF;background-color:#23272A;\">");
 			_page.Add("<div>");
-			_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/stats\">Portal2Boards.Net</a></h2>");
-			_page.Add($"<h4 align=\"center\">World Record Statistics</h4>");
+			_page.Add("<h1 align=\"center\"><a href=\"/Portal2Boards.Net\">Portal2Boards.Net</a></h1>");
+			_page.Add
+			(
+				"<h4 align=\"center\">" +
+				"<a href=\"/Portal2Boards.Net/sp\">Single Player WRs</a> | " +
+				"<a href=\"/Portal2Boards.Net/mp\">Cooperative WRs</a> | " +
+				"<a href=\"/Portal2Boards.Net/wrs\">WRs Statistics</a> | " +
+				"<a href=\"/Portal2Boards.Net/stats\">Overall Statistics</a>" +
+				"</h4>"
+			);
 
 			// Data, single API call
 			var changelog = await _client.GetChangelogAsync(q =>
@@ -755,16 +760,24 @@ namespace Portal2Boards.Test.Examples
 			_page.Add("<!DOCTYPE html>");
 			_page.Add("<html>");
 			_page.Add("<head>");
-			_page.Add("<title>Portal2Boards.Net</title>");
+			_page.Add("<title>Portal2Boards.Net | Overall Statistics</title>");
 			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
 			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: center;padding: 10px;}table.wrs{width:50%;}table.wrholders{margin:0px auto;}th,td{padding: 3px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
 			_page.Add("</head>");
 
 			// Body
-			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:rgba(200,200,200,1);background-color:rgba(0,0,0,0.9);\">");
+			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:#FFFFFF;background-color:#23272A;\">");
 			_page.Add("<div>");
-			_page.Add("<h2 align=\"center\"><a href=\"/Portal2Boards.Net/sp\">Portal2Boards.Net</a></h2>");
-			_page.Add($"<h4 align=\"center\">Overall Statistics</h4>");
+			_page.Add("<h1 align=\"center\"><a href=\"/Portal2Boards.Net\">Portal2Boards.Net</a></h1>");
+			_page.Add
+			(
+				"<h4 align=\"center\">" +
+				"<a href=\"/Portal2Boards.Net/sp\">Single Player WRs</a> | " +
+				"<a href=\"/Portal2Boards.Net/mp\">Cooperative WRs</a> | " +
+				"<a href=\"/Portal2Boards.Net/wrs\">WRs Statistics</a> | " +
+				"<a href=\"/Portal2Boards.Net/stats\">Overall Statistics</a>" +
+				"</h4>"
+			);
 
 			// Data, single API call
 			var changelog = await _client.GetChangelogAsync(q =>
@@ -938,15 +951,20 @@ namespace Portal2Boards.Test.Examples
 					.First().Records
 					.Count(r => r.Date.Value.Year == year);
 				
-				foreach (var player in players
-					.Where(rh => rh.Records
-						.Count(r => r.Date.Value.Year == year) == most))
+				var once = false;
+				var mostrecs = players
+					.Where(rh => rh.Records.Count(r => r.Date.Value.Year == year) == most);
+				foreach (var player in mostrecs)
 				{
 					var recs = player.Records.Count(r => r.Date.Value.Year == year);
 					var off = player.Records.Count(r => r.Map.IsOfficial);
 
 					_page.Add("<tr>");
-					_page.Add($"<td>{year}</td>");
+					if (!once)
+					{
+						_page.Add($"<td rowspan=\"{mostrecs.Count()}\" align=\"center\">{year}</td>");
+						once = true;
+					}
 					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
 					_page.Add("</tr>");
@@ -984,6 +1002,92 @@ namespace Portal2Boards.Test.Examples
 					_page.Add($"<td title=\"{official.Count()} Official\">{total.Count()}</td>");
 				}
 				_page.Add("</tr>");
+			}
+			_page.Add("</tbody>");
+			_page.Add("</table>");
+			_page.Add("</div>");
+
+			// New Players per Year
+			_page.Add("<div>");
+			_page.Add("<br><h3 align=\"center\">New Players per Year</h3>");
+			_page.Add("<table align=\"center\" class=\"wrholders\">");
+			_page.Add("<thead><tr>");
+			_page.Add("<th>Year</th>");
+			_page.Add("<th>Players</th>");
+			_page.Add("<th>Total</th>");
+			_page.Add("<th>Growth</th>");
+			_page.Add("</tr></thead>");
+			_page.Add("<tbody>");
+			var peeps = all
+				.Where(rh => rh.Records.Any(r => r.Date.Value.Year == 2013));
+			var totalpeeps = peeps.Count();
+			var lastpeeps = 0;
+			for (int year = 2013; year < 2019; year++)
+			{
+				var players = all
+					.Where(rh => rh.Records.Any(r => r.Date.Value.Year == year))
+					.Where(rh => !peeps.Contains(rh))
+					.Count();
+				totalpeeps += players;
+
+				_page.Add("<tr>");
+				_page.Add($"<td>{year}</td>");
+				_page.Add($"<td>{((players == 0) ? totalpeeps : players)}</td>");
+				_page.Add($"<td>{totalpeeps}</td>");
+				_page.Add($"<td>{((lastpeeps == 0) ? ((double)players / lastpeeps) * 100 : 0).ToString("N2")}%</td>");
+				_page.Add("</tr>");
+				lastpeeps = totalpeeps;
+			}
+			_page.Add("</tbody>");
+			_page.Add("</table>");
+			_page.Add("</div>");
+
+			// Most "Almost World Record"s
+			_page.Add("<div>");
+			_page.Add("<br><h3 align=\"center\">Most \"Almost World Record\"s</h3>");
+			_page.Add("<table align=\"center\" class=\"wrholders\">");
+			_page.Add("<thead><tr>");
+			_page.Add("<th>Year</th>");
+			_page.Add("<th>Player</th>");
+			_page.Add("<th>Total</th>");
+			_page.Add("</tr></thead>");
+			_page.Add("<tbody>");
+			for (int year = 2013; year < 2019; year++)
+			{
+				var players = all
+					.OrderByDescending(rh => rh.Records
+						.Where(r => r.Entry.Rank.Current == 2)
+						.Count(r => r.Date.Value.Year == year));
+				var most = players
+					.First().Records
+					.Where(r => r.Entry.Rank.Current == 2)
+					.Count(r => r.Date.Value.Year == year);
+				
+				var once = false;
+				var rank2 = players
+					.Where(rh => rh.Records
+						.Where(r => r.Entry.Rank.Current == 2)
+						.Count(r => r.Date.Value.Year == year) == most);
+				foreach (var player in rank2)
+				{
+					var recs = player.Records
+						.Where(r => r.Entry.Rank.Current == 2)
+						.Count(r => r.Date.Value.Year == year);
+					var off = player.Records
+						.Where(r => r.Entry.Rank.Current == 2)
+						.Where(r => r.Date.Value.Year == year)
+						.Count(r => r.Map.IsOfficial);
+					
+					_page.Add("<tr>");
+					if (!once)
+					{
+						_page.Add($"<td rowspan=\"{rank2.Count()}\" align=\"center\">{year}</td>");
+						once = true;
+					}
+					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
+					_page.Add("</tr>");
+				}
 			}
 			_page.Add("</tbody>");
 			_page.Add("</table>");

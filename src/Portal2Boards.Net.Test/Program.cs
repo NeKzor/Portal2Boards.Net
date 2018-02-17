@@ -45,6 +45,8 @@ namespace Portal2Boards.Test
 			BugTestOne();
 			BugTestTwo();
 			BugTestThree();
+			TestRuleOne();
+			TestRuleTwo();
 		}
 
 		[Conditional("AGG")]
@@ -206,16 +208,16 @@ namespace Portal2Boards.Test
 		// Example 1 (LeaderboardWebPage.cs)
 		[Conditional("GEN_SP")]
 		public static void GenerateSpPage()
-			=> new LeaderboardWebPage().GeneratePage("sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GeneratePage("pages/sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
 		public static void GenerateMpPage()
-			=> new LeaderboardWebPage().GeneratePage("coop.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GeneratePage("pages/mp.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
 		[Conditional("GEN_WRS")]
 		public static void GenerateWrStatsPage()
-			=> new LeaderboardWebPage().GenerateWorldRecordStatsPage("wrs.html").GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GenerateWorldRecordStatsPage("pages/wrs.html").GetAwaiter().GetResult();
 		[Conditional("GEN_STATS")]
 		public static void GenerateStatsPage()
-			=> new LeaderboardWebPage().GenerateStatsPage("stats.html").GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GenerateStatsPage("pages/stats.html").GetAwaiter().GetResult();
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]
@@ -235,5 +237,11 @@ namespace Portal2Boards.Test
 		[Conditional("BUG_TEST3")]
 		public static void BugTestThree()
 			=> new BugHunter().TestThree().GetAwaiter().GetResult();
+		[Conditional("RULE_TEST")]
+		public static void TestRuleOne()
+			=> new BugHunter().TestRuleOne().GetAwaiter().GetResult();
+		[Conditional("RULE_TEST2")]
+		public static void TestRuleTwo()
+			=> new BugHunter().TestRuleTwo().GetAwaiter().GetResult();
 	}
 }

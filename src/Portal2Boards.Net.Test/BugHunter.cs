@@ -175,5 +175,77 @@ namespace Portal2Boards.Test
 #endif
 			}
 		}
+
+		// Finds every entry that should contain demo/video proof but does not
+		// People tend to not upload their old personal best and only upload their
+		// fastest one, so this doesn't check if it is their current personal best
+		public async Task TestRuleOne()
+		{
+			using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+			{
+				client.Log += Logger.LogPortal2Boards;
+
+				var query = new ChangelogQueryBuilder()
+					.WithBanned(false)
+					.WithMaxDaysAgo(3333);
+				
+				var changelog = await client.GetChangelogAsync(() => query.Build());
+
+				WriteLine("--- Scores Without Proof ---");
+				var since = System.DateTime.Parse("2017-05-11");
+				foreach (var entry in changelog.Entries
+					.Where(e => e.Date.Value >= since)
+					.Where(e => e.Rank.Current <= 5)
+					.Where(e => !e.DemoExists && !(e as ChangelogEntry).VideoExists)
+					.OrderBy(e => e.Date))
+				{
+					var map = Portal2Map.Search(entry.MapId);
+					Write($"[{(entry as IEntity<ulong>).Id}] ");
+					Write($"{map.Alias} ");
+					Write($"in {entry.Score.Current.AsTimeToString()} ");
+					Write($"by {entry.Player.Name} ");
+					Write($"at {entry.Date?.ToString("yyyy-MM-dd")}");
+					WriteLine();
+				}
+			}
+		}
+
+		// Checks every current top five scores and if they follow the rule
+		// Also not a real bug but useful for moderators
+		public async Task TestRuleTwo()
+		{
+			using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+			{
+				client.Log += Logger.LogPortal2Boards;
+
+				var query = new ChangelogQueryBuilder()
+					.WithBanned(false)
+					.WithMaxDaysAgo(3333);
+				
+				WriteLine("--- Scores Without Proof² ---");
+				var since = System.DateTime.Parse("2017-05-11");
+				foreach (var map in Portal2.CampaignMaps
+					.Where(m => m.Exists))
+				{
+					// Note: Multiple API calls
+					var chamber = await client.GetChamberAsync((ulong)map.BestTimeId);
+					
+					foreach (var entry in chamber.Entries
+						.Where(e => e.Date.Value >= since)
+						.Where(e => e.PlayerRank <= 5) // Hmm, score rank?
+						.Where(e => !e.DemoExists && !(e as ChamberEntry).VideoExists)
+						.OrderBy(e => e.Date))
+					{
+						Write($"[{entry.ChangelogId}] ");
+						Write($"{map.Alias} ");
+						Write($"in {entry.Score.AsTimeToString()} ");
+						Write($"by {entry.Player.Name} ");
+						Write($"at {entry.Date?.ToString("yyyy-MM-dd")}");
+						WriteLine();
+					}
+					await Task.Delay(10);
+				}
+			}
+		}
 	}
 }
