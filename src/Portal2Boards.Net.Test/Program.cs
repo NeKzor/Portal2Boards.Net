@@ -208,16 +208,16 @@ namespace Portal2Boards.Test
 		// Example 1 (LeaderboardWebPage.cs)
 		[Conditional("GEN_SP")]
 		public static void GenerateSpPage()
-			=> new LeaderboardWebPage().GeneratePage("pages/sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GeneratePage("gh-pages/sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
 		[Conditional("GEN_MP")]
 		public static void GenerateMpPage()
-			=> new LeaderboardWebPage().GeneratePage("pages/mp.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GeneratePage("gh-pages/mp.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
 		[Conditional("GEN_WRS")]
 		public static void GenerateWrStatsPage()
-			=> new LeaderboardWebPage().GenerateWorldRecordStatsPage("pages/wrs.html").GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GenerateWorldRecordStatsPage("gh-pages/wrs.html").GetAwaiter().GetResult();
 		[Conditional("GEN_STATS")]
 		public static void GenerateStatsPage()
-			=> new LeaderboardWebPage().GenerateStatsPage("pages/stats.html").GetAwaiter().GetResult();
+			=> new LeaderboardWebPage().GenerateStatsPage("gh-pages/stats.html").GetAwaiter().GetResult();
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]

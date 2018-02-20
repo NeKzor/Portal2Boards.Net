@@ -1032,9 +1032,9 @@ namespace Portal2Boards.Test.Examples
 
 				_page.Add("<tr>");
 				_page.Add($"<td>{year}</td>");
-				_page.Add($"<td>{((players == 0) ? totalpeeps : players)}</td>");
+				_page.Add($"<td>{players}</td>");
 				_page.Add($"<td>{totalpeeps}</td>");
-				_page.Add($"<td>{((lastpeeps == 0) ? ((double)players / lastpeeps) * 100 : 0).ToString("N2")}%</td>");
+				_page.Add($"<td>{((lastpeeps != 0) ? ((double)players / lastpeeps) * 100 : 0).ToString("N2")}%</td>");
 				_page.Add("</tr>");
 				lastpeeps = totalpeeps;
 			}
@@ -1042,9 +1042,9 @@ namespace Portal2Boards.Test.Examples
 			_page.Add("</table>");
 			_page.Add("</div>");
 
-			// Most "Almost World Record"s
+			// Most Second Places
 			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most \"Almost World Record\"s</h3>");
+			_page.Add("<br><h3 align=\"center\">Most Second Places</h3>");
 			_page.Add("<table align=\"center\" class=\"wrholders\">");
 			_page.Add("<thead><tr>");
 			_page.Add("<th>Year</th>");
