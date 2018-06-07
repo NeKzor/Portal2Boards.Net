@@ -9,21 +9,41 @@ using Portal2Boards.Extensions;
 
 namespace Portal2Boards.Test.Examples
 {
-	internal class LeaderboardWebPage
+	internal class Leaderboard
 	{
+		public const uint Version = 4;
+ 
 		private readonly List<string> _page;
 		private readonly Portal2BoardsClient _client;
 
-		public LeaderboardWebPage()
+		public Leaderboard()
 		{
 			_page = new List<string>();
-			_client = new Portal2BoardsClient("LeaderboardWebPage/2.0", false);
+			_client = new Portal2BoardsClient($"Leaderboard/{Version}.0");
 			_client.Log += Logger.LogPortal2Boards;
 		}
 
-		public async Task GeneratePage(string path, Portal2MapType mode)
+		public Task ExportPage(string path)
 		{
-			// Local functions
+			if (File.Exists(path))
+				File.Delete(path);
+			File.AppendAllLines(path, _page);
+			return Task.CompletedTask;
+		}
+		public async Task Build()
+		{
+			var watch = Stopwatch.StartNew();
+			StartPage();
+			await GenerateRecordsAsync(Portal2MapType.SinglePlayer);
+			await GenerateRecordsAsync(Portal2MapType.Cooperative);
+			await GenerateStatsPageAsync();
+			await GenerateCommunityStatsPageAsync();
+			EndPage();
+			_page.Insert(0, $"<!-- Generated static page in {watch.Elapsed.TotalSeconds} seconds. -->");
+		}
+		public async Task GenerateRecordsAsync(Portal2MapType mode)
+		{
+			// Local function
 			Task<uint?> GetDuration(DateTime? time)
 			{
 				if (time == default(DateTime?))
@@ -33,94 +53,52 @@ namespace Portal2Boards.Test.Examples
 				return Task.FromResult((duration < 1) ? default(uint?) : (uint)duration);
 			}
 
-			if (File.Exists(path))
-				File.Delete(path);
-			
-			_page.Clear();
-
-			var watch = Stopwatch.StartNew();
-			// Head
-			_page.Add("<!DOCTYPE html>");
-			_page.Add("<html>");
-			_page.Add("<head>");
-			if (mode == Portal2MapType.Cooperative)
-				_page.Add("<title>Portal2Boards.Net | Cooperative WRs</title>");
-			else
-				_page.Add("<title>Portal2Boards.Net | Single Player WRs</title>");
-			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
-			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: left;}table.wrs{width:50%;}table.wrholders{width:20%;}th,td{padding: 3px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
-			_page.Add("</head>");
-
-			// Body
-			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:#FFFFFF;background-color:#23272A;\">");
-			_page.Add("<div>");
-			_page.Add("<h1 align=\"center\"><a href=\"/Portal2Boards.Net\">Portal2Boards.Net</a></h1>");
-			_page.Add
-			(
-				"<h4 align=\"center\">" +
-				"<a href=\"/Portal2Boards.Net/sp\">Single Player WRs</a> | " +
-				"<a href=\"/Portal2Boards.Net/mp\">Cooperative WRs</a> | " +
-				"<a href=\"/Portal2Boards.Net/wrs\">WRs Statistics</a> | " +
-				"<a href=\"/Portal2Boards.Net/stats\">Overall Statistics</a>" +
-				"</h4>"
-			);
-
-			// First table
-			_page.Add("<table align=\"center\" class=\"wrs\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Time</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Date</th>");
-			_page.Add("<th>Duration</th>");
-			_page.Add("<th>Demo</th>");
-			_page.Add("<th>Video</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			StartSection((mode == Portal2MapType.SinglePlayer) ? "sp" : "coop");
+			StartTable(8, 2, (mode == Portal2MapType.SinglePlayer) ? "Map²" : "Map", "Time", "Player", "Date", "Duration", "Demo", "Video");
 
 			var totalscore = 0u;
-			var totalscorewithnoncm = 0u;
+			var officialtotal = 0u;
 			var wrholders = new Dictionary<string, UserStats>();
 			var maps = ((mode == Portal2MapType.SinglePlayer)
 				? Portal2.SinglePlayerMaps
 				: Portal2.CooperativeMaps)
 				.Where(m => m.Exists)
+				.Where(m => m.BestTimeId != 47817) // Propulsion Catch
 				.OrderBy(m => m.Index)
 				.ToList();
-			
+
 			var changelog = await _client.GetChangelogAsync(q =>
 			{
 				q.WorldRecord = true;
 				q.Banned = false;
 				q.MaxDaysAgo = 3333;
 			});
-			
+
 			foreach (var map in maps)
 			{
 				var entries = changelog.Entries
 					.Where(e => e.MapId == map.BestTimeId);
-				
+
 				var latestwr = entries
 					.OrderByDescending(e => e.Date)
 					.First(e => !e.IsBanned);
-				
+
 				if (map.IsOfficial)
-					totalscore += latestwr.Score.Current ?? 0;
-				if (mode == Portal2MapType.SinglePlayer)
-					totalscorewithnoncm += latestwr.Score.Current ?? 0;
+					officialtotal += latestwr.Score.Current ?? 0;
+				totalscore += latestwr.Score.Current ?? 0;
 
 				var wrs = entries
 					.Where(e => e.Score.Current == latestwr.Score.Current)
 					.OrderBy(e => e.Date)
 					.ToList();
-				
+
 				var once = false;
 				foreach (var wr in wrs)
 				{
 					var duration = await GetDuration(wr.Date);
 					if (!wrholders.Keys.Contains(wr.Player.Name))
 						wrholders.Add(wr.Player.Name, new UserStats());
-					
+
 					wrholders[wr.Player.Name] = new UserStats()
 					{
 						OfficialDuration = wrholders[wr.Player.Name].OfficialDuration
@@ -135,15 +113,15 @@ namespace Portal2Boards.Test.Examples
 					_page.Add("<tr>");
 					if (!once)
 					{
-						_page.Add($"<td rowspan=\"{wrs.Count}\" align=\"center\"><a href=\"{map.Url}\" title=\"{map.Name}\">{map.Alias}</a>{((map.IsOfficial) ? string.Empty : "<sup>1</sup>")}</td>");
+						_page.Add($"<td rowspan=\"{wrs.Count}\" align=\"center\"><a class=\"link\" href=\"{map.Url}\" title=\"{map.Name}\">{map.Alias}</a>{((map.IsOfficial) ? string.Empty : "<sup>1</sup>")}</td>");
 						_page.Add($"<td rowspan=\"{wrs.Count}\">{wr.Score.Current.AsTimeToString() ?? "Error :("}</td>");
 						once = true;
 					}
-					_page.Add($"<td><a href=\"{(wr.Player as SteamUser).Url}\">{wr.Player.Name}</a></td>");
+					_page.Add($"<td class=\"valign-wrapper\"><img class=\"circle responsive-img\" src=\"{(wr.Player as SteamUser).AvatarUrl.Replace("_full", string.Empty)}\">&nbsp;&nbsp;&nbsp;<a class=\"link\" href=\"https://board.iverb.me/profile/{(wr.Player as SteamUser).Id}\">{wr.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{wr.Date?.DateTimeToString() + " (CST)"}\">{((wr.Date != null) ? wr.Date?.ToString("yyyy-MM-dd") : "Unknown")}</td>");
-					_page.Add($"<td>{duration?.ToString() ?? "<1"}</td>");
-					_page.Add((wr.DemoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).DemoUrl}\">Download</a></td>" : "<td></td>");
-					_page.Add(((wr as ChangelogEntry).VideoExists) ? $"<td><a href=\"{(wr as ChangelogEntry).VideoUrl}\">Watch</a></td>" : "<td></td>");
+					_page.Add($"<td title=\"{duration?.ToString() ?? "less than 1"} day{(((duration ?? 1 ) == 1) ? string.Empty : "s")}\">{duration?.ToString() ?? "<1"}</td>");
+					_page.Add((wr.DemoExists) ? $"<td><a title=\"Download Demo File\" class=\"link\" href=\"{(wr as ChangelogEntry).DemoUrl}\" target=\"_blank\">Download</a></td>" : "<td></td>");
+					_page.Add(((wr as ChangelogEntry).VideoExists) ? $"<td><a title=\"Watch on YouTube\" class=\"link\" href=\"{(wr as ChangelogEntry).VideoUrl}\" target=\"_blank\">Watch</a></td>" : "<td></td>");
 					_page.Add("</tr>");
 				}
 			}
@@ -151,121 +129,76 @@ namespace Portal2Boards.Test.Examples
 			{
 				_page.Add("<tr>");
 				_page.Add("<td><b>Official Total</b></td>");
-				_page.Add($"<td><b>{totalscorewithnoncm.AsTimeToString()}</b></td>");
+				_page.Add($"<td><b>{officialtotal.AsTimeToString()}</b></td>");
 				_page.Add("</tr>");
 			}
 			_page.Add("<tr>");
 			_page.Add("<td><b>Total</b></td>");
 			_page.Add($"<td><b>{totalscore.AsTimeToString()}</b></td>");
 			_page.Add("</tr>");
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Total wrs
-			_page.Add("<div>");
-			_page.Add($"<br><h3 align=\"center\">{((mode == Portal2MapType.SinglePlayer) ? "Official " : string.Empty)}World Record Holders</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
+			Title("Total Records");
 			if (mode == Portal2MapType.SinglePlayer)
-				_page.Add("<th>Official</th>");
-			_page.Add("<th>Total</th>");
-			if (mode == Portal2MapType.Cooperative)
-				_page.Add("<th>Percentage</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+				StartTable(4, 4, "Player", "Official", "Total");
+			else if (mode == Portal2MapType.Cooperative)
+				StartTable(4, 4, "Player", "Total", "Percentage");
+
 			foreach (var player in wrholders
 				.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer)
 					? p.Value.OfficialWorldRecords
 					: p.Value.TotalWorldRecords))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{player.Value.Player.Url}\">{player.Key}</a></td>");
+				_page.Add($"<td class=\"valign-wrapper\"><img class=\"circle responsive-img\" src=\"{player.Value.Player.AvatarUrl.Replace("_full", string.Empty)}\">&nbsp;&nbsp;&nbsp;<a class=\"link\" href=\"https://board.iverb.me/profile/{player.Value.Player.Id}\">{player.Key}</a></td>");
 				if (mode == Portal2MapType.SinglePlayer)
-					_page.Add($"<td title=\"{(int)(Math.Round((decimal)player.Value.OfficialWorldRecords / maps.Count, 2) * 100)}%\">{player.Value.OfficialWorldRecords}</td>");
+					_page.Add($"<td title=\"{(int)(Math.Round((decimal)player.Value.OfficialWorldRecords / maps.Where(m => m.IsOfficial).Count(), 2) * 100)}%\">{player.Value.OfficialWorldRecords}</td>");
 				var totalpercentage = (int)(Math.Round((decimal)player.Value.TotalWorldRecords / maps.Count, 2) * 100);
 				_page.Add($"<td title=\"{totalpercentage}%\">{player.Value.TotalWorldRecords}</td>");
 				if (mode == Portal2MapType.Cooperative)
 					_page.Add($"<td>{totalpercentage}%</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Duration
-			_page.Add("<div>");
-			_page.Add($"<br><h3 align=\"center\">{((mode == Portal2MapType.SinglePlayer) ? "Official " : string.Empty)}Duration</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
+			Title("Total Duration");
+
 			if (mode == Portal2MapType.SinglePlayer)
-				_page.Add("<th>Official</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+				StartTable(4, 4, "Player", "Official", "Total");
+			else
+				StartTable(4, 4, "Player", "Total");
+
 			foreach (var player in wrholders
 				.OrderByDescending(p => (mode == Portal2MapType.SinglePlayer)
 					? p.Value.OfficialDuration
 					: p.Value.TotalDuration))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{player.Value.Player.Url}\">{player.Key}</a></td>");
+				_page.Add($"<td class=\"valign-wrapper\"><img class=\"circle responsive-img\" src=\"{player.Value.Player.AvatarUrl.Replace("_full", string.Empty)}\">&nbsp;&nbsp;&nbsp;<a class=\"link\" href=\"https://board.iverb.me/profile/{player.Value.Player.Id}\">{player.Key}</a></td>");
 				if (mode == Portal2MapType.SinglePlayer)
-					_page.Add($"<td>{player.Value.OfficialDuration}</td>");
-				_page.Add($"<td>{player.Value.TotalDuration}</td>");
+					_page.Add($"<td title=\"{player.Value.OfficialDuration} days\">{player.Value.OfficialDuration}</td>");
+				_page.Add($"<td title=\"{player.Value.TotalDuration} days\">{player.Value.TotalDuration}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
+
+			// Footer
+			_page.Add("<br><br><br>");
+			_page.Add("<div clas=\"row\" align=\"center\">");
+			if (mode == Portal2MapType.SinglePlayer)
+			{
+				_page.Add("<br><br><sup>1</sup> Unofficial challenge mode map.");
+				_page.Add("<br><sup>2</sup> Excluding Propulsion Catch.");
+			}
 			_page.Add("</div>");
 
-			watch.Stop();
-			// Footer
-			if (mode == Portal2MapType.SinglePlayer)
-				_page.Add("<br><sup>1</sup> Unofficial challenge mode map.");
-			_page.Add($"<br>Generated static page in {watch.Elapsed.TotalSeconds.ToString("N3")} seconds.");
-			_page.Add("<br><a href=\"https://github.com/NeKzor/Portal2Boards.Net\">Portal2Boards.Net</a> example made by NeKz.");
-			_page.Add($"<br>Last update: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss '(UTC)'")}");
-
-			// Rest
-			_page.Add("</body>");
-			_page.Add("</html>");
-
-			File.AppendAllLines(path, _page);
+			EndSection();
 		}
-
-		public async Task GenerateWorldRecordStatsPage(string path)
+		public async Task GenerateStatsPageAsync()
 		{
-			if (File.Exists(path))
-				File.Delete(path);
-			
-			_page.Clear();
-
-			var watch = Stopwatch.StartNew();
-			// Head
-			_page.Add("<!DOCTYPE html>");
-			_page.Add("<html>");
-			_page.Add("<head>");
-			_page.Add("<title>Portal2Boards.Net | WRs Statistics</title>");
-			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
-			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: center;padding: 10px;}table.wrs{width:50%;}table.wrholders{margin:0px auto;}th,td{padding: 3px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
-			_page.Add("</head>");
-
-			// Body
-			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:#FFFFFF;background-color:#23272A;\">");
-			_page.Add("<div>");
-			_page.Add("<h1 align=\"center\"><a href=\"/Portal2Boards.Net\">Portal2Boards.Net</a></h1>");
-			_page.Add
-			(
-				"<h4 align=\"center\">" +
-				"<a href=\"/Portal2Boards.Net/sp\">Single Player WRs</a> | " +
-				"<a href=\"/Portal2Boards.Net/mp\">Cooperative WRs</a> | " +
-				"<a href=\"/Portal2Boards.Net/wrs\">WRs Statistics</a> | " +
-				"<a href=\"/Portal2Boards.Net/stats\">Overall Statistics</a>" +
-				"</h4>"
-			);
+			StartSection("stats");
 
 			// Data, single API call
 			var changelog = await _client.GetChangelogAsync(q =>
@@ -285,7 +218,7 @@ namespace Portal2Boards.Test.Examples
 					Date = entry.Date,
 					Entry = entry
 				};
-				
+
 				var pro = wrh.FirstOrDefault(x => x.Player.Id == (entry.Player as SteamUser).Id);
 				if (pro != null)
 				{
@@ -310,7 +243,7 @@ namespace Portal2Boards.Test.Examples
 					.Where(e => e.MapId == map.BestTimeId)
 					.OrderBy(e => e.Date)
 					.ToList();
-				
+
 				maps.Add(new RecordMap()
 				{
 					Map = map,
@@ -330,7 +263,7 @@ namespace Portal2Boards.Test.Examples
 				var last = map.Records
 					.OrderBy(r => r.Score.Current)
 					.First();
-				
+
 				foreach (var wr in map.Records
 					.OrderBy(r => r.Score.Current)
 					.Skip(1))
@@ -343,22 +276,14 @@ namespace Portal2Boards.Test.Examples
 			}
 
 			// Most World Records
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most World Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			for (int year = 2013; year < 2019; year++)
-				_page.Add($"<th>{year}</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Records");
+			StartTable(6, 3, "Player", "Total", "2013", "2014", "2015", "2016", "2017", "2018");
 			foreach (var wr in wrh
 				.OrderByDescending(h => h.Records.Count)
 				.ThenBy(r => r.Records.First().Date))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{wr.Player.Url}\">{wr.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{wr.Player.Id}\">{wr.Player.Name}</a></td>");
 				_page.Add($"<td title=\"{wr.Records.Count(r => r.Map.IsOfficial)} Official\">{wr.Records.Count}</td>");
 				for (int year = 2013; year < 2019; year++)
 				{
@@ -368,20 +293,11 @@ namespace Portal2Boards.Test.Examples
 				}
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Unique World Records of Players
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Unique World Records of Players</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("<th title=\"SP:COOP\">Mode Ratio</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Unique Records");
+			StartTable(4, 4, "Player", "Total", "Sp:Coop");
 			foreach (var wr in wrh.OrderByDescending(h => h.UniqueRecords.Count))
 			{
 				var unique = wr.UniqueRecords;	
@@ -391,36 +307,16 @@ namespace Portal2Boards.Test.Examples
 				var omp = unique.Count(r => r.Map.Type == Portal2MapType.Cooperative && r.Map.IsOfficial);
 
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{wr.Player.Url}\">{wr.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{wr.Player.Id}\">{wr.Player.Name}</a></td>");
 				_page.Add($"<td title=\"{unique.Count(r => r.Map.IsOfficial)} Official\">{unique.Count}</td>");
 				_page.Add($"<td title=\"{osp}:{omp} Official\">{sp}:{mp}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
-			// World Records Activity
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">World Records Activity</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year/Month</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("<th>Jan</th>");
-			_page.Add("<th>Feb</th>");
-			_page.Add("<th>Mar</th>");
-			_page.Add("<th>Apr</th>");
-			_page.Add("<th>May</th>");
-			_page.Add("<th>Jun</th>");
-			_page.Add("<th>Jul</th>");
-			_page.Add("<th>Aug</th>");
-			_page.Add("<th>Sep</th>");
-			_page.Add("<th>Oct</th>");
-			_page.Add("<th>Nov</th>");
-			_page.Add("<th>Dec</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			// Activity
+			Title("Activity");
+			StartTable(6, 3, "Year/Month", "Total", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 			for (int i = 2013; i < 2019; i++)
 			{
 				var year = changelog.Entries
@@ -448,20 +344,11 @@ namespace Portal2Boards.Test.Examples
 				}
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Most World Records per Year
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most World Records per Year</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Records per Year");
+			StartTable(4, 4, "Year", "Player", "Total");
 			for (int year = 2013; year < 2019; year++)
 			{
 				var players = wrh
@@ -480,37 +367,25 @@ namespace Portal2Boards.Test.Examples
 
 					_page.Add("<tr>");
 					_page.Add($"<td>{year}</td>");
-					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+					_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
 					_page.Add("</tr>");
 				}
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Longest Lasting World Records
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Longest Lasting World Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Time</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Duration</th>");
-			_page.Add("<th>Start</th>");
-			_page.Add("<th>End</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Longest Lasting Records");
+			StartTable(6, 3, "Map", "Time", "Player", "Duration/in days", "Start", "End");
 			foreach (var stats in durations
 				.OrderByDescending(d => d.Duration)
 				.Take(20))
 			{
 				var (duration, current, previous, map) = stats;
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{map.Url}\">{map.Alias}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"{map.Url}\">{map.Alias}</a></td>");
 				_page.Add($"<td>{current.Score.Current.AsTimeToString()}</td>");
-				_page.Add($"<td><a href=\"{(current.Player as SteamUser).Url}\">{current.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(current.Player as SteamUser).Id}\">{current.Player.Name}</a></td>");
 				_page.Add($"<td>{((duration < 1) ? "<1" : $"{duration}")}</td>");
 				_page.Add($"<td title=\"{current.Date.DateTimeToString() + " (CST)"}\">{(current.Date?.ToString("yyy-MM-dd"))}</td>");
 				if (previous != null)
@@ -519,23 +394,11 @@ namespace Portal2Boards.Test.Examples
 					_page.Add("<td>Ongoing</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Longest Lasting World Records History
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Longest Lasting World Records History</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Time</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Duration</th>");
-			_page.Add("<th>Start</th>");
-			_page.Add("<th>End</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Longest Lasting Records History");
+			StartTable(6, 3, "Map", "Time", "Player", "Duration/in days", "Start", "End");
 			var highest = default((int Duration, IChangelogEntry Current, IChangelogEntry Previous, Portal2Map Map));
 			foreach (var stats in durations
 				.OrderBy(d => d.Current.Date))
@@ -544,9 +407,9 @@ namespace Portal2Boards.Test.Examples
 				{
 					var (duration, current, previous, map) = stats;
 					_page.Add("<tr>");
-					_page.Add($"<td><a href=\"{map.Url}\">{map.Alias}</a></td>");
+					_page.Add($"<td><a class=\"link\" href=\"{map.Url}\">{map.Alias}</a></td>");
 					_page.Add($"<td>{current.Score.Current.AsTimeToString()}</td>");
-					_page.Add($"<td><a href=\"{(current.Player as SteamUser).Url}\">{current.Player.Name}</a></td>");
+					_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(current.Player as SteamUser).Id}\">{current.Player.Name}</a></td>");
 					_page.Add($"<td>{((duration < 1) ? "<1" : $"{duration}")}</td>");
 					_page.Add($"<td title=\"{current.Date.DateTimeToString() + " (CST)"}\">{(current.Date?.ToString("yyy-MM-dd"))}</td>");
 					if (previous != null)
@@ -558,20 +421,11 @@ namespace Portal2Boards.Test.Examples
 					highest = stats;
 				}
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Total Time of World Records
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Total Time of World Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year</th>");
-			_page.Add("<th>Single Player</th>");
-			_page.Add("<th>Cooperative</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Total Time of Records");
+			StartTable(4, 4, "Year", "Single Player", "Cooperative");
 			for (int year = 2014; year < 2019; year++)
 			{
 				Func<RecordMap, long?> SumScores = (m) =>
@@ -609,44 +463,25 @@ namespace Portal2Boards.Test.Examples
 				_page.Add($"<td title=\"{((uint)omp).AsTimeToString()} Official\">{((uint)mp).AsTimeToString()}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Most World Record Improvements
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most World Record Improvements</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>World Records</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Record Improvements");
+			StartTable(4, 4, "Map", "Records");
 			foreach (var improvement in wri
 				.OrderByDescending(i => i.Improvements)
 				.Take(20))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{improvement.Map.Url}\">{improvement.Map.Alias}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"{improvement.Map.Url}\">{improvement.Map.Alias}</a></td>");
 				_page.Add($"<td>{improvement.Improvements}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Largest World Record Improvement
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Largest World Record Improvement</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Time</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Improvement</th>");
-			_page.Add("<th>Date Set</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Largest Record Improvement");
+			StartTable(6, 3, "Map", "Time", "Player", "Improvement", "Date Set");
 			foreach (var stats in improvements
 				.OrderByDescending(d => d.Improvement)
 				.ThenBy(d => d.Current.Date)
@@ -654,75 +489,59 @@ namespace Portal2Boards.Test.Examples
 			{
 				var (improvement, current, previous, map) = stats;
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{map.Url}\">{map.Alias}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"{map.Url}\">{map.Alias}</a></td>");
 				_page.Add($"<td>{current.Score.Current.AsTimeToString()}</td>");
-				_page.Add($"<td><a href=\"{(current.Player as SteamUser).Url}\">{current.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(current.Player as SteamUser).Id}\">{current.Player.Name}</a></td>");
 				_page.Add($"<td>{((uint)improvement).AsTimeToString()}</td>");
 				_page.Add($"<td title=\"{current.Date.DateTimeToString() + " (CST)"}\">{(current.Date?.ToString("yyy-MM-dd"))}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Others
 			var longest = maps
 				.SelectMany(m => m.Records)
 				.Where(m => !string.IsNullOrEmpty(m.Comment))
-				.OrderByDescending(c => c.Comment.Length);
+				.OrderByDescending(c => c.Comment.Length)
+				.ThenBy(c => c.Date);
 			var shortest = maps
 				.SelectMany(m => m.Records)
 				.Where(m => !string.IsNullOrEmpty(m.Comment))
-				.OrderBy(c => c.Comment.Length);
-			
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Longest World Record Comment</h3>");
-			
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Length</th>");
-			_page.Add("<th>Comment</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+				.OrderBy(c => c.Comment.Length)
+				.ThenBy(c => c.Date);
+
+			Title("Longest Comments");
+			StartTable(8, 2, "Player", "Length", "Comment");
 			foreach (var others in longest.Take(5))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{(others.Player as SteamUser).Url}\">{others.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(others.Player as SteamUser).Id}\">{others.Player.Name}</a></td>");
 				_page.Add($"<td>{others.Comment.Length}</td>");
 				_page.Add($"<td>{others.Comment}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Shortest World Record Comment</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Length</th>");
-			_page.Add("<th>Comment</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Shortest Comments");
+			StartTable(4, 4, "Player", "Length", "Comment");
 			foreach (var others in shortest.Take(5))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{(others.Player as SteamUser).Url}\">{others.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(others.Player as SteamUser).Id}\">{others.Player.Name}</a></td>");
 				_page.Add($"<td>{others.Comment.Length}</td>");
 				_page.Add($"<td>{others.Comment}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Average World Record Comment Length</h3>");
+			Title("Average Comment Length");
 			var avgcomment = maps
 				.SelectMany(m => m.Records)
 				.Where(e => !string.IsNullOrEmpty(e.Comment))
 				.Average(e => e.Comment.Length);
 			_page.Add($"<br><h2 align=\"center\">{avgcomment.ToString("N2")}</h2>");
 
-			_page.Add("<br><h3 align=\"center\">Percentage of World Record Proof</h3>");
+			Title("Percentage of Proof");
 			var since = DateTime.Parse("2017-05-11");
 			var requireproof = maps
 				.SelectMany(m => m.Records)
@@ -732,52 +551,13 @@ namespace Portal2Boards.Test.Examples
 				.Count(e => e.DemoExists || (e as ChangelogEntry).VideoExists);
 			var proofornoproof = requireproof
 				.Count();
-			_page.Add($"<br><h2 align=\"center\">{((double)proof / proofornoproof * 100).ToString("N2")}%</h2>");
-			_page.Add("</div>");
+			_page.Add($"<br><h2 title=\"since 2017-05-11\" align=\"center\">{((double)proof / proofornoproof * 100).ToString("N2")}%</h2>");
 
-			watch.Stop();
-			// Footer
-			_page.Add($"<br>Generated static page in {watch.Elapsed.TotalSeconds.ToString("N3")} seconds.");
-			_page.Add("<br><a href=\"https://github.com/NeKzor/Portal2Boards.Net\">Portal2Boards.Net</a> example made by NeKz.");
-			_page.Add($"<br>Last update: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss '(UTC)'")}");
-
-			// Rest
-			_page.Add("</body>");
-			_page.Add("</html>");
-
-			File.AppendAllLines(path, _page);
+			EndSection();
 		}
-
-		public async Task GenerateStatsPage(string path)
+		public async Task GenerateCommunityStatsPageAsync()
 		{
-			if (File.Exists(path))
-				File.Delete(path);
-			
-			_page.Clear();
-
-			var watch = Stopwatch.StartNew();
-			// Head
-			_page.Add("<!DOCTYPE html>");
-			_page.Add("<html>");
-			_page.Add("<head>");
-			_page.Add("<title>Portal2Boards.Net | Overall Statistics</title>");
-			_page.Add("<link href=\"https://fonts.googleapis.com/css?family=Roboto\" rel=\"stylesheet\">");
-			_page.Add("<style>table,td,th{border-collapse:collapse;border:1px solid #ddd;text-align: center;padding: 10px;}table.wrs{width:50%;}table.wrholders{margin:0px auto;}th,td{padding: 3px;}a{color:inherit;text-decoration:none;}a:hover{color:#FF8C00;}</style>");
-			_page.Add("</head>");
-
-			// Body
-			_page.Add("<body style=\"font-family:'Roboto',sans-serif;color:#FFFFFF;background-color:#23272A;\">");
-			_page.Add("<div>");
-			_page.Add("<h1 align=\"center\"><a href=\"/Portal2Boards.Net\">Portal2Boards.Net</a></h1>");
-			_page.Add
-			(
-				"<h4 align=\"center\">" +
-				"<a href=\"/Portal2Boards.Net/sp\">Single Player WRs</a> | " +
-				"<a href=\"/Portal2Boards.Net/mp\">Cooperative WRs</a> | " +
-				"<a href=\"/Portal2Boards.Net/wrs\">WRs Statistics</a> | " +
-				"<a href=\"/Portal2Boards.Net/stats\">Overall Statistics</a>" +
-				"</h4>"
-			);
+			StartSection("community");
 
 			// Data, single API call
 			var changelog = await _client.GetChangelogAsync(q =>
@@ -795,7 +575,7 @@ namespace Portal2Boards.Test.Examples
 					Date = entry.Date,
 					Entry = entry
 				};
-				
+
 				var pro = all.FirstOrDefault(x => x.Player.Id == (entry.Player as SteamUser).Id);
 				if (pro != null)
 				{
@@ -827,7 +607,7 @@ namespace Portal2Boards.Test.Examples
 				var recs = changelog.Entries
 					.Where(e => e.MapId == map.BestTimeId)
 					.OrderBy(e => e.Date);
-				
+
 				maps.Add(new RecordMap()
 				{
 					Map = map,
@@ -841,16 +621,8 @@ namespace Portal2Boards.Test.Examples
 			}
 
 			// Most Personal Records
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most Personal Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			for (int year = 2013; year < 2019; year++)
-				_page.Add($"<th>{year}</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Personal Records");
+			StartTable(6, 3, "Player", "Total", "2013", "2014", "2015", "2016", "2017", "2018");
 			var always = new List<RecordHolder>();
 			foreach (var player in all
 				.OrderByDescending(h => h.Records.Count)
@@ -860,7 +632,7 @@ namespace Portal2Boards.Test.Examples
 				var off = player.Records.Count(r => r.Map.IsOfficial);
 
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
 				_page.Add($"<td title=\"{off} Official\">{recs}</td>");
 				var active = 0;
 				for (int year = 2013; year < 2019; year++)
@@ -874,31 +646,11 @@ namespace Portal2Boards.Test.Examples
 					always.Add(player);
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Activity
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Activity</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year/Month</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("<th>Jan</th>");
-			_page.Add("<th>Feb</th>");
-			_page.Add("<th>Mar</th>");
-			_page.Add("<th>Apr</th>");
-			_page.Add("<th>May</th>");
-			_page.Add("<th>Jun</th>");
-			_page.Add("<th>Jul</th>");
-			_page.Add("<th>Aug</th>");
-			_page.Add("<th>Sep</th>");
-			_page.Add("<th>Oct</th>");
-			_page.Add("<th>Nov</th>");
-			_page.Add("<th>Dec</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Activity");
+			StartTable(6, 3, "Year/Month", "Total", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 			for (int i = 2013; i < 2019; i++)
 			{
 				var year = changelog.Entries
@@ -928,20 +680,11 @@ namespace Portal2Boards.Test.Examples
 				}
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Most Records per Year
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most Records per Year</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Records per Year");
+			StartTable(4, 4, "Year", "Player", "Total");
 			for (int year = 2013; year < 2019; year++)
 			{
 				var players = all
@@ -950,7 +693,7 @@ namespace Portal2Boards.Test.Examples
 				var most = players
 					.First().Records
 					.Count(r => r.Date.Value.Year == year);
-				
+
 				var once = false;
 				var mostrecs = players
 					.Where(rh => rh.Records.Count(r => r.Date.Value.Year == year) == most);
@@ -965,26 +708,16 @@ namespace Portal2Boards.Test.Examples
 						_page.Add($"<td rowspan=\"{mostrecs.Count()}\" align=\"center\">{year}</td>");
 						once = true;
 					}
-					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+					_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
 					_page.Add("</tr>");
 				}
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// At Least One Record Every Year
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">At Least One Record Every Year</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			for (int year = 2013; year < 2019; year++)
-				_page.Add($"<th>{year}</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Activity Since 2013");
+			StartTable(6, 3, "Player", "Total", "2013", "2014", "2015", "2016", "2017", "2018");
 			foreach (var player in always
 				.OrderByDescending(h => h.Records.Count)
 				.Take(10))
@@ -993,7 +726,7 @@ namespace Portal2Boards.Test.Examples
 				var off = player.Records.Count(r => r.Map.IsOfficial);
 
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
 				_page.Add($"<td title=\"{off} Official\">{recs}</td>");
 				for (int year = 2013; year < 2019; year++)
 				{
@@ -1003,21 +736,11 @@ namespace Portal2Boards.Test.Examples
 				}
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// New Players per Year
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">New Players per Year</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year</th>");
-			_page.Add("<th>Players</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("<th>Growth</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("New Players");
+			StartTable(4, 4, "Year", "Players", "Total", "Growth");
 			var peeps = all
 				.Where(rh => rh.Records.Any(r => r.Date.Value.Year == 2013));
 			var totalpeeps = peeps.Count();
@@ -1038,20 +761,11 @@ namespace Portal2Boards.Test.Examples
 				_page.Add("</tr>");
 				lastpeeps = totalpeeps;
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Most Second Places
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most Second Places</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Year</th>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Total</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most 2nd Places");
+			StartTable(4, 4, "Year", "Player", "Total");
 			for (int year = 2013; year < 2019; year++)
 			{
 				var players = all
@@ -1062,7 +776,7 @@ namespace Portal2Boards.Test.Examples
 					.First().Records
 					.Where(r => r.Entry.Rank.Current == 2)
 					.Count(r => r.Date.Value.Year == year);
-				
+
 				var once = false;
 				var rank2 = players
 					.Where(rh => rh.Records
@@ -1077,65 +791,47 @@ namespace Portal2Boards.Test.Examples
 						.Where(r => r.Entry.Rank.Current == 2)
 						.Where(r => r.Date.Value.Year == year)
 						.Count(r => r.Map.IsOfficial);
-					
+
 					_page.Add("<tr>");
 					if (!once)
 					{
 						_page.Add($"<td rowspan=\"{rank2.Count()}\" align=\"center\">{year}</td>");
 						once = true;
 					}
-					_page.Add($"<td><a href=\"{player.Player.Url}\">{player.Player.Name}</a></td>");
+					_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
 					_page.Add($"<td title=\"{off} Official\">{recs}</td>");
 					_page.Add("</tr>");
 				}
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Most Records
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Most Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Records</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Records");
+			StartTable(4, 4, "Map", "Records");
 			foreach (var map in maps
 				.OrderByDescending(m => m.Records.Count)
 				.Take(20))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{map.Map.Url}\">{map.Map.Alias}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"{map.Map.Url}\">{map.Map.Alias}</a></td>");
 				_page.Add($"<td>{map.Records.Count}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Least Records
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Least Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Records</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Least Records");
+			StartTable(4, 4, "Map", "Records");
 			foreach (var map in maps
 				.OrderBy(m => m.Records.Count)
 				.Take(20))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{map.Map.Url}\">{map.Map.Alias}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"{map.Map.Url}\">{map.Map.Alias}</a></td>");
 				_page.Add($"<td>{map.Records.Count}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
-			_page.Add("</div>");
+			EndTable();
 
 			// Others
 			var longest = maps
@@ -1148,93 +844,65 @@ namespace Portal2Boards.Test.Examples
 				.Where(e => !string.IsNullOrEmpty(e.Comment))
 				.OrderBy(e => e.Comment.Length)
 				.ThenBy(e => e.Date);
-			
-			_page.Add("<div>");
-			_page.Add("<br><h3 align=\"center\">Longest Comment</h3>");
-			
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Length</th>");
-			_page.Add("<th>Comment</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+
+			Title("Longest Comments");
+			StartTable(8, 2, "Player", "Length", "Comment");
 			foreach (var others in longest.Take(10))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{(others.Player as SteamUser).Url}\">{others.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(others.Player as SteamUser).Id}\">{others.Player.Name}</a></td>");
 				_page.Add($"<td>{others.Comment.Length}</td>");
 				_page.Add($"<td>{others.Comment}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Shortest Comment</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Length</th>");
-			_page.Add("<th>Comment</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Shortest Comments");
+			StartTable(4, 4, "Player", "Length", "Comment");
 			foreach (var others in shortest.Take(10))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{(others.Player as SteamUser).Url}\">{others.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{(others.Player as SteamUser).Id}\">{others.Player.Name}</a></td>");
 				_page.Add($"<td>{others.Comment.Length}</td>");
 				_page.Add($"<td>{others.Comment}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Average Comment Length</h3>");
+			Title("Average Comment Length");
 			var avgcomment = maps
 				.SelectMany(m => m.Records)
 				.Where(e => !string.IsNullOrEmpty(e.Comment))
 				.Average(e => e.Comment.Length);
 			_page.Add($"<br><h2 align=\"center\">{avgcomment.ToString("N2")}</h2>");
 
-			_page.Add("<br><h3 align=\"center\">Most Banned Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Map</th>");
-			_page.Add("<th>Bans</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Bans by Map");
+			StartTable(4, 4, "Map", "Bans");
 			foreach (var others in mapbans
 				.OrderByDescending(h => h.Records.Count)
 				.Take(10))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{others.Map.Url}\">{others.Map.Alias}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"{others.Map.Url}\">{others.Map.Alias}</a></td>");
 				_page.Add($"<td>{others.Records.Count}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Most Banned Personal Records</h3>");
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Bans</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
+			Title("Most Bans by Player");
+			StartTable(4, 4, "Player", "Bans");
 			foreach (var others in all
 				.OrderByDescending(h => h.BannedRecords.Count)
 				.Take(20))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{others.Player.Url}\">{others.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{others.Player.Id}\">{others.Player.Name}</a></td>");
 				_page.Add($"<td>{others.BannedRecords.Count}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Percentage of Demo or Video Proof</h3>");
+			Title("Percentage Proof");
 			var since = DateTime.Parse("2017-05-11");
 			var requireproof = maps
 				.SelectMany(m => m.Records)
@@ -1244,60 +912,154 @@ namespace Portal2Boards.Test.Examples
 				.Count(e => e.DemoExists || (e as ChangelogEntry).VideoExists);
 			var proofornoproof = requireproof
 				.Count();
-			_page.Add($"<br><h2 align=\"center\">{((double)proof / proofornoproof * 100).ToString("N2")}%</h2>");
+			_page.Add($"<br><h2 title=\"since 2017-05-11\" align=\"center\">{((double)proof / proofornoproof * 100).ToString("N2")}%</h2>");
 
-			_page.Add("<br><h3 align=\"center\">Most Demo Uploads</h3>");
+			Title("Most Demo Uploads");
+			StartTable(4, 4, "Player", "Demos");
 			var demos = all
 				.Where(m => m.Records.Any(e => e.Entry.DemoExists))
 				.OrderByDescending(m => m.Records.Count(e => e.Entry.DemoExists));
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Demos</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
 			foreach (var demo in demos.Take(10))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{demo.Player.Url}\">{demo.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{demo.Player.Id}\">{demo.Player.Name}</a></td>");
 				_page.Add($"<td>{demo.Records.Count(e => e.Entry.DemoExists)}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
 
-			_page.Add("<br><h3 align=\"center\">Most Video Links</h3>");
+			Title("Most Video Links");
+			StartTable(4, 4, "Player", "Links");
 			var videos = all
 				.Where(m => m.Records.Any(e => (e.Entry as ChangelogEntry).VideoExists))
 				.OrderByDescending(m => m.Records.Count(e => (e.Entry as ChangelogEntry).VideoExists));;
-			_page.Add("<table align=\"center\" class=\"wrholders\">");
-			_page.Add("<thead><tr>");
-			_page.Add("<th>Player</th>");
-			_page.Add("<th>Videos</th>");
-			_page.Add("</tr></thead>");
-			_page.Add("<tbody>");
 			foreach (var video in videos.Take(10))
 			{
 				_page.Add("<tr>");
-				_page.Add($"<td><a href=\"{video.Player.Url}\">{video.Player.Name}</a></td>");
+				_page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{video.Player.Id}\">{video.Player.Name}</a></td>");
 				_page.Add($"<td>{video.Records.Count(e => (e.Entry as ChangelogEntry).VideoExists)}</td>");
 				_page.Add("</tr>");
 			}
-			_page.Add("</tbody>");
-			_page.Add("</table>");
+			EndTable();
+
+			EndSection();
+		}
+
+		// HTML stuff
+		private void StartPage()
+		{
+			_page.Clear();
+			_page.Add(
+$@"<!-- src/Portal2Boards.Net.Test/Examples/Leaderboard.cs -->
+<!-- v{Version}.0 -->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Portal2Boards.Net | nekzor.github.io</title>
+		<link href=""https://fonts.googleapis.com/css?family=Roboto"" rel=""stylesheet"">
+		<link href=""https://fonts.googleapis.com/icon?family=Material+Icons"" rel=""stylesheet"">
+		<link href=""https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.4/css/materialize.min.css"" rel=""stylesheet"">
+		<style>.link {{ color: white }} .link:hover {{ color: black }}</style>
+	</head>
+	<body class=""white-text blue-grey darken-4"">
+		<nav class=""nav-extended blue-grey darken-3"">
+			<div class=""nav-wrapper"">
+				<div class=""col s12 hide-on-small-only"">
+					<a href=""index.html"" class=""breadcrumb"">&nbsp;&nbsp;&nbsp;nekzor.github.io</a>
+					<a href=""p2bn.html"" class=""breadcrumb"">Portal2Boards.Net</a>
+				</div>
+				<div class=""col s12 hide-on-med-and-up"">
+					<a href=""#"" data-target=""slide-out"" class=""sidenav-trigger""><i class=""material-icons"">menu</i></a>
+					<a href=""p2bn.html"" class=""brand-logo center"">P2BN</a>
+				</div>
+			</div>
+			<div class=""nav-content"">
+				<ul class=""tabs tabs-transparent"">
+					<li class=""tab""><a href=""#sp"">Single Player</a></li>
+					<li class=""tab""><a href=""#coop"">Cooperative</a></li>
+					<li class=""tab""><a href=""#stats"">Statistics</a></li>
+					<li class=""tab""><a href=""#community"">Community</a></li>
+					<li class=""tab""><a href=""#about"">About</a></li>
+				</ul>
+			</div>
+		</nav>
+		<ul id=""slide-out"" class=""sidenav hide-on-med-and-up"">
+			<li><a href=""index.html"">nekzor.github.io</a></li>
+			<li><a href=""p2bn.html"">Portal2Boards.Net</a></li>
+		</ul>");
+		}
+		private void EndPage()
+		{
+			_page.Add(
+$@"		<div id=""about"">
+			<div class=""row""></div>
+			<div class=""row"">
+				<div class=""col s10 push-s1"">
+					<h3>Portal2Boards.Net Library Test</h3>
+					<h6><a class=""link"" href=""https://github.com/NeKzor/Portal2Boards.Net"">Portal2Boards.Net</a> is a .NET API wrapper for <a class=""link"" href=""https://board.iverb.me"">board.iverb.me</a>. One of the tests are made to mess around with the data from the website. This page will be generated as result.</h6>
+					<br>
+					<h6>Last Update: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss '(UTC)'")}</h6>
+				</div>
+			</div>
+		</div>
+		<script src=""https://code.jquery.com/jquery-3.3.1.min.js"" integrity=""sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="" crossorigin=""anonymous""></script>
+		<script src=""https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.4/js/materialize.min.js""></script>
+		<script>
+			$(document).ready(function() {{
+				$('.tabs').tabs();
+				$('.sidenav').sidenav();
+			}});
+		</script>
+	</body>
+</html>");
+		}
+		void StartSection(string id)
+		{
+			_page.Add($"<div id=\"{id}\">");
+		}
+		void EndSection()
+		{
 			_page.Add("</div>");
-
-			watch.Stop();
-			// Footer
-			_page.Add($"<br>Generated static page in {watch.Elapsed.TotalSeconds.ToString("N3")} seconds.");
-			_page.Add("<br><a href=\"https://github.com/NeKzor/Portal2Boards.Net\">Portal2Boards.Net</a> example made by NeKz.");
-			_page.Add($"<br>Last update: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss '(UTC)'")}");
-
-			// Rest
-			_page.Add("</body>");
-			_page.Add("</html>");
-
-			File.AppendAllLines(path, _page);
+		}
+		void Title(string text, bool br = true)
+		{
+			if (br) _page.Add("<br><br><br>");
+			_page.Add($"<div class=\"row\"><h3 align=\"center\">{text}</h3></div>");
+		}
+		private void StartTable(int colLength, int pushLength, params string[] items)
+		{
+			_page.Add(
+$@"		<div class=""row"">
+			<div class=""col s12 m12 l{colLength} push-l{pushLength}"">
+				<table class=""highlight"">
+					<thead>
+						<tr>");
+			foreach (var item in items)
+			{
+				if (item.Contains("/"))
+				{
+					var split = item.Split('/');
+					_page.Add(
+$@"							<th title=""{split[1]}"">{split[0]}</th>");
+				}
+				else
+				{
+				_page.Add(
+$@"							<th>{item}</th>");
+				}
+			}
+			_page.Add(
+@"						</tr>
+					</thead>
+					<tbody>");
+		}
+		private void EndTable()
+		{
+			_page.Add(
+@"					</tbody>
+				</table>
+			</div>
+		</div>");
 		}
 	}
 

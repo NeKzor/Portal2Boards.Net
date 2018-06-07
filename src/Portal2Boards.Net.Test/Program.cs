@@ -35,10 +35,7 @@ namespace Portal2Boards.Test
 			GetProfile();
 			GetDemo();
 
-			GenerateSpPage();
-			GenerateMpPage();
-			GenerateWrStatsPage();
-			GenerateStatsPage();
+			GenerateLeaderboardPage();
 
 			StartTwitterBot();
 			
@@ -205,19 +202,14 @@ namespace Portal2Boards.Test
 			}
 		}
 
-		// Example 1 (LeaderboardWebPage.cs)
-		[Conditional("GEN_SP")]
-		public static void GenerateSpPage()
-			=> new LeaderboardWebPage().GeneratePage("gh-pages/sp.html", Portal2MapType.SinglePlayer).GetAwaiter().GetResult();
-		[Conditional("GEN_MP")]
-		public static void GenerateMpPage()
-			=> new LeaderboardWebPage().GeneratePage("gh-pages/mp.html", Portal2MapType.Cooperative).GetAwaiter().GetResult();
-		[Conditional("GEN_WRS")]
-		public static void GenerateWrStatsPage()
-			=> new LeaderboardWebPage().GenerateWorldRecordStatsPage("gh-pages/wrs.html").GetAwaiter().GetResult();
-		[Conditional("GEN_STATS")]
-		public static void GenerateStatsPage()
-			=> new LeaderboardWebPage().GenerateStatsPage("gh-pages/stats.html").GetAwaiter().GetResult();
+		// Example 1 (Leaderboard.cs)
+		[Conditional("GEN_LB")]
+		public static void GenerateLeaderboardPage()
+		{
+			var lb = new Leaderboard();
+			lb.Build().GetAwaiter().GetResult();
+			lb.ExportPage("gh-pages/p2bn.html").GetAwaiter().GetResult();
+		}
 
 		// Example 2 (TwitterBot.cs)
 		[Conditional("TWBOT")]
