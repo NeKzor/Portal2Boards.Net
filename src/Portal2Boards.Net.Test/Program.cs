@@ -35,6 +35,7 @@ namespace Portal2Boards.Test
             GetChangelog();
             GetProfile();
             GetDemo();
+            GetWoS();
 
             GenerateLeaderboardPage();
             GenerateHistoryPage();
@@ -201,6 +202,20 @@ namespace Portal2Boards.Test
                 var content = client.GetDemoContentAsync(79120).GetAwaiter().GetResult();
 
                 WriteLine($"Bytes: {content?.Length ?? 0}");
+            }
+        }
+        [Conditional("WOS")]
+        public static void GetWoS()
+        {
+            using (var client = new Portal2BoardsClient())
+            {
+                client.Log += Logger.LogPortal2Boards;
+
+                WriteLine("Fetching wall of shame...");
+                var wos = client.GetWallOfShame().GetAwaiter().GetResult();
+
+                foreach (SteamUser user in wos)
+                    WriteLine($"[{user.Id}] {user.Name}");
             }
         }
 

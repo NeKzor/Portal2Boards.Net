@@ -247,6 +247,30 @@ namespace Portal2Boards
             }
             return result;
         }
+        public async Task<IEnumerable<ISteamUser>> GetWallOfShame(bool ignoreCache = false)
+        {
+            var result = default(IEnumerable<ISteamUser>);
+            try
+            {
+                var get = $"/wallofshame/json";
+                var model = await GetCacheOrFetch<WallOfShameModel[]>(get, ignoreCache).ConfigureAwait(false);
+                result = await Task.Run(() =>
+                {
+                    var users = new List<ISteamUser>();
+                    foreach (var user in model)
+                    {
+                        users.Add(SteamUser.Create(this, user.ProfileNumber, user.PlayerName, user.Avatar));
+                    }
+                    return users;
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (Log != null)
+                    await Log.Invoke(this, new LogMessage(typeof(List<ISteamUser>), ex)).ConfigureAwait(false);
+            }
+            return result;
+        }
 
         public Task<bool> ResetCacheTimer()
         {
