@@ -56,7 +56,7 @@ namespace Portal2Boards.Test
                 client.Log += Logger.LogPortal2Boards;
 
                 WriteLine("Fetching aggregated...");
-                var aggregated = client.GetAggregatedAsync().GetAwaiter().GetResult();
+                var aggregated = client.GetAggregatedAsync(ChapterType.HardLight).GetAwaiter().GetResult();
 
                 WriteLine("Global points:");
                 foreach (var points in aggregated.Points.Take(10))
