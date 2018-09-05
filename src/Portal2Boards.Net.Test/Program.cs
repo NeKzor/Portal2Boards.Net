@@ -173,7 +173,7 @@ namespace Portal2Boards.Test
                 client.Log += Logger.LogPortal2Boards;
 
                 WriteLine("Fetching profile...");
-                var profile = client.GetProfileAsync("Xinera").GetAwaiter().GetResult();
+                var profile = client.GetProfileAsync("NeKz").GetAwaiter().GetResult();
 
                 WriteLine($"User profile of: {profile.SteamName}");
                 WriteLine($"User profile of: {profile.DisplayName}");

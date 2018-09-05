@@ -44,7 +44,7 @@ namespace Portal2Boards
 
 			return new DataScore()
 			{
-				Id = model.Map,
+				Id = (model.Map != "several chambers") ? ulong.Parse(model.Map) : 0,
 				Comment = WebUtility.HtmlDecode(model.ScoreData.Note),
 				IsSubmission = model.ScoreData.Submission == "1",
 				ChangelogId = model.ScoreData.ChangelogId,
