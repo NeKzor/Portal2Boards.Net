@@ -271,6 +271,30 @@ namespace Portal2Boards
             }
             return result;
         }
+        public async Task<IEnumerable<IDonator>> GetDonators(bool ignoreCache = false)
+        {
+            var result = default(IEnumerable<IDonator>);
+            try
+            {
+                var get = $"/donators/json";
+                var model = await GetCacheOrFetch<DonatorModel[]>(get, ignoreCache).ConfigureAwait(false);
+                result = await Task.Run(() =>
+                {
+                    var donators = new List<IDonator>();
+                    foreach (var donator in model)
+                    {
+                        donators.Add(Donator.Create(this, donator));
+                    }
+                    return donators;
+                }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                if (Log != null)
+                    await Log.Invoke(this, new LogMessage(typeof(List<IDonator>), ex)).ConfigureAwait(false);
+            }
+            return result;
+        }
 
         public Task<bool> ResetCacheTimer()
         {

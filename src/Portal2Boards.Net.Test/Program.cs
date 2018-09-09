@@ -36,6 +36,7 @@ namespace Portal2Boards.Test
             GetProfile();
             GetDemo();
             GetWoS();
+            GetDonator();
 
             GenerateLeaderboardPage();
             GenerateHistoryPage();
@@ -216,6 +217,20 @@ namespace Portal2Boards.Test
 
                 foreach (SteamUser user in wos)
                     WriteLine($"[{user.Id}] {user.Name}");
+            }
+        }
+        [Conditional("DON")]
+        public static void GetDonator()
+        {
+            using (var client = new Portal2BoardsClient())
+            {
+                client.Log += Logger.LogPortal2Boards;
+
+                WriteLine("Fetching donators...");
+                var donators = client.GetDonators().GetAwaiter().GetResult();
+
+                foreach (Donator donator in donators)
+                    WriteLine($"[{donator.Id}] {donator.Player.Name} -> €{donator.DonationAmount:N2}");
             }
         }
 
