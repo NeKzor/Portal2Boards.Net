@@ -213,7 +213,7 @@ namespace Portal2Boards.Test
                 client.Log += Logger.LogPortal2Boards;
 
                 WriteLine("Fetching wall of shame...");
-                var wos = client.GetWallOfShame().GetAwaiter().GetResult();
+                var wos = client.GetWallOfShameAsync().GetAwaiter().GetResult();
 
                 foreach (SteamUser user in wos)
                     WriteLine($"[{user.Id}] {user.Name}");
@@ -227,7 +227,7 @@ namespace Portal2Boards.Test
                 client.Log += Logger.LogPortal2Boards;
 
                 WriteLine("Fetching donators...");
-                var donators = client.GetDonators().GetAwaiter().GetResult();
+                var donators = client.GetDonatorsAsync().GetAwaiter().GetResult();
 
                 foreach (Donator donator in donators)
                     WriteLine($"[{donator.Id}] {donator.Player.Name} -> €{donator.DonationAmount:N2}");

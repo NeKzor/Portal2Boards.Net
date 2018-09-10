@@ -6,13 +6,23 @@
 Retrieve Portal 2 challenge mode data from the speedrunning community [board.iverb.me](https://board.iverb.me).
 Client includes automatic caching system and exception event for logging purposes.
 
-## Overview
-- [C# Documentation](#c-documentation)
+## Examples
+
+- [nekzor.github.io/stats](https://nekzor.github.io/stats)
+- [nekzor.github.io/history](https://nekzor.github.io/history)
+- [nekzor.github.io/skill](https://nekzor.github.io/skill)
+- [NeKzBot](https://github.com/NeKzor/NeKzBot)
+
+## Credits
+- [Portal2Boards](https://github.com/iVerb1/Portal2Boards)
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
+
+## Documentation
   - [Namespaces](#namespaces)
   - [Client](#client)
     - [Usage](#usage)
     - [Caching](#caching)
-    - [Debugging](#debugging)
+    - [Logging](#logging)
   - [Changelog](#changelog)
     - [Query](#query)
     - [Advanced](#advanced)
@@ -20,10 +30,9 @@ Client includes automatic caching system and exception event for logging purpose
   - [Profile](#profile)
   - [Aggregated](#aggregated)
   - [Demo Content](#demo-content)
-- [Examples](#examples)
-- [Credits](#credits)
-
-## C# Documentation
+  - [Wall of Shame](#wall-of-shame)
+  - [Donators](#donators)
+  - [Relations](#relations)
 
 ### Namespaces
 
@@ -64,14 +73,14 @@ await _client.ResetCacheTimer();
 await _client.ClearCache();
 ```
 
-#### Debugging
+#### Logging
 ```cs
 // Logs client-side exceptions
 _client.Log += LogPortal2Boards;
 
 Task LogPortal2Boards(object sender, LogMessage msg)
 {
-    // Do stuff
+    // Log stuff
 }
 ```
 
@@ -143,12 +152,28 @@ aggregated = await _client.GetAggregatedAsync(ChapterType.ThePartWhereHeKillsYou
 var bytes = await _client.GetDemoContentAsync(id);
 ```
 
-## Examples
+### Wall of Shame
+```cs
+var wos = await _client.GetWallOfShameAsync();
 
-- [Leaderboard.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/Examples/Leaderboard.cs) generates an example [leaderboard web page](https://nekzor.github.io/p2bn) of all world records.
-- [TwitterBot.cs](https://github.com/NeKzor/Portal2Boards.Net/tree/master/src/Portal2Boards.Net.Test/Examples/TwitterBot.cs) generates a list of latest world records for tweets.
-- [NeKzBot](https://github.com/NeKzor/NeKzBot) implemented a notification system for world record updates.
+foreach (SteamUser user in wos)
+{
+  Console.WriteLine($"{user.Name}");
+}
+```
 
-## Credits
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [Portal2Boards](https://github.com/iVerb1/Portal2Boards) by [iVerb](https://github.com/iVerb1)
+### Donators
+```cs
+var donators = await _client.GetAggregatedAsync();
+
+foreach (Donator donator in donators)
+{
+  Console.Write($"{donator.Player.Name}: ");
+  Console.WriteLine($"€{donator.DonationAmount:N2}");
+}
+```
+
+### Relations
+```cs
+// TODO
+```

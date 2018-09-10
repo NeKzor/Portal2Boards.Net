@@ -247,7 +247,7 @@ namespace Portal2Boards
             }
             return result;
         }
-        public async Task<IEnumerable<ISteamUser>> GetWallOfShame(bool ignoreCache = false)
+        public async Task<IEnumerable<ISteamUser>> GetWallOfShameAsync(bool ignoreCache = false)
         {
             var result = default(IEnumerable<ISteamUser>);
             try
@@ -271,7 +271,7 @@ namespace Portal2Boards
             }
             return result;
         }
-        public async Task<IEnumerable<IDonator>> GetDonators(bool ignoreCache = false)
+        public async Task<IEnumerable<IDonator>> GetDonatorsAsync(bool ignoreCache = false)
         {
             var result = default(IEnumerable<IDonator>);
             try
