@@ -267,7 +267,7 @@ namespace Portal2Boards
             catch (Exception ex)
             {
                 if (Log != null)
-                    await Log.Invoke(this, new LogMessage(typeof(List<ISteamUser>), ex)).ConfigureAwait(false);
+                    await Log.Invoke(this, new LogMessage(typeof(IEnumerable<ISteamUser>), ex)).ConfigureAwait(false);
             }
             return result;
         }
@@ -291,7 +291,7 @@ namespace Portal2Boards
             catch (Exception ex)
             {
                 if (Log != null)
-                    await Log.Invoke(this, new LogMessage(typeof(List<IDonator>), ex)).ConfigureAwait(false);
+                    await Log.Invoke(this, new LogMessage(typeof(IEnumerable<IDonator>), ex)).ConfigureAwait(false);
             }
             return result;
         }

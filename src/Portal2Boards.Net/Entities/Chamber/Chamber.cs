@@ -29,7 +29,7 @@ namespace Portal2Boards
 			foreach (var item in model)
 				entries.Add(ChamberEntry.Create(client, item.Key, item.Value));
 
-			return new Chamber
+			return new Chamber()
 			{
 				Id = id,
 				Entries = entries,

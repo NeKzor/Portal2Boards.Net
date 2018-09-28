@@ -11,6 +11,7 @@ Client includes automatic caching system and exception event for logging purpose
 - [nekzor.github.io/stats](https://nekzor.github.io/stats)
 - [nekzor.github.io/history](https://nekzor.github.io/history)
 - [nekzor.github.io/skill](https://nekzor.github.io/skill)
+- [nekzor.github.io/seum](https://nekzor.github.io/seum)
 - [NeKzBot](https://github.com/NeKzor/NeKzBot)
 
 ## Credits
@@ -33,12 +34,13 @@ Client includes automatic caching system and exception event for logging purpose
   - [Wall of Shame](#wall-of-shame)
   - [Donators](#donators)
   - [Relations](#relations)
+  - [Extensions](#extensions)
 
 ### Namespaces
 
 | Namespace | Description |
 | --- | --- |
-| Portal2Boards | Client for fetching changelog, chamber, profile, aggregated data and demo content. |
+| Portal2Boards | Client for fetching changelog, chamber, profile, aggregated data, demo content, wall of shame and donators. |
 | Portal2Boards.API.Models | API models converted from raw json. |
 | Portal2Boards.Extensions | Useful extension methods. |
 
@@ -174,6 +176,36 @@ foreach (Donator donator in donators)
 ```
 
 ### Relations
+
+[![p2bn_relations.png](p2bn_relations.png)](p2bn_relations.png)
+
+Entity interfaces can be casted to its actual type which exposes methods for fetching another entity or updating itself.
+
 ```cs
-// TODO
+Profile pro = await _client.GetProfileAsync(id);
+Changelog clog = await pro.GetChangelogAsync();
+```
+
+`Changelog`, `Chamber`, `Profile` and `Aggregated` implement the `IUpdatable` interface for easy access to the root client.
+
+```cs
+Profile pro = await _client.GetProfileAsync(id);
+await pro.UpdateAsync(true); // true forces cache update
+```
+
+Note: `WallOfShame` and `Demo` do not have its own entity type.
+
+### Extensions
+
+```cs
+_ = Portal2Map.Search("Portal Gun");
+
+// Converts to 3.9f
+Console.WriteLine(390u.AsTime());
+
+// Prints "1:00.00"
+Console.WriteLine(6000u.AsTimeToString());
+
+// Prints in "yyyy-MM-dd HH:mm:ss" format
+Console.WriteLine(DateTime.Now.DateTimeToString());
 ```

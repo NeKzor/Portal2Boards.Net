@@ -36,7 +36,7 @@ namespace Portal2Boards
 		public async Task<IChangelog> GetChangelogAsync(bool ignoreCache = false)
 			=> await Client.GetChangelogAsync($"?chamber={Id}", ignoreCache).ConfigureAwait(false);
 		public async Task<byte[]> GetDemoContentAsync(bool ignoreCache = false)
-			=> await Client.GetDemoContentAsync(Id, ignoreCache).ConfigureAwait(false);
+			=> await Client.GetDemoContentAsync(ChangelogId, ignoreCache).ConfigureAwait(false);
 
 		internal static DataScore Create(Portal2BoardsClient client, Model model)
 		{

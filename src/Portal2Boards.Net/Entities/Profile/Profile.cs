@@ -9,7 +9,7 @@ using Model = Portal2Boards.API.ProfileModel;
 namespace Portal2Boards
 {
 	[DebuggerDisplay("{SteamId,nq}")]
-	public class Profile : IEntity<ulong>, IProfile
+	public class Profile : IEntity<ulong>, IProfile, IUpdatable
 	{
 		public ulong Id { get; private set; }
 		public string DisplayName { get; private set; }
@@ -40,6 +40,9 @@ namespace Portal2Boards
 			=> $"https://steamcommunity.com/profiles/{Id}";
 
 		internal Portal2BoardsClient Client { get; private set; }
+
+        public async Task<IChangelog> GetChangelogAsync(bool ignoreCache = false)
+			=> await Client.GetChangelogAsync($"?profileNumber={Id}", ignoreCache).ConfigureAwait(false);
 
 		public async Task UpdateAsync(bool ignoreCache = false)
 		{

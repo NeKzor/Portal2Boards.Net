@@ -35,8 +35,6 @@ namespace Portal2Boards
 
 		public async Task<IProfile> GetProfileAsync(bool ignoreCache = false)
 			=> await Client.GetProfileAsync(Id, ignoreCache).ConfigureAwait(false);
-		public async Task<IChangelog> GetChangelogAsync(bool ignoreCache = false)
-			=> await Client.GetChangelogAsync($"?profileNumber={Id}", ignoreCache).ConfigureAwait(false);
 		public async Task<byte[]> GetDemoContentAsync(bool ignoreCache = false)
 			=> await Client.GetDemoContentAsync(ChangelogId, ignoreCache).ConfigureAwait(false);
 
