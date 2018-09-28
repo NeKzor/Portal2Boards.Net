@@ -177,7 +177,7 @@ foreach (Donator donator in donators)
 
 ### Relations
 
-[![p2bn_relations.png](p2bn_relations.png)](p2bn_relations.png)
+[![relations.png](doc/relations.png)](doc/relations.png)
 
 Entity interfaces can be casted to its actual type which exposes methods for fetching another entity or updating itself.
 
