@@ -193,7 +193,7 @@ Profile pro = await _client.GetProfileAsync(id);
 await pro.UpdateAsync(true); // true forces cache update
 ```
 
-Note: `WallOfShame` and `Demo` do not have its own entity type.
+Note: `WallOfShame` and `DemoContent` do not have its own entity type.
 
 ### Extensions
 
