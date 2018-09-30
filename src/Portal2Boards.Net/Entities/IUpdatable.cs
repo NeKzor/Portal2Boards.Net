@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 
 namespace Portal2Boards
 {
-	public interface IUpdatable
-	{
-		Task UpdateAsync(bool ignoreCache = false);
-	}
+    public interface IUpdatable
+    {
+        Task UpdateAsync(bool ignoreCache = false);
+    }
 }

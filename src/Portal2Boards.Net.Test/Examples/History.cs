@@ -317,16 +317,17 @@ $@"<!-- src/Portal2Boards.Net.Test/Examples/History.cs -->
 	<body class=""white-text blue-grey darken-4"">
 		<nav class=""nav-extended blue-grey darken-3"">
 			<div class=""nav-wrapper"">
-				<div class=""col s12 hide-on-small-only"">
-					<a href=""index.html"" class=""breadcrumb"">&nbsp;&nbsp;&nbsp;nekzor.github.io</a>
-					<a href=""history.html"" class=""breadcrumb"">History</a>
-				</div>
-				<div class=""col s12 hide-on-med-and-up"">
-					<a href=""#"" data-target=""slide-out"" class=""sidenav-trigger""><i class=""material-icons"">menu</i></a>
-                    <a href=""p2bn.html"" class=""brand-logo center"">P2BN</a>
-					<a href=""history.html"" class=""brand-logo center"">History</a>
-				</div>
-			</div>
+                <div class=""col s12 hide-on-small-only"">
+                    <a href=""#"" data-target=""slide-out"" class=""sidenav-trigger show-on-large""><i class=""material-icons"">menu</i></a>
+                    <a href=""index.html"">&nbsp;&nbsp;&nbsp;nekzor.github.io</a>
+                    <a class=""breadcrumb""></a>
+                    <a href=""history.html"">History</a>
+                </div>
+                <div class=""col s12 hide-on-med-and-up"">
+                    <a href=""#"" data-target=""slide-out"" class=""sidenav-trigger""><i class=""material-icons"">menu</i></a>
+                    <a href=""history.html"" class=""brand-logo center"">History</a>
+                </div>
+            </div>
 			<div class=""nav-content"">
 				<ul class=""tabs tabs-transparent"">
                     {string.Join("\n", _sections)}
@@ -334,10 +335,13 @@ $@"<!-- src/Portal2Boards.Net.Test/Examples/History.cs -->
 				</ul>
 			</div>
 		</nav>
-		<ul id=""slide-out"" class=""sidenav hide-on-med-and-up"">
-			<li><a href=""index.html"">nekzor.github.io</a></li>
-			<li><a href=""history.html"">History</a></li>
-		</ul>");
+		<ul id=""slide-out"" class=""sidenav"">
+            <li><a href=""index.html"">nekzor.github.io</a></li>
+            <li><a href=""stats.html"">Statistics</a></li>
+            <li><a href=""history.html"">History</a></li>
+            <li><a href=""skill.html"">Skill Points</a></li>
+            <li><a href=""seum.html"">SEUM</a></li>
+        </ul>");
         }
         private void EndPage()
         {
@@ -345,10 +349,11 @@ $@"<!-- src/Portal2Boards.Net.Test/Examples/History.cs -->
 $@"		<div id=""about"">
 			<div class=""row""></div>
 			<div class=""row"">
-				<div class=""col s12 m12 l10 push-s1"">
-					<h3>Portal2Boards.Net Library Test</h3>
-					<p><a class=""link"" href=""https://github.com/NeKzor/Portal2Boards.Net"">Portal2Boards.Net</a> is a .NET API wrapper for <a class=""link"" href=""https://board.iverb.me"">board.iverb.me</a>. One of the tests are made to mess around with the data from the website. This page will be generated as result.</p>
-					<br>
+				<div class=""col s12 m12 l8 push-l2"">
+					<h3>board.iverb.me History</h3>
+                    <br>
+                    <h6>Made with <a class=""link"" href=""https://github.com/NeKzor/Portal2Boards.Net"">Portal2Boards.Net</a></h6>
+                    <br>
 					<h6>Last Update: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss '(UTC)'")}</h6>
 				</div>
 			</div>

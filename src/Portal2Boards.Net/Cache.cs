@@ -3,25 +3,25 @@ using System.Threading.Tasks;
 
 namespace Portal2Boards
 {
-	internal class Cache
-	{
-		private ConcurrentDictionary<string, object> _appCache { get; }
+    internal class Cache
+    {
+        private ConcurrentDictionary<string, object> _appCache { get; }
 
-		public Cache() => _appCache = new ConcurrentDictionary<string, object>();
+        public Cache() => _appCache = new ConcurrentDictionary<string, object>();
 
-		public Task<T> Get<T>(string key)
-		{
-			if ((_appCache.ContainsKey(key)) && (_appCache.TryGetValue(key, out var cache)))
-				return Task.FromResult((T)cache);
-			return Task.FromResult(default(T));
-		}
-		public Task<bool> AddOrUpdate(string key, object cache)
-		{
-			if (cache is null)
-				return Task.FromResult(false);
-			if (!_appCache.ContainsKey(key))
-				return Task.FromResult(_appCache.TryAdd(key, cache));
-			return Task.FromResult(_appCache.TryUpdate(key, cache, cache));
-		}
-	}
+        public Task<T> Get<T>(string key)
+        {
+            if ((_appCache.ContainsKey(key)) && (_appCache.TryGetValue(key, out var cache)))
+                return Task.FromResult((T)cache);
+            return Task.FromResult(default(T));
+        }
+        public Task<bool> AddOrUpdate(string key, object cache)
+        {
+            if (cache is null)
+                return Task.FromResult(false);
+            if (!_appCache.ContainsKey(key))
+                return Task.FromResult(_appCache.TryAdd(key, cache));
+            return Task.FromResult(_appCache.TryUpdate(key, cache, cache));
+        }
+    }
 }

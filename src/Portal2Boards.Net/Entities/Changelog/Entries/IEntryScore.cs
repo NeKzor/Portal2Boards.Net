@@ -1,7 +1,7 @@
 namespace Portal2Boards
 {
-	public interface IEntryScore
-	{
-		ScoreType Type { get; }
-	}
+    public interface IEntryScore
+    {
+        ScoreType Type { get; }
+    }
 }
