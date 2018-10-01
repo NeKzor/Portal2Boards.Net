@@ -235,12 +235,12 @@ namespace Portal2Boards.Test
         }
 
         // Example 1 (Leaderboard.cs)
-        [Conditional("GEN_LB")]
+        [Conditional("STATS")]
         public static void GenerateLeaderboardPage()
         {
             var lb = new Leaderboard();
             lb.Build().GetAwaiter().GetResult();
-            lb.ExportPage("gh-pages/p2bn.html").GetAwaiter().GetResult();
+            lb.ExportPage("gh-pages/stats.html").GetAwaiter().GetResult();
         }
 
         // Example 2 (TwitterBot.cs)
@@ -253,7 +253,7 @@ namespace Portal2Boards.Test
         }
 
         // Example 3 (History.cs)
-        [Conditional("HISTORY_LB")]
+        [Conditional("HISTORY")]
         public static void GenerateHistoryPage()
         {
             var lb = new History();
