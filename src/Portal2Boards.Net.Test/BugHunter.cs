@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,10 +14,12 @@ namespace Portal2Boards.Test
 
     internal class BugHunter
     {
+        public static readonly string UserAgent = "BugHunter/2.0";
+
         // Finds every "wr" that shouldn't be a wr
         public async Task TestOne()
         {
-            using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+            using (var client = new Portal2BoardsClient(UserAgent, false))
             {
                 client.Log += Logger.LogPortal2Boards;
 
@@ -37,7 +38,6 @@ namespace Portal2Boards.Test
                     // Make sure it's wr
                     if (entry.Rank.Current == 1) continue;
 
-                    // Ehem?
                     var map = Portal2Map.Search(entry.MapId);
                     Write($"[{(entry as IEntity<ulong>).Id}] ");
                     Write($"{map.Alias} ");
@@ -52,7 +52,7 @@ namespace Portal2Boards.Test
         // Finds every entry with a "positive" improvement
         public async Task TestTwo()
         {
-            using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+            using (var client = new Portal2BoardsClient(UserAgent, false))
             {
                 client.Log += Logger.LogPortal2Boards;
 
@@ -66,9 +66,12 @@ namespace Portal2Boards.Test
                 foreach (var entry in changelog.Entries
                     .OrderBy(e => e.Date))
                 {
-                    // Ehem?
-                    if (entry.Rank.Improvement < 0)
-                    {
+                    if (entry.Rank.Improvement < 0
+                        // Have to check if someone improved at the same time...
+                        && !changelog.Entries
+                            .Any(e => e.Date == entry.Date
+                                && e.MapId == entry.MapId
+                                && e.Score.Current < entry.Score.Current)) {
                         var map = Portal2Map.Search(entry.MapId);
                         Write($"[{(entry as IEntity<ulong>).Id}] ");
                         Write($"{map.Alias} ");
@@ -82,7 +85,6 @@ namespace Portal2Boards.Test
                 foreach (var entry in changelog.Entries
                     .OrderBy(e => e.Date))
                 {
-                    // Ehem²?
                     if (entry.Score.Improvement < 0)
                     {
                         var map = Portal2Map.Search(entry.MapId);
@@ -100,7 +102,7 @@ namespace Portal2Boards.Test
         // Finds every "pb" that shouldn't be a pb
         public async Task TestThree()
         {
-            using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+            using (var client = new Portal2BoardsClient(UserAgent, false))
             {
                 client.Log += Logger.LogPortal2Boards;
 
@@ -156,23 +158,12 @@ namespace Portal2Boards.Test
                                 Write($"in {entry.Score.Current.AsTimeToString()} ");
                                 Write($"by {entry.Player.Name} ");
                                 Write($"at {entry.Date?.ToString("yyyy-MM-dd")}");
+                                if (entry.IsSubmission) Write(" (Submission)");
                                 WriteLine();
                             }
                         }
                     }
                 }
-
-#if TEST_PROFILES
-				// TODO
-				foreach (var player in players
-					.Take(10)
-					.Select(p => p.Value))
-				{
-					var id = (player.User as SteamUser).Id;
-					WriteLine($"[{id}] {player.User.Name}");
-					_ = await client.GetProfileAsync(id):
-				}
-#endif
             }
         }
 
@@ -181,7 +172,7 @@ namespace Portal2Boards.Test
         // fastest one, so this doesn't check if it is their current personal best
         public async Task TestRuleOne()
         {
-            using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+            using (var client = new Portal2BoardsClient(UserAgent, false))
             {
                 client.Log += Logger.LogPortal2Boards;
 
@@ -214,7 +205,7 @@ namespace Portal2Boards.Test
         // Also not a real bug but useful for moderators
         public async Task TestRuleTwo()
         {
-            using (var client = new Portal2BoardsClient("BugHunter/1.0", false))
+            using (var client = new Portal2BoardsClient(UserAgent, false))
             {
                 client.Log += Logger.LogPortal2Boards;
 
