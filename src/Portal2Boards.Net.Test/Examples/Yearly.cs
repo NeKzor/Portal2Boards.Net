@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using Portal2Boards;
 using Portal2Boards.Extensions;
 
-namespace Portal2Boards.Test.Examples.History
+namespace Portal2Boards.Test.Examples.Yearly
 {
-    internal class HistoryMap
+    internal class YearlyMap
     {
         public Portal2Map Map { get; set; }
         public List<IChangelogEntry> Records { get; set; }
 
-        public HistoryMap(Portal2Map map)
+        public YearlyMap(Portal2Map map)
         {
             Map = map;
             Records = new List<IChangelogEntry>();
@@ -35,41 +35,40 @@ namespace Portal2Boards.Test.Examples.History
             Records.Add(entry);
         }
     }
-    internal class HistoryYear
+    internal class YearlyYear
     {
         public int Year { get; set; }
-        public List<HistoryMap> Maps { get; set; }
+        public List<YearlyMap> Maps { get; set; }
 
-        public HistoryYear(int year)
+        public YearlyYear(int year)
         {
             Year = year;
-            Maps = new List<HistoryMap>();
+            Maps = new List<YearlyMap>();
         }
-        public HistoryYear(HistoryYear history)
+        public YearlyYear(YearlyYear history)
         {
             Year = history.Year + 1;
-            Maps = new List<HistoryMap>();
-            Maps.AddRange(history.Maps);
+            Maps = new List<YearlyMap>();
         }
-        public HistoryMap GetOrAddNew(Portal2Map map)
+        public YearlyMap GetOrAddNew(Portal2Map map)
         {
             var result = Maps.FirstOrDefault(m => m.Map.BestTimeId == map.BestTimeId);
             if (result == null)
-                Maps.Add(result = new HistoryMap(map));
+                Maps.Add(result = new YearlyMap(map));
             return result;
         }
     }
-    internal class History
+    internal class Yearly
     {
         public const uint Version = 1;
 
         private readonly List<string> _page;
         private readonly Portal2BoardsClient _client;
 
-        public History()
+        public Yearly()
         {
             _page = new List<string>();
-            _client = new Portal2BoardsClient($"History/{Version}.0");
+            _client = new Portal2BoardsClient($"Yearly/{Version}.0");
             _client.Log += Logger.LogPortal2Boards;
         }
 
@@ -92,7 +91,7 @@ namespace Portal2Boards.Test.Examples.History
         }
         public async Task GenerateRecordsAsync(Portal2MapType mode, int from, int to)
         {
-            var years = new List<HistoryYear>();
+            var years = new List<YearlyYear>();
             var year = from;
 
             StartSection((mode == Portal2MapType.SinglePlayer) ? $"sp" : $"coop", (mode == Portal2MapType.SinglePlayer) ? "Single Player" : "Cooperative");
@@ -101,7 +100,6 @@ namespace Portal2Boards.Test.Examples.History
 
             var changelog = await _client.GetChangelogAsync(q =>
             {
-                //q.WorldRecord = true;
                 q.Banned = false;
                 q.MaxDaysAgo = 3333;
             });
@@ -134,12 +132,11 @@ namespace Portal2Boards.Test.Examples.History
                     .OrderBy(m => m.Index)
                     .ToList();
 
-                var history = default(HistoryYear);
-                history = (years.Any()) ? new HistoryYear(years.Last()) : new HistoryYear(year);
+                var history = default(YearlyYear);
+                history = (years.Any()) ? new YearlyYear(years.Last()) : new YearlyYear(year);
                 years.Add(history);
 
                 var yearentries = changelog.Entries
-                    .Where(e => (e.Rank.Current ?? 0) == 1)
                     .Where(e => e.Date != null && e.Date.Value.Year == history.Year);
 
                 foreach (var map in maps)
@@ -303,12 +300,12 @@ $@"         <ul class=""tabs tabs-transparent"">
         private void StartPage()
         {
             _page.Insert(0,
-$@"<!-- src/Portal2Boards.Net.Test/Examples/History.cs -->
+$@"<!-- src/Portal2Boards.Net.Test/Examples/Yearly.cs -->
 <!-- v{Version}.0 -->
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>History | nekzor.github.io</title>
+		<title>Yearly | nekzor.github.io</title>
 		<link href=""https://fonts.googleapis.com/css?family=Roboto"" rel=""stylesheet"">
 		<link href=""https://fonts.googleapis.com/icon?family=Material+Icons"" rel=""stylesheet"">
 		<link href=""https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-alpha.4/css/materialize.min.css"" rel=""stylesheet"">
@@ -322,11 +319,11 @@ $@"<!-- src/Portal2Boards.Net.Test/Examples/History.cs -->
                     <a href=""#"" data-target=""slide-out"" class=""sidenav-trigger show-on-large""><i class=""material-icons"">menu</i></a>
                     <a href=""index.html"">&nbsp;&nbsp;&nbsp;nekzor.github.io</a>
                     <a class=""breadcrumb""></a>
-                    <a href=""history.html"">History</a>
+                    <a href=""yearly.html"">Yearly</a>
                 </div>
                 <div class=""col s12 hide-on-med-and-up"">
                     <a href=""#"" data-target=""slide-out"" class=""sidenav-trigger""><i class=""material-icons"">menu</i></a>
-                    <a href=""history.html"" class=""brand-logo center"">History</a>
+                    <a href=""yearly.html"" class=""brand-logo center"">Yearly</a>
                 </div>
             </div>
 			<div class=""nav-content"">
@@ -352,9 +349,9 @@ $@"		<div id=""about"">
 			<div class=""row""></div>
 			<div class=""row"">
 				<div class=""col s12 m12 l8 push-l2"">
-					<h3>board.iverb.me History</h3>
+					<h3>board.iverb.me Yearly</h3>
                     <p>
-                        All end-of-year world records since 2013, when it was board.ncla.me back then.
+                        Fastest time every year since 2013, when it was board.ncla.me back then.
                     </p>
                     <br>
                     <h6>Made with <a class=""link"" href=""https://github.com/NeKzor/Portal2Boards.Net"">Portal2Boards.Net</a></h6>

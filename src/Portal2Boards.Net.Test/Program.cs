@@ -7,6 +7,7 @@ using Portal2Boards.API;
 using Portal2Boards.Extensions;
 using Portal2Boards.Test.Examples;
 using Portal2Boards.Test.Examples.History;
+using Portal2Boards.Test.Examples.Yearly;
 using static System.Console;
 
 namespace Portal2Boards.Test
@@ -40,6 +41,7 @@ namespace Portal2Boards.Test
 
             GenerateLeaderboardPage();
             GenerateHistoryPage();
+            GenerateYearlyPage();
 
             StartTwitterBot();
 
@@ -259,6 +261,15 @@ namespace Portal2Boards.Test
             var lb = new History();
             lb.Build().GetAwaiter().GetResult();
             lb.ExportPage("gh-pages/history.html").GetAwaiter().GetResult();
+        }
+
+        // Example 3 (Yearly.cs)
+        [Conditional("YEARLY")]
+        public static void GenerateYearlyPage()
+        {
+            var lb = new Yearly();
+            lb.Build().GetAwaiter().GetResult();
+            lb.ExportPage("gh-pages/yearly.html").GetAwaiter().GetResult();
         }
 
         [Conditional("BUG_TEST")]

@@ -12,6 +12,7 @@ Client includes automatic caching system and exception event for logging purpose
 - [nekzor.github.io/history](https://nekzor.github.io/history)
 - [nekzor.github.io/skill](https://nekzor.github.io/skill)
 - [nekzor.github.io/seum](https://nekzor.github.io/seum)
+- [nekzor.github.io/seum](https://nekzor.github.io/yearly)
 - [NeKzBot](https://github.com/NeKzor/NeKzBot)
 
 ## Credits

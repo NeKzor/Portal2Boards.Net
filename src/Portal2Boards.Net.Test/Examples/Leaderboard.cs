@@ -204,13 +204,14 @@ namespace Portal2Boards.Test.Examples
             // Data, single API call
             var changelog = await _client.GetChangelogAsync(q =>
             {
-                q.WorldRecord = true;
+                //q.WorldRecord = true;
                 q.Banned = false;
                 q.MaxDaysAgo = 3333;
             });
 
             var wrh = new List<RecordHolder>();
-            foreach (var entry in changelog.Entries)
+            foreach (var entry in changelog.Entries
+                .Where(e => (e.Rank.Current ?? 0) == 1))
             {
                 var map = Portal2Map.Search(entry.MapId);
                 var wr = new Record()
@@ -989,6 +990,7 @@ $@"<!-- src/Portal2Boards.Net.Test/Examples/Leaderboard.cs -->
             <li><a href=""history.html"">History</a></li>
             <li><a href=""skill.html"">Skill Points</a></li>
             <li><a href=""seum.html"">SEUM</a></li>
+            <li><a href=""yearly.html"">Yearly</a></li>
         </ul>");
         }
         private void EndPage()
@@ -1038,7 +1040,7 @@ $@"                 <li class=""tab""><a href=""#{id}"">{title}</a></li>");
             _page.Add(
 $@"		<div class=""row"">
 			<div class=""col s12 m12 l{colLength} push-l{pushLength}"">
-				<table class=""highlight"">
+				<table>
 					<thead>
 						<tr>");
             foreach (var item in items)
