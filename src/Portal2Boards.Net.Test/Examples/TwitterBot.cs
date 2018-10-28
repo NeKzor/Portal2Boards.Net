@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Portal2Boards.Extensions;
 
-namespace Portal2Boards.Test.Examples
+namespace Portal2Boards.Test.Examples.Twitter
 {
     // This is a copy of NeKzBot (https://github.com/NeKzor/NeKzBot)
     internal static class Twitter

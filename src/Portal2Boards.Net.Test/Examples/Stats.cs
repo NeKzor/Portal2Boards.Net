@@ -7,19 +7,19 @@ using System.Threading.Tasks;
 using Portal2Boards;
 using Portal2Boards.Extensions;
 
-namespace Portal2Boards.Test.Examples
+namespace Portal2Boards.Test.Examples.Stats
 {
-    internal class Leaderboard
+    internal class Stats
     {
         public const uint Version = 4;
 
         private readonly List<string> _page;
         private readonly Portal2BoardsClient _client;
 
-        public Leaderboard()
+        public Stats()
         {
             _page = new List<string>();
-            _client = new Portal2BoardsClient($"Leaderboard/{Version}.0");
+            _client = new Portal2BoardsClient($"Stats/{Version}.0", clientTimeout: 5 * 60);
             _client.Log += Logger.LogPortal2Boards;
         }
 
@@ -209,9 +209,10 @@ namespace Portal2Boards.Test.Examples
                 q.MaxDaysAgo = 3333;
             });
 
+            var entries = changelog.Entries.Where(e => (e.Rank.Current ?? 0) == 1);
+
             var wrh = new List<RecordHolder>();
-            foreach (var entry in changelog.Entries
-                .Where(e => (e.Rank.Current ?? 0) == 1))
+            foreach (var entry in entries)
             {
                 var map = Portal2Map.Search(entry.MapId);
                 var wr = new Record()
@@ -241,7 +242,7 @@ namespace Portal2Boards.Test.Examples
             var maps = new List<RecordMap>();
             foreach (var map in Portal2.CampaignMaps.Where(m => m.Exists))
             {
-                var wrs = changelog.Entries
+                var wrs = entries
                     .Where(e => e.MapId == map.BestTimeId)
                     .OrderBy(e => e.Date)
                     .ToList();
@@ -318,13 +319,13 @@ namespace Portal2Boards.Test.Examples
 
             // Activity
             Title("Activity");
-            StartTable(6, 3, "Year/Month", "Total", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            StartTable(6, 3, "Year", "Total", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
             for (int i = 2013; i < 2019; i++)
             {
-                var year = changelog.Entries
+                var year = entries
                     .Where(r => r.Date.Value.Year == i)
                     .ToList();
-                var oyear = changelog.Entries
+                var oyear = entries
                     .Where(r => Portal2Map.Search(r.MapId).IsOfficial)
                     .Where(r => r.Date.Value.Year == i)
                     .ToList();
@@ -348,8 +349,8 @@ namespace Portal2Boards.Test.Examples
             }
             EndTable();
 
-            // Most World Records per Year
-            Title("Most Records per Year");
+            // Most World Records each Year
+            Title("Most Records each Year");
             StartTable(4, 4, "Year", "Player", "Total");
             for (int year = 2013; year < 2019; year++)
             {
@@ -364,13 +365,13 @@ namespace Portal2Boards.Test.Examples
                     .Where(rh => rh.Records
                         .Count(r => r.Date.Value.Year == year) == most))
                 {
-                    var recs = player.Records.Count(r => r.Date.Value.Year == year);
-                    var off = player.Records.Count(r => r.Map.IsOfficial);
+                    var recs = player.Records.Where(r => r.Date.Value.Year == year);
+                    var off = recs.Count(r => r.Map.IsOfficial);
 
                     _page.Add("<tr>");
                     _page.Add($"<td>{year}</td>");
                     _page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
-                    _page.Add($"<td title=\"{off} Official\">{recs}</td>");
+                    _page.Add($"<td title=\"{off} Official\">{recs.Count()}</td>");
                     _page.Add("</tr>");
                 }
             }
@@ -434,7 +435,7 @@ namespace Portal2Boards.Test.Examples
                 {
                     if (!m.Records.Any(r => r.Date.Value.Year <= year))
                     {
-                        Console.WriteLine($"Ignored {m.Map.Alias} at {year}.");
+                        Console.WriteLine($"Ignored {m.Map.Alias} in {year}.");
                         return 0;
                     }
                     return m.Records
@@ -644,7 +645,7 @@ namespace Portal2Boards.Test.Examples
                     if (total.Count() > 0) active++;
                     _page.Add($"<td title=\"{official.Count()} Official\">{total.Count()}</td>");
                 }
-                if (active == 6)
+                if (active == 2019 - 2013)
                     always.Add(player);
                 _page.Add("</tr>");
             }
@@ -652,7 +653,7 @@ namespace Portal2Boards.Test.Examples
 
             // Activity
             Title("Activity");
-            StartTable(6, 3, "Year/Month", "Total", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+            StartTable(6, 3, "Year", "Total", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
             for (int i = 2013; i < 2019; i++)
             {
                 var year = changelog.Entries
@@ -684,8 +685,8 @@ namespace Portal2Boards.Test.Examples
             }
             EndTable();
 
-            // Most Records per Year
-            Title("Most Records per Year");
+            // Most Records each Year
+            Title("Most Records each Year");
             StartTable(4, 4, "Year", "Player", "Total");
             for (int year = 2013; year < 2019; year++)
             {
@@ -701,8 +702,8 @@ namespace Portal2Boards.Test.Examples
                     .Where(rh => rh.Records.Count(r => r.Date.Value.Year == year) == most);
                 foreach (var player in mostrecs)
                 {
-                    var recs = player.Records.Count(r => r.Date.Value.Year == year);
-                    var off = player.Records.Count(r => r.Map.IsOfficial);
+                    var recs = player.Records.Where(r => r.Date.Value.Year == year);
+                    var off = recs.Count(r => r.Map.IsOfficial);
 
                     _page.Add("<tr>");
                     if (!once)
@@ -711,18 +712,18 @@ namespace Portal2Boards.Test.Examples
                         once = true;
                     }
                     _page.Add($"<td><a class=\"link\" href=\"https://board.iverb.me/profile/{player.Player.Id}\">{player.Player.Name}</a></td>");
-                    _page.Add($"<td title=\"{off} Official\">{recs}</td>");
+                    _page.Add($"<td title=\"{off} Official\">{recs.Count()}</td>");
                     _page.Add("</tr>");
                 }
             }
             EndTable();
 
             // At Least One Record Every Year
-            Title("Activity Since 2013");
+            Title("Active since 2013");
             StartTable(6, 3, "Player", "Total", "2013", "2014", "2015", "2016", "2017", "2018");
             foreach (var player in always
                 .OrderByDescending(h => h.Records.Count)
-                .Take(10))
+                .Take(20))
             {
                 var recs = player.Records.Count;
                 var off = player.Records.Count(r => r.Map.IsOfficial);
@@ -740,7 +741,7 @@ namespace Portal2Boards.Test.Examples
             }
             EndTable();
 
-            // New Players per Year
+            // New Players each Year
             Title("New Players");
             StartTable(4, 4, "Year", "Players", "Total", "Growth");
             var peeps = all
@@ -951,7 +952,7 @@ namespace Portal2Boards.Test.Examples
         private void StartPage()
         {
             _page.Insert(0,
-$@"<!-- src/Portal2Boards.Net.Test/Examples/Leaderboard.cs -->
+$@"<!-- src/Portal2Boards.Net.Test/Examples/Stats.cs -->
 <!-- v{Version}.0 -->
 <!DOCTYPE html>
 <html>

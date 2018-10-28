@@ -68,7 +68,7 @@ namespace Portal2Boards.Test.Examples.Yearly
         public Yearly()
         {
             _page = new List<string>();
-            _client = new Portal2BoardsClient($"Yearly/{Version}.0");
+            _client = new Portal2BoardsClient($"Yearly/{Version}.0", clientTimeout: 5 * 60);
             _client.Log += Logger.LogPortal2Boards;
         }
 
@@ -83,8 +83,8 @@ namespace Portal2Boards.Test.Examples.Yearly
         {
             var watch = Stopwatch.StartNew();
             _page.Clear();
-            await GenerateRecordsAsync(Portal2MapType.SinglePlayer, 2013, 2018);
-            await GenerateRecordsAsync(Portal2MapType.Cooperative, 2013, 2018);
+            await GenerateRecordsAsync(Portal2MapType.SinglePlayer, 2012, 2018);
+            await GenerateRecordsAsync(Portal2MapType.Cooperative, 2012, 2018);
             StartPage();
             EndPage();
             _page.Insert(0, $"<!-- Generated static page in {watch.Elapsed.TotalSeconds} seconds. -->");
@@ -119,7 +119,7 @@ namespace Portal2Boards.Test.Examples.Yearly
                 }
 
                 StartSectionSection((mode == Portal2MapType.SinglePlayer) ? $"sp-{year}" : $"coop-{year}", $"{year}");
-                StartTable(8, 2, (mode == Portal2MapType.SinglePlayer) ? "Map²" : "Map", "Time", "Player", "Date", "Duration", "Demo", "Video");
+                StartTable(8, 2, (mode == Portal2MapType.SinglePlayer) ? "Map" : "Map", "Time", "Player", "Date", "Duration", "Demo", "Video");
 
                 var totalscore = 0u;
                 var officialtotal = 0u;
@@ -128,7 +128,7 @@ namespace Portal2Boards.Test.Examples.Yearly
                     ? Portal2.SinglePlayerMaps
                     : Portal2.CooperativeMaps)
                     .Where(m => m.Exists)
-                    .Where(m => m.BestTimeId != 47817) // Propulsion Catch
+                    //.Where(m => m.BestTimeId != 47817) // Propulsion Catch
                     .OrderBy(m => m.Index)
                     .ToList();
 
@@ -280,7 +280,7 @@ namespace Portal2Boards.Test.Examples.Yearly
                 if (mode == Portal2MapType.SinglePlayer)
                 {
                     _page.Add("<br><br><sup>1</sup> Unofficial challenge mode map.");
-                    _page.Add("<br><sup>2</sup> Excluding Propulsion Catch.");
+                    //_page.Add("<br><sup>2</sup> Excluding Propulsion Catch.");
                 }
                 _page.Add("</div>");
 
@@ -351,7 +351,7 @@ $@"		<div id=""about"">
 				<div class=""col s12 m12 l8 push-l2"">
 					<h3>board.iverb.me Yearly</h3>
                     <p>
-                        Fastest time every year since 2013, when it was board.ncla.me back then.
+                        Fastest time every year since 2012, when it was board.ncla.me back then.
                     </p>
                     <br>
                     <h6>Made with <a class=""link"" href=""https://github.com/NeKzor/Portal2Boards.Net"">Portal2Boards.Net</a></h6>

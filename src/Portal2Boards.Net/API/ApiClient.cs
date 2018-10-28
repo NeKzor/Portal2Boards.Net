@@ -9,9 +9,10 @@ namespace Portal2Boards.API
     {
         private readonly HttpClient _client;
 
-        public ApiClient(string userAgent)
+        public ApiClient(string userAgent, uint timeout)
         {
             _client = new HttpClient();
+            _client.Timeout = TimeSpan.FromSeconds(timeout);
             _client.DefaultRequestHeaders.UserAgent.ParseAdd
             (
                 ((!string.IsNullOrEmpty(userAgent)) ? userAgent : string.Empty)

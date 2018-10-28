@@ -44,9 +44,10 @@ namespace Portal2Boards
             string userAgent = "",
             bool autoCache = true,
             uint? cacheResetTime = default,
-            bool noSsl = false)
+            bool noSsl = false,
+            uint clientTimeout = 100)
         {
-            _client = new ApiClient(userAgent);
+            _client = new ApiClient(userAgent, clientTimeout);
             _autoCache = autoCache;
             CacheResetTime = cacheResetTime ?? 5;
             NoSsl = noSsl;
