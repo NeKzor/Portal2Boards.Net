@@ -5,10 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Portal2Boards.API;
 using Portal2Boards.Extensions;
-using Portal2Boards.Test.Examples.History;
-using Portal2Boards.Test.Examples.Stats;
-using Portal2Boards.Test.Examples.Twitter;
-using Portal2Boards.Test.Examples.Yearly;
 using static System.Console;
 
 namespace Portal2Boards.Test
@@ -39,12 +35,6 @@ namespace Portal2Boards.Test
             GetDemo();
             GetWoS();
             GetDonator();
-
-            GenerateStatsPage();
-            GenerateHistoryPage();
-            GenerateYearlyPage();
-
-            StartTwitterBot();
 
             BugTestOne();
             BugTestTwo();
@@ -235,36 +225,6 @@ namespace Portal2Boards.Test
                 foreach (Donator donator in donators)
                     WriteLine($"[{donator.Id}] {donator.Player.Name} -> €{donator.DonationAmount:N2}");
             }
-        }
-
-        // Examples
-        [Conditional("STATS")]
-        public static void GenerateStatsPage()
-        {
-            var builder = new Stats();
-            builder.Build().GetAwaiter().GetResult();
-            builder.ExportPage("gh-pages/stats.html").GetAwaiter().GetResult();
-        }
-        [Conditional("HISTORY")]
-        public static void GenerateHistoryPage()
-        {
-            var builder = new History();
-            builder.Build().GetAwaiter().GetResult();
-            builder.ExportPage("gh-pages/history.html").GetAwaiter().GetResult();
-        }
-        [Conditional("YEARLY")]
-        public static void GenerateYearlyPage()
-        {
-            var builder = new Yearly();
-            builder.Build().GetAwaiter().GetResult();
-            builder.ExportPage("gh-pages/yearly.html").GetAwaiter().GetResult();
-        }
-        [Conditional("TWBOT")]
-        public static void StartTwitterBot()
-        {
-            var bot = new TwitterBot();
-            _ = bot.InitAsync();
-            _ = bot.RunAsync();
         }
 
         [Conditional("BUG_TEST")]
