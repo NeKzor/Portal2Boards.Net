@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.2</TargetFramework>
+    <TargetFrameworks>netstandard1.2;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Authors>NeKz</Authors>
     <Description>Retrieve Portal 2 challenge mode data from the speedrunning community board.iverb.me. Client includes automatic caching system and exception event for logging purposes.</Description>
     <Copyright>Copyright © NeKz 2017-2018</Copyright>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
 </Project>
