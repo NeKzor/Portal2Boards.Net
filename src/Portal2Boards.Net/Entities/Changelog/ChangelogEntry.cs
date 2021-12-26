@@ -31,15 +31,15 @@ namespace Portal2Boards
             => !(string.IsNullOrEmpty(YouTubeId));
 
         public string DemoUrl
-            => $"https://board.iverb.me/getDemo?id={Id}";
+            => $"https://board.portal2.sr/getDemo?id={Id}";
         public string VideoUrl
             => $"https://youtu.be/{YouTubeId}";
         public string Url
-            => $"https://board.iverb.me/chamber/{MapId}";
+            => $"https://board.portal2.sr/chamber/{MapId}";
         public string ImageUrl
-            => $"https://board.iverb.me/images/chambers/{MapId}.jpg";
+            => $"https://board.portal2.sr/images/chambers/{MapId}.jpg";
         public string ImageFullUrl
-            => $"https://board.iverb.me/images/chambers_full/{MapId}.jpg";
+            => $"https://board.portal2.sr/images/chambers_full/{MapId}.jpg";
         public string SteamUrl
             => $"https://steamcommunity.com/stats/Portal2/leaderboards/{MapId}";
 

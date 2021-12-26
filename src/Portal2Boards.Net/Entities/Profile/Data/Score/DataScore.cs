@@ -25,7 +25,7 @@ namespace Portal2Boards
             => !(string.IsNullOrEmpty(YouTubeId));
 
         public string DemoUrl
-            => $"https://board.iverb.me/getDemo?id={Id}";
+            => $"https://board.portal2.sr/getDemo?id={Id}";
         public string VideoUrl
             => $"https://youtu.be/{YouTubeId}";
 

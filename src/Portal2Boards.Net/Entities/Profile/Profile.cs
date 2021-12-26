@@ -35,7 +35,7 @@ namespace Portal2Boards
         public float? GlobalAveragePlace { get; private set; }
 
         public string Url
-            => $"https://board.iverb.me/profile/{Id}";
+            => $"https://board.portal2.sr/profile/{Id}";
         public string SteamUrl
             => $"https://steamcommunity.com/profiles/{Id}";
 

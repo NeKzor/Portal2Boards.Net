@@ -24,11 +24,11 @@ namespace Portal2Boards.Extensions
                 && (BestTimeId != default);
 
         public string Url
-            => $"https://board.iverb.me/chamber/{BestTimeId}";
+            => $"https://board.portal2.sr/chamber/{BestTimeId}";
         public string ImageUrl
-            => $"https://board.iverb.me/images/chambers/{BestTimeId}.jpg";
+            => $"https://board.portal2.sr/images/chambers/{BestTimeId}.jpg";
         public string ImageFullUrl
-            => $"https://board.iverb.me/images/chambers_full/{BestTimeId}.jpg";
+            => $"https://board.portal2.sr/images/chambers_full/{BestTimeId}.jpg";
         public string BestTimeSteamUrl
             => $"https://steamcommunity.com/stats/Portal2/leaderboards/{BestTimeId}";
         public string BestPortalsSteamUrl

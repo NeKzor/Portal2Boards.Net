@@ -10,7 +10,7 @@ namespace Portal2Boards
 {
     public sealed class Portal2BoardsClient : IDisposable
     {
-        public string BaseApiUrl => $"http{((NoSsl) ? string.Empty : "s")}://board.iverb.me";
+        public string BaseApiUrl => $"http{((NoSsl) ? string.Empty : "s")}://board.portal2.sr";
         public event Func<object, LogMessage, Task> Log;
 
         // Config

@@ -22,7 +22,7 @@ namespace Portal2Boards
         public string Comment { get; private set; }
 
         public string DemoUrl
-            => $"https://board.iverb.me/getDemo?id={ChangelogId}";
+            => $"https://board.portal2.sr/getDemo?id={ChangelogId}";
         public string VideoUrl
             => $"https://youtu.be/{YouTubeId}";
 

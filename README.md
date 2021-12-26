@@ -3,20 +3,20 @@
 [![Release Version](https://img.shields.io/github/release/NeKzor/Portal2Boards.Net.svg)](https://github.com/NeKzor/Portal2Boards.Net/releases)
 [![NuGet Version](https://img.shields.io/nuget/v/Portal2Boards.Net.svg)](https://www.nuget.org/packages/Portal2Boards.Net)
 
-Retrieve Portal 2 challenge mode data from the speedrunning community [board.iverb.me](https://board.iverb.me).
+Retrieve Portal 2 challenge mode data from the speedrunning community [board.portal2.sr](https://board.portal2.sr).
 Client includes automatic caching system and exception event for logging purposes.
 
 ## Examples
 
-- [nekzor.github.io/stats](https://nekzor.github.io/stats)
-- [nekzor.github.io/history](https://nekzor.github.io/history)
-- [nekzor.github.io/skill](https://nekzor.github.io/skill)
-- [nekzor.github.io/seum](https://nekzor.github.io/seum)
-- [nekzor.github.io/seum](https://nekzor.github.io/yearly)
+- [nekz.me/stats](https://nekz.me/stats)
+- [nekz.me/history](https://nekz.me/history)
+- [nekz.me/skill](https://nekz.me/skill)
+- [nekz.me/seum](https://nekz.me/seum)
+- [nekz.me/yearly](https://nekz.me/yearly)
 - [NeKzBot](https://github.com/NeKzor/NeKzBot)
 
 ## Credits
-- [Portal2Boards](https://github.com/iVerb1/Portal2Boards)
+- [Portal2Boards](https://github.com/p2sr/Portal2Boards)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 
 ## Documentation
